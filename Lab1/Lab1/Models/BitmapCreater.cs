@@ -13,8 +13,6 @@ namespace Lab1.Models
         private int _columns;
         private int _rows;
         private int _stride;
-        
-        // todo: думать куда сохранять путь к новому файлу, пока менять локально для себя
         private string _path;
 
         public Bitmap CreateP5Bit8(FileHeaderInfo header, byte[] bytes)
@@ -56,40 +54,6 @@ namespace Lab1.Models
             Bitmap im = new Bitmap(_columns, _rows, _stride, 
                 _pixelFormat, 
                 scan0);
-
-            return im;
-        }
-
-        public Bitmap CreateP5Bit16(FileHeaderInfo header, byte[] bytes)
-        {
-            _pixelFormat = PixelFormat.Format24bppRgb;
-            
-            _columns = header.Width;
-            _rows = header.Height;
-            _stride = _columns * 2;
-            var bytePtr = Marshal.AllocHGlobal(bytes.Length);
-            Marshal.Copy(bytes, 0, bytePtr, bytes.Length);
-
-            Bitmap im = new Bitmap(_columns, _rows, _stride, 
-                _pixelFormat, 
-                Marshal.UnsafeAddrOfPinnedArrayElement(bytes, 0));
-
-            return im;
-        }
-
-        public Bitmap CreateP6Bit16(FileHeaderInfo header, byte[] bytes)
-        {
-            _pixelFormat = PixelFormat.Format24bppRgb;
-            
-            _columns = header.Width;
-            _rows = header.Height;
-            _stride = _columns * 6;
-            var bytePtr = Marshal.AllocHGlobal(bytes.Length);
-            Marshal.Copy(bytes, 0, bytePtr, bytes.Length);
-
-            Bitmap im = new Bitmap(_columns, _rows, _stride, 
-                _pixelFormat, 
-                Marshal.UnsafeAddrOfPinnedArrayElement(bytes, 0));
 
             return im;
         }

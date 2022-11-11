@@ -9,7 +9,6 @@ public class FileHeaderInfo
     public int Width { get; }
     public int Height { get; }
     public int MaxColorLevel { get; }
-
     public int PixelSize { get; }
 
     public FileHeaderInfo(string header)
@@ -28,11 +27,6 @@ public class FileHeaderInfo
         if (FileFormat.Equals("P6"))
         {
             PixelSize *= 3;
-        }
-
-        if (MaxColorLevel == 65535)
-        {
-            PixelSize *= 2;
         }
     }
 }

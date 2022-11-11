@@ -84,26 +84,13 @@ public class PortableAnyMapModel
                 {
                     ChangeToBGR();
                 }
+
                 newImage = cr.CreateP6Bit8(_header, _bytesOfImage);
-                break;
-            }
-            case "P6" when _header.MaxColorLevel == 65535:
-            {
-                if (!ColorType)
-                {
-                    ChangeToBGR();
-                }
-                newImage = cr.CreateP6Bit16(_header, _bytesOfImage);
                 break;
             }
             case "P5" when _header.MaxColorLevel == 255:
             {
                 newImage = cr.CreateP5Bit8(_header, _bytesOfImage);
-                break;
-            }
-            case "P5" when _header.MaxColorLevel == 65535:
-            {
-                newImage = cr.CreateP5Bit16(_header, _bytesOfImage);
                 break;
             }
         }
