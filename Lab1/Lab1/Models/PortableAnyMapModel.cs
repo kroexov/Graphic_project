@@ -14,10 +14,10 @@ public class PortableAnyMapModel
     private int _index;
     private FileHeaderInfo _header;
     
-    private String ExtractHeaderInfo()
+    private string ExtractHeaderInfo()
     {
-        String header = "";
-        int lineBreakCounter = 0;
+        var header = "";
+        var lineBreakCounter = 0;
         const int codeOfLineBreakChar = 10;
         _index = 0;
 
@@ -56,7 +56,7 @@ public class PortableAnyMapModel
         }
 
         _bytes = File.ReadAllBytes(filePath);
-        string headerInfo = ExtractHeaderInfo();
+        var headerInfo = ExtractHeaderInfo();
         _header = new FileHeaderInfo(headerInfo);
         ExtractImageBytes();
 
@@ -68,13 +68,13 @@ public class PortableAnyMapModel
 
     public string AfterOpenFileLogic(string filePath)
     {
-        BitmapCreate cr = new BitmapCreate();
-        Bitmap newImage = new Bitmap(3, 3);
-        string fileName = Path.GetFileName(filePath);
+        var cr = new BitmapCreate();
+        var newImage = new Bitmap(3, 3);
+        var fileName = Path.GetFileName(filePath);
         fileName = fileName.Substring(0, fileName.Length - 3) + "bmp";
-        string pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
         pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-        string fullFileName = pathSaveFile + "\\imgFiles\\" + fileName;
+        var fullFileName = pathSaveFile + "\\imgFiles\\" + fileName;
 
         switch (_header.FileFormat)
         {
@@ -82,7 +82,7 @@ public class PortableAnyMapModel
             {
                 if (!ColorType)
                 {
-                    ChangeToBGR();
+                    ChangeToBgr();
                 }
 
                 newImage = cr.CreateP6Bit8(_header, _bytesOfImage);
@@ -99,17 +99,14 @@ public class PortableAnyMapModel
         return fullFileName;
     }
 
-    static void Swap<T>(ref T lhs, ref T rhs)
+    private static void Swap<T>(ref T lhs, ref T rhs)
     {
-        T temp;
-        temp = lhs;
-        lhs = rhs;
-        rhs = temp;
+        (lhs, rhs) = (rhs, lhs);
     }
 
-    public void ChangeToBGR()
+    private void ChangeToBgr()
     {
-        for (int i = 0; i < _bytesOfImage.Length - 2; i += 3)
+        for (var i = 0; i < _bytesOfImage.Length - 2; i += 3)
         {
             Swap(ref _bytesOfImage[i], ref _bytesOfImage[i + 2]);
         }
