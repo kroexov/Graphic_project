@@ -4,32 +4,42 @@ using Lab1.Models;
 
 namespace Lab1.TypeFileImg;
 
-public abstract class PNM
+public abstract class Pnm
 {
-    protected FileHeaderInfo _header;
+    #region Private/protected fields
+
+    protected FileHeaderInfo Header;
     private int _index;
-    protected double[] _data;
-    
-    protected PNM(byte[] bytes)
+    protected double[] Data;
+
+    #endregion
+
+    #region Public abstract methods
+
+    public abstract Bitmap CreateBitmap();
+
+    public abstract void ConvertColor(ColorSpace colorSpace);
+
+    #endregion
+
+    #region Private/protected methods
+
+    protected Pnm(byte[] bytes)
     {
-        _header = new FileHeaderInfo(ExtractHeaderInfo(bytes));
+        Header = new FileHeaderInfo(ExtractHeaderInfo(bytes));
         
-        _data = new double[_header.Width * _header.Height * _header.PixelSize];
-        for (var i = 0; i < _header.Width * _header.Height * _header.PixelSize; i++)
+        Data = new double[Header.Width * Header.Height * Header.PixelSize];
+        for (var i = 0; i < Header.Width * Header.Height * Header.PixelSize; i++)
         {
-            _data[i] = Convert.ToDouble(bytes[i + _index]) / 255.0;
+            Data[i] = Convert.ToDouble(bytes[i + _index]) / 255.0;
         }
         
-        if (_header.Width * _header.Height > bytes.Length - _index)
+        if (Header.Width * Header.Height > bytes.Length - _index)
         {
             throw new Exception("Damaged file");
         }
     }
 
-    public abstract Bitmap CreateBitmap();
-
-    public abstract void ConvertColor(ColorSpace colorSpace);
-    
     private string ExtractHeaderInfo(byte[] bytes)
     {
         var header = "";
@@ -57,6 +67,8 @@ public abstract class PNM
 
     protected int GetCoordinates(int x, int y)
     {
-        return y * _header.Width + x;
+        return y * Header.Width + x;
     }
+
+    #endregion
 }

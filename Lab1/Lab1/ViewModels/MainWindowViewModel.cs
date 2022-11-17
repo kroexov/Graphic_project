@@ -16,7 +16,7 @@ namespace Lab1.ViewModels
 
         private string _data;
 
-        private string _selectedImage = string.Empty;
+        private string _selectedColorSpace;
 
         private ObservableCollection<string> _items = new ObservableCollection<string>();
         private ObservableCollection<string> _spaces = new ObservableCollection<string>()
@@ -36,7 +36,9 @@ namespace Lab1.ViewModels
         
         private string _errorText = "Неизвестная ошибка";
 
-        private bool _rgbMode = true;
+        private bool _redChannel = true;
+        private bool _greenChannel = true;
+        private bool _blueChannel = true;
 
         #endregion
 
@@ -53,23 +55,42 @@ namespace Lab1.ViewModels
 
         #region Public properties
 
-        public string SelectedImage
+        public string SelectedColorSpace
         {
-            get => _selectedImage;
+            get => _selectedColorSpace;
             set
             {
-                this.RaiseAndSetIfChanged(ref _selectedImage, value);
-                RaisePropertyChanged(nameof(IsImageSelected));
+                this.RaiseAndSetIfChanged(ref _selectedColorSpace, value);
             }
         }
 
-        public bool RgbMode
+        public bool RedChannel
         {
-            get => _rgbMode;
+            get => _redChannel;
             set
             {
-                this.RaiseAndSetIfChanged(ref _rgbMode, value);
-                _model.ColorType = _rgbMode;
+                this.RaiseAndSetIfChanged(ref _redChannel, value);
+                _model.ColorType = _redChannel;
+            } 
+        }
+        
+        public bool GreenChannel
+        {
+            get => _greenChannel;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _greenChannel, value);
+                _model.ColorType = _greenChannel;
+            } 
+        }
+        
+        public bool BlueChannel
+        {
+            get => _blueChannel;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _blueChannel, value);
+                _model.ColorType = _blueChannel;
             } 
         }
 
@@ -90,8 +111,6 @@ namespace Lab1.ViewModels
                 this.RaiseAndSetIfChanged(ref _errorText, value);
             }
         }
-
-        public bool IsImageSelected => SelectedImage != String.Empty;
         
         public ImageDisplayViewModel ImageDisplayViewModel { get; }
 
@@ -101,7 +120,6 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _spaces, value);
-                RaisePropertyChanged(nameof(IsImageSelected));
             }
         }
 
@@ -129,9 +147,7 @@ namespace Lab1.ViewModels
                 
                 _items.Add(result.First());
                 Data = File.ReadAllText(result.First());
-                _selectedImage = result.First(); // TODO: rework, delete this
-                OpenFile();
-                return;
+                OpenFile(result.First());
             }
         }
 
@@ -149,34 +165,23 @@ namespace Lab1.ViewModels
             }
         }
 
-        public void DeleteFile()
-        {
-            if (_items.Contains(_selectedImage))
-            {
-                _items.Remove(_selectedImage);
-                _selectedImage = String.Empty;
-                RaisePropertyChanged(nameof(IsImageSelected));
-            }
-        }
-
-        public void OpenFile()
+        public void OpenFile(string path)
         {
             bool isok = true;
             try
             {
-                _model.ReadFile(_selectedImage);
+                _model.ReadFile(path);
             }
             catch (Exception e)
             {
                 isok = false;
-                DeleteFile();
                 OnErrorHappened(e.Message);
             }
 
             if (isok)
             {
-                string _pathFile = _model.AfterOpenFileLogic(_selectedImage);
-                ImageDisplayViewModel.SetPath(_pathFile);
+                string pathFile = _model.AfterOpenFileLogic(path);
+                ImageDisplayViewModel.SetPath(pathFile);
             }
         }
 

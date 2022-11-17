@@ -1,16 +1,25 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace Lab1.TypeFileImg;
 
-public class PNG
+public class Png
 {
-    public PNG(byte[] bytes)
+    #region Construction
+
+    public Png(byte[] bytes)
     {
         
     }
 
+    #endregion
+
+    #region Public methods
+
     public Bitmap CreateBitmap()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
+
+    #endregion
 }

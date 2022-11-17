@@ -5,12 +5,19 @@ using Lab1.TypeFileImg;
 
 namespace Lab1.Models;
 
-public class PNMServices: IPNMServices
+public class PnmServices: IPnmServices
 {
+    #region Private fields
+
     private TypeFile _typeFile;
     private byte[] _bytes;
     private string _filePath;
-    private PNM _fileImg;
+    private Pnm _fileImg;
+    
+
+    #endregion
+
+    #region Public methods
 
     public void ReadFile(string filePath)
     {
@@ -23,7 +30,7 @@ public class PNMServices: IPNMServices
         _typeFile = FindTypeFile();
         _filePath = filePath;
 
-        _fileImg = FindPNMImg();
+        _fileImg = FindPnmImg();
 
         var test  = _fileImg.CreateBitmap();
         test.Save("C:\\Users\\dewor\\Desktop\\test1.bmp", ImageFormat.Bmp);
@@ -39,6 +46,9 @@ public class PNMServices: IPNMServices
         throw new NotImplementedException();
     }
 
+    #endregion
+    
+    #region Private methods
 
     private TypeFile FindTypeFile()
     {
@@ -58,13 +68,13 @@ public class PNMServices: IPNMServices
         }
         else if (res[1] == 'P' && res[1] == 'N' && res[1] == 'G')
         {
-            return TypeFile.PNG;
+            return TypeFile.Png;
         }
 
-        return TypeFile.ISFalseFile;
+        return TypeFile.IsFalseFile;
     }
 
-    private PNM FindPNMImg()
+    private Pnm FindPnmImg()
     {
         switch (_typeFile)
         {
@@ -80,4 +90,6 @@ public class PNMServices: IPNMServices
 
         return null;
     }
+
+    #endregion
 }

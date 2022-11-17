@@ -8,12 +8,18 @@ namespace Lab1.Models;
 
 public class PortableAnyMapModel
 {
+    #region Private fields
+
     public bool ColorType = true;
     private byte[] _bytes;
     private byte[] _bytesOfImage;
     private int _index;
     private FileHeaderInfo _header;
-    
+
+    #endregion
+
+    #region Private methods
+
     private string ExtractHeaderInfo()
     {
         var header = "";
@@ -47,6 +53,23 @@ public class PortableAnyMapModel
             _bytesOfImage[i] = _bytes[i + _index];
         }
     }
+    
+    private static void Swap<T>(ref T lhs, ref T rhs)
+    {
+        (lhs, rhs) = (rhs, lhs);
+    }
+
+    private void ChangeToBgr()
+    {
+        for (var i = 0; i < _bytesOfImage.Length - 2; i += 3)
+        {
+            Swap(ref _bytesOfImage[i], ref _bytesOfImage[i + 2]);
+        }
+    }
+
+    #endregion
+
+    #region Public methods
 
     public void ReadFile(String filePath)
     {
@@ -99,18 +122,11 @@ public class PortableAnyMapModel
         return fullFileName;
     }
 
-    private static void Swap<T>(ref T lhs, ref T rhs)
-    {
-        (lhs, rhs) = (rhs, lhs);
-    }
+    #endregion
 
-    private void ChangeToBgr()
-    {
-        for (var i = 0; i < _bytesOfImage.Length - 2; i += 3)
-        {
-            Swap(ref _bytesOfImage[i], ref _bytesOfImage[i + 2]);
-        }
-    }
+    #region Events
 
     public event Action<string>? ModelErrorHappened;
+
+    #endregion
 }

@@ -5,23 +5,29 @@ using Lab1.Models;
 
 namespace Lab1.TypeFileImg;
 
-public class P5 : PNM
+public class P5 : Pnm
 {
-    
+
+    #region Constructor
+
     public P5(byte[] bytes) : base(bytes)
     {
         
     }
 
+    #endregion
+
+    #region Public methods
+
     public override Bitmap CreateBitmap()
     {
-        var image = new Bitmap(_header.Width, _header.Height, PixelFormat.Format8bppIndexed);
+        var image = new Bitmap(Header.Width, Header.Height, PixelFormat.Format8bppIndexed);
 
-        for (var x = 0; x < _header.Width; x++)
+        for (var x = 0; x < Header.Width; x++)
         {
-            for (var y = 0; y < _header.Height; y++)
+            for (var y = 0; y < Header.Height; y++)
             {
-                var valueColor = 255 * _data[GetCoordinates(x, y)];
+                var valueColor = 255 * Data[GetCoordinates(x, y)];
                 Color newColor = Color.FromArgb((byte)Math.Round(valueColor, 8), (byte)Math.Round(valueColor, 8), (byte)Math.Round(valueColor, 8));
                 image.SetPixel(x, y, newColor);
             }
@@ -43,4 +49,6 @@ public class P5 : PNM
     {
         throw new NotImplementedException();
     }
+
+    #endregion
 }

@@ -9,11 +9,17 @@ namespace Lab1.Models
 {
     public class BitmapCreate
     {
+        #region Private fields
+
         private PixelFormat _pixelFormat;
         private int _columns;
         private int _rows;
         private int _stride;
         private string _path;
+
+        #endregion
+
+        #region Public Methods
 
         public Bitmap CreateP5Bit8(FileHeaderInfo header, byte[] bytes)
         {
@@ -26,15 +32,15 @@ namespace Lab1.Models
                 _pixelFormat, 
                 Marshal.UnsafeAddrOfPinnedArrayElement(bytes, 0));
             
-            ColorPalette _palette = im.Palette;
-            Color[] _entries = _palette.Entries;
+            ColorPalette palette = im.Palette;
+            Color[] entries = palette.Entries;
             for (int i = 0; i < 256; i++)
             {
                 Color b = new Color();
                 b = Color.FromArgb((byte)i, (byte)i, (byte)i);
-                _entries[i] = b;
+                entries[i] = b;
             }
-            im.Palette = _palette;
+            im.Palette = palette;
 
             return im;
         }
@@ -57,5 +63,7 @@ namespace Lab1.Models
 
             return im;
         }
+
+        #endregion
     }
 }

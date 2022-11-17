@@ -6,7 +6,7 @@ namespace Lab1.Views
 {
     public partial class MainWindow : Window
     {
-        private MainWindowViewModel mvm;
+        private MainWindowViewModel _mvm;
         
         public MainWindow()
         {
@@ -15,7 +15,7 @@ namespace Lab1.Views
         public MainWindow(MainWindowViewModel mvm)
         {
             InitializeComponent();
-            this.mvm = mvm;
+            this._mvm = mvm;
             mvm.OnErrorHappened += MvmOnOnErrorHappened;
         }
 

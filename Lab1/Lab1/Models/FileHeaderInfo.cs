@@ -5,11 +5,7 @@ namespace Lab1.Models;
 
 public class FileHeaderInfo
 {
-    public string FileFormat { get; }
-    public int Width { get; }
-    public int Height { get; }
-    public int MaxColorLevel { get; }
-    public int PixelSize { get; }
+    #region Constructor
 
     public FileHeaderInfo(string header)
     {
@@ -29,4 +25,16 @@ public class FileHeaderInfo
             PixelSize *= 3;
         }
     }
+
+    #endregion
+    
+    #region Public properties
+
+    public string FileFormat { get; }
+    public int Width { get; }
+    public int Height { get; }
+    public int MaxColorLevel { get; }
+    public int PixelSize { get; }
+
+    #endregion
 }

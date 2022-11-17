@@ -7,7 +7,7 @@ public class ImageDisplayViewModel : ViewModelBase
 {
     #region Private fields
 
-    private Bitmap? ImageToLoad;
+    private Bitmap? _imageToLoad;
 
     #endregion
 
@@ -24,8 +24,8 @@ public class ImageDisplayViewModel : ViewModelBase
 
     public Bitmap? ImageToLoadPublic
     {
-        get => ImageToLoad;
-        private set => this.RaiseAndSetIfChanged(ref ImageToLoad, value);
+        get => _imageToLoad;
+        private set => this.RaiseAndSetIfChanged(ref _imageToLoad, value);
     }
 
     #endregion

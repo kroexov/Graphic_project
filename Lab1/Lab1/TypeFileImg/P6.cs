@@ -5,22 +5,28 @@ using Lab1.Models;
 
 namespace Lab1.TypeFileImg;
 
-public class P6 : PNM
+public class P6 : Pnm
 {
+    #region Private fields
+
     private ColorSpace _colorSpace;
     private bool[] _colorСhannel;
     private Bitmap _img;
+
+    #endregion
+
+    #region Constructor
+
     public P6(byte[] bytes) : base(bytes)
     {
         _colorСhannel = new bool[] { true, true, true };
-        _colorSpace = ColorSpace.RGB;
+        _colorSpace = ColorSpace.Rgb;
     }
 
-    private void SetColorSpace(ColorSpace colorSpace)
-    {
-        _colorSpace = colorSpace;
-    }
+    #endregion
 
+    #region Public methods
+    
     public void SetColorCanal(int numColorCanal)
     {
         _colorСhannel[numColorCanal] = !_colorСhannel[numColorCanal];
@@ -28,25 +34,25 @@ public class P6 : PNM
 
     public override Bitmap CreateBitmap()
     {
-        var image = new Bitmap(_header.Width, _header.Height, PixelFormat.Format24bppRgb);
+        var image = new Bitmap(Header.Width, Header.Height, PixelFormat.Format24bppRgb);
 
-        for (var y = 0; y < _header.Height; y++)
+        for (var y = 0; y < Header.Height; y++)
         {
-            for (var x = 0; x < _header.Width; x++)
+            for (var x = 0; x < Header.Width; x++)
             {
-                var value1 = _data[GetCoordinates(3*x, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
-                var value2 = _data[GetCoordinates(3*x + 1, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
-                var value3 = _data[GetCoordinates(3*x + 2, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
+                var value1 = Data[GetCoordinates(3*x, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
+                var value2 = Data[GetCoordinates(3*x + 1, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
+                var value3 = Data[GetCoordinates(3*x + 2, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
                 
-                var rgbPixel = ConvertColorPixel(value1, value2, value3, ColorSpace.RGB);
+                var rgbPixel = ConvertColorPixel(value1, value2, value3, ColorSpace.Rgb);
                 
                 var valueRed = 255 * rgbPixel[0];
                 var valueGreen = 255 * rgbPixel[1];
                 var valueBlue = 255 * rgbPixel[2];
                 
                 Color newColor = Color.FromArgb((byte)Math.Round(valueRed),
-                                                (byte)Math.Round(valueGreen), 
-                                                (byte)Math.Round(valueBlue));
+                    (byte)Math.Round(valueGreen), 
+                    (byte)Math.Round(valueBlue));
                 
                 image.SetPixel(x, y, newColor);
             }
@@ -60,63 +66,67 @@ public class P6 : PNM
 
     public override void ConvertColor(ColorSpace colorSpace)
     {
-        if (_colorSpace == ColorSpace.RGB && colorSpace == ColorSpace.RGB)
+        if (_colorSpace == ColorSpace.Rgb && colorSpace == ColorSpace.Rgb)
         {
             return;
         }
         
-        if (_colorSpace != ColorSpace.RGB && colorSpace != ColorSpace.RGB)
+        if (_colorSpace != ColorSpace.Rgb && colorSpace != ColorSpace.Rgb)
         {
-            ConvertColor(ColorSpace.RGB);
+            ConvertColor(ColorSpace.Rgb);
         }
-        for (var y = 0; y < _header.Height; y++)
+        for (var y = 0; y < Header.Height; y++)
         {
-            for (var x = 0; x < _header.Width; x++)
+            for (var x = 0; x < Header.Width; x++)
             {
                 // значение цвета от 0 до 1;
-                var value1 = _data[GetCoordinates(3*x, 3*y)];
-                var value2 = _data[GetCoordinates(3*x + 1, 3*y)];
-                var value3 = _data[GetCoordinates(3*x + 2, 3*y)];
+                var value1 = Data[GetCoordinates(3*x, 3*y)];
+                var value2 = Data[GetCoordinates(3*x + 1, 3*y)];
+                var value3 = Data[GetCoordinates(3*x + 2, 3*y)];
                 
                 var newPixel = ConvertColorPixel(value1, value2, value3, colorSpace);
                 
-                _data[GetCoordinates(3*x, 3*y)] = newPixel[0];
-                _data[GetCoordinates(3*x + 1, 3*y)] = newPixel[1];
-                _data[GetCoordinates(3*x + 2, 3*y)] = newPixel[2];
+                Data[GetCoordinates(3*x, 3*y)] = newPixel[0];
+                Data[GetCoordinates(3*x + 1, 3*y)] = newPixel[1];
+                Data[GetCoordinates(3*x + 2, 3*y)] = newPixel[2];
             }
         }
         SetColorSpace(colorSpace);
     }
-    
+
+    #endregion
+
+    #region Private methods
+
     private double[] ConvertColorPixel(double value1, double value2, double value3, ColorSpace colorSpace)
     {
         double[] pixel;
 
-        if (_colorSpace == ColorSpace.RGB && colorSpace == ColorSpace.RGB)
+        if (_colorSpace == ColorSpace.Rgb && colorSpace == ColorSpace.Rgb)
         {
             return new[] {value1, value2, value3};
         }
 
-        if (_colorSpace == ColorSpace.RGB)
+        if (_colorSpace == ColorSpace.Rgb)
         {
             switch (colorSpace)
             {
-                case ColorSpace.HSL:
+                case ColorSpace.Hsl:
                 {
                     pixel = RgbToHsl(value1, value2, value3);
                     break;
                 }
-                case ColorSpace.HSV:
+                case ColorSpace.Hsv:
                 {
                     pixel = RgbToHsv(value1, value2, value3);
                     break;
                 }
-                case ColorSpace.YCbCR601:
+                case ColorSpace.YCbCr601:
                 {
                     pixel = RgbToYСbСr601(value1, value2, value3);
                     break;
                 }
-                case ColorSpace.YCbCR709:
+                case ColorSpace.YCbCr709:
                 {
                     pixel = RgbToYСbСr709(value1, value2, value3);
                     break;
@@ -126,7 +136,7 @@ public class P6 : PNM
                     pixel = RgbToYCoCg(value1, value2, value3);
                     break;
                 }
-                case ColorSpace.CMY:
+                case ColorSpace.Cmy:
                 {
                     pixel = RgbToCmy(value1, value2, value3);
                     break;
@@ -139,22 +149,22 @@ public class P6 : PNM
         {
             switch (_colorSpace)
             {
-                case ColorSpace.HSL:
+                case ColorSpace.Hsl:
                 {
                     pixel = HslToRgb(value1, value2, value3);
                     break;
                 }
-                case ColorSpace.HSV:
+                case ColorSpace.Hsv:
                 {
                     pixel = HsvToRgb(value1, value2, value3);
                     break;
                 }
-                case ColorSpace.YCbCR601:
+                case ColorSpace.YCbCr601:
                 {
                     pixel = YСbСr601ToRgb(value1, value2, value3);
                     break;
                 }
-                case ColorSpace.YCbCR709:
+                case ColorSpace.YCbCr709:
                 {
                     pixel = YСbСr709ToRgb(value1, value2, value3);
                     break;
@@ -164,7 +174,7 @@ public class P6 : PNM
                     pixel = YCoCgToRgb(value1, value2, value3);
                     break;
                 }
-                case ColorSpace.CMY:
+                case ColorSpace.Cmy:
                 {
                     pixel = CmyToRgb(value1, value2, value3);
                     break;
@@ -302,4 +312,11 @@ public class P6 : PNM
         
         return pixel;
     }
+    
+    private void SetColorSpace(ColorSpace colorSpace)
+    {
+        _colorSpace = colorSpace;
+    }
+
+    #endregion
 }
