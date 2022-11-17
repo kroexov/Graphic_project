@@ -12,10 +12,11 @@ public class P6 : PNM
     private Bitmap _img;
     public P6(byte[] bytes) : base(bytes)
     {
-        _colorСhannel = new bool[] { false, false, true };
+        _colorСhannel = new bool[] { true, true, true };
+        _colorSpace = ColorSpace.RGB;
     }
 
-    public void SetColorSpace(ColorSpace colorSpace)
+    private void SetColorSpace(ColorSpace colorSpace)
     {
         _colorSpace = colorSpace;
     }
@@ -33,9 +34,9 @@ public class P6 : PNM
         {
             for (var x = 0; x < _header.Width; x++)
             {
-                var value1 = _data[GetCoordinates(x, y)]  * Convert.ToInt32(_colorСhannel[0]);
-                var value2 = _data[GetCoordinates(x + 1, y)]  * Convert.ToInt32(_colorСhannel[0]);
-                var value3 = _data[GetCoordinates(x + 2, y)]  * Convert.ToInt32(_colorСhannel[0]);
+                var value1 = _data[GetCoordinates(3*x, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
+                var value2 = _data[GetCoordinates(3*x + 1, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
+                var value3 = _data[GetCoordinates(3*x + 2, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
                 
                 var rgbPixel = ConvertColorPixel(value1, value2, value3, ColorSpace.RGB);
                 
@@ -57,7 +58,7 @@ public class P6 : PNM
         return image;
     }
 
-    public void ConvertColor(ColorSpace colorSpace)
+    public override void ConvertColor(ColorSpace colorSpace)
     {
         if (_colorSpace == ColorSpace.RGB && colorSpace == ColorSpace.RGB)
         {
@@ -73,15 +74,15 @@ public class P6 : PNM
             for (var x = 0; x < _header.Width; x++)
             {
                 // значение цвета от 0 до 1;
-                var value1 = _data[GetCoordinates(x, y)];
-                var value2 = _data[GetCoordinates(x + 1, y)];
-                var value3 = _data[GetCoordinates(x + 2, y)];
+                var value1 = _data[GetCoordinates(3*x, 3*y)];
+                var value2 = _data[GetCoordinates(3*x + 1, 3*y)];
+                var value3 = _data[GetCoordinates(3*x + 2, 3*y)];
                 
                 var newPixel = ConvertColorPixel(value1, value2, value3, colorSpace);
                 
-                _data[GetCoordinates(x, y)] = newPixel[0];
-                _data[GetCoordinates(x + 1, y)] = newPixel[1];
-                _data[GetCoordinates(x + 2, y)] = newPixel[2];
+                _data[GetCoordinates(3*x, 3*y)] = newPixel[0];
+                _data[GetCoordinates(3*x + 1, 3*y)] = newPixel[1];
+                _data[GetCoordinates(3*x + 2, 3*y)] = newPixel[2];
             }
         }
         SetColorSpace(colorSpace);

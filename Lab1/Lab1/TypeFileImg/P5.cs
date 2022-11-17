@@ -38,4 +38,9 @@ public class P5 : PNM
 
         return image;
     }
+
+    public override void ConvertColor(ColorSpace colorSpace)
+    {
+        throw new NotImplementedException();
+    }
 }

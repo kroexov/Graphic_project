@@ -27,6 +27,8 @@ public abstract class PNM
     }
 
     public abstract Bitmap CreateBitmap();
+
+    public abstract void ConvertColor(ColorSpace colorSpace);
     
     private string ExtractHeaderInfo(byte[] bytes)
     {
@@ -55,6 +57,6 @@ public abstract class PNM
 
     protected int GetCoordinates(int x, int y)
     {
-        return _header.PixelSize * y * _header.Width + _header.PixelSize * x;
+        return y * _header.Width + x;
     }
 }

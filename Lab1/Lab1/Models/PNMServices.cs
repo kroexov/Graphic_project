@@ -31,7 +31,7 @@ public class PNMServices: IPNMServices
 
     public void ChangeColorSpace(ColorSpace newColorSpace)
     {
-        throw new NotImplementedException();
+        _fileImg.ConvertColor(newColorSpace);
     }
 
     public void ChangeColorChannel(bool[] newColorChannel)
