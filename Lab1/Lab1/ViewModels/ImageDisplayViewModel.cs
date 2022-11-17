@@ -5,11 +5,17 @@ namespace Lab1.ViewModels;
 
 public class ImageDisplayViewModel : ViewModelBase
 {
-    public ImageDisplayViewModel(string path)
+    public ImageDisplayViewModel()
     {
-        ImageToLoad = new Bitmap(path);
+        
     }
+    
     private Bitmap? ImageToLoad;
+
+    public void SetPath(string path)
+    {
+        ImageToLoadPublic = new Bitmap(path);
+    }
     public Bitmap? ImageToLoadPublic
     {
         get => ImageToLoad;

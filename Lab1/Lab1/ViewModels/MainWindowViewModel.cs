@@ -17,6 +17,16 @@ namespace Lab1.ViewModels
         private string _selectedImage = string.Empty;
 
         private ObservableCollection<string> _items = new ObservableCollection<string>();
+        private ObservableCollection<string> _spaces = new ObservableCollection<string>()
+        {
+            "RGB",
+            "HSL",
+            "HSV",
+            "YCbCr.601",
+            "YCbCr.709",
+            "YCoCg",
+            "CMY"
+        };
 
         private PortableAnyMapModel _model;
 
@@ -70,14 +80,17 @@ namespace Lab1.ViewModels
         {
             _model = model;
             model.ModelErrorHappened += (s => OnErrorHappened(s));
+            ImageDisplayViewModel = new ImageDisplayViewModel();
         }
 
-        public ObservableCollection<string> Items
+        public ImageDisplayViewModel ImageDisplayViewModel { get; }
+
+        public ObservableCollection<string> ColorSpaces
         {
-            get => _items;
+            get => _spaces;
             set
             {
-                this.RaiseAndSetIfChanged(ref _items, value);
+                this.RaiseAndSetIfChanged(ref _spaces, value);
                 RaisePropertyChanged(nameof(IsImageSelected));
             }
         }
@@ -99,13 +112,12 @@ namespace Lab1.ViewModels
             result = await ofd.ShowAsync(new Window());
             if (result != null)
             {
-                if (!Items.Contains(result.First()))
-                {
-                    _items.Add(result.First());
-                    Data = File.ReadAllText(result.First());
-                    return;
-                }
-                OnErrorHappened("Вы уже выбирали этот файл!");
+                
+                _items.Add(result.First());
+                Data = File.ReadAllText(result.First());
+                _selectedImage = result.First(); // TODO: rework, delete this
+                OpenFile();
+                return;
             }
         }
 
@@ -150,11 +162,7 @@ namespace Lab1.ViewModels
             if (isok)
             {
                 string _pathFile = _model.AfterOpenFileLogic(_selectedImage);
-                ImageDisplayWindow imageDisplayWindow = new ImageDisplayWindow()
-                {
-                    DataContext = new ImageDisplayViewModel(_pathFile)
-                };
-                imageDisplayWindow.Show();
+                ImageDisplayViewModel.SetPath(_pathFile);
             }
 
             
