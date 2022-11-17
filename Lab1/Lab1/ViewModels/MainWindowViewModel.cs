@@ -12,6 +12,8 @@ namespace Lab1.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase, INotifyPropertyChanged
     {
+        #region Private fields
+
         private string _data;
 
         private string _selectedImage = string.Empty;
@@ -35,6 +37,21 @@ namespace Lab1.ViewModels
         private string _errorText = "Неизвестная ошибка";
 
         private bool _rgbMode = true;
+
+        #endregion
+
+        #region Constructor
+
+        public MainWindowViewModel(PortableAnyMapModel model)
+        {
+            _model = model;
+            model.ModelErrorHappened += (s => OnErrorHappened(s));
+            ImageDisplayViewModel = new ImageDisplayViewModel();
+        }
+
+        #endregion
+
+        #region Public properties
 
         public string SelectedImage
         {
@@ -75,14 +92,7 @@ namespace Lab1.ViewModels
         }
 
         public bool IsImageSelected => SelectedImage != String.Empty;
-
-        public MainWindowViewModel(PortableAnyMapModel model)
-        {
-            _model = model;
-            model.ModelErrorHappened += (s => OnErrorHappened(s));
-            ImageDisplayViewModel = new ImageDisplayViewModel();
-        }
-
+        
         public ImageDisplayViewModel ImageDisplayViewModel { get; }
 
         public ObservableCollection<string> ColorSpaces
@@ -100,7 +110,11 @@ namespace Lab1.ViewModels
             get => _data;
             set => this.RaiseAndSetIfChanged(ref _data, value);
         }
-        
+
+        #endregion
+
+        #region Public methods
+
         public async void AddNewFile()
         {
             var ofd = new OpenFileDialog();
@@ -164,13 +178,12 @@ namespace Lab1.ViewModels
                 string _pathFile = _model.AfterOpenFileLogic(_selectedImage);
                 ImageDisplayViewModel.SetPath(_pathFile);
             }
-
-            
         }
 
-        public event Action<string> OnErrorHappened;
-        
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
+
+        #region Private methods
+
         private void RaisePropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
@@ -178,6 +191,17 @@ namespace Lab1.ViewModels
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        #endregion
+
+        #region Events
+
+        public event Action<string> OnErrorHappened;
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+        
     }
 }
 
