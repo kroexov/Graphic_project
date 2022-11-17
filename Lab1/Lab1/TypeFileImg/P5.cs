@@ -21,7 +21,7 @@ public class P5 : PNM
         {
             for (var y = 0; y < _header.Height; y++)
             {
-                var valueColor = _data[GetCoordinates(x, y)];
+                var valueColor = 255 * _data[GetCoordinates(x, y)];
                 Color newColor = Color.FromArgb((byte)Math.Round(valueColor, 8), (byte)Math.Round(valueColor, 8), (byte)Math.Round(valueColor, 8));
                 image.SetPixel(x, y, newColor);
             }

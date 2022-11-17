@@ -17,7 +17,7 @@ public abstract class PNM
         _data = new double[_header.Width * _header.Height * _header.PixelSize];
         for (var i = 0; i < _header.Width * _header.Height * _header.PixelSize; i++)
         {
-            _data[i] = Convert.ToDouble(bytes[i + _index]);
+            _data[i] = Convert.ToDouble(bytes[i + _index]) / 255.0;
         }
         
         if (_header.Width * _header.Height > bytes.Length - _index)
