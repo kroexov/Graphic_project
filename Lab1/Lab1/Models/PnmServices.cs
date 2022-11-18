@@ -38,6 +38,8 @@ public class PnmServices: IPnmServices
         var test  = _fileImg.CreateBitmap();
         test.Save(fullFileName, ImageFormat.Bmp);
         return fullFileName;
+        
+        
     }
 
     public void ChangeColorSpace(ColorSpace newColorSpace)
@@ -94,6 +96,12 @@ public class PnmServices: IPnmServices
 
         return null;
     }
+
+    #endregion
+    
+    #region Events
+
+    public event Action<string>? ModelErrorHappened;
 
     #endregion
 }

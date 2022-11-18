@@ -49,7 +49,7 @@ namespace Lab1.ViewModels
         public MainWindowViewModel(PnmServices model)
         {
             _model = model;
-            //model.ModelErrorHappened += (s => OnErrorHappened(s));
+            model.ModelErrorHappened += (s => OnErrorHappened(s));
             ImageDisplayViewModel = new ImageDisplayViewModel();
         }
 
