@@ -16,7 +16,9 @@ namespace Lab1.ViewModels
 
         private string _data;
 
-        private string _selectedColorSpace;
+        private string _currentPath;
+
+        private string _selectedColorSpace = "RGB";
 
         private ObservableCollection<string> _items = new ObservableCollection<string>();
         private ObservableCollection<string> _spaces = new ObservableCollection<string>()
@@ -61,6 +63,8 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _selectedColorSpace, value);
+                _model.ChangeColorSpace((ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
+                //ImageDisplayViewModel.SetPath();
             }
         }
 
@@ -144,9 +148,9 @@ namespace Lab1.ViewModels
             result = await ofd.ShowAsync(new Window());
             if (result != null)
             {
-                
                 _items.Add(result.First());
                 Data = File.ReadAllText(result.First());
+                _currentPath = result.First();
                 OpenFile(result.First());
             }
         }

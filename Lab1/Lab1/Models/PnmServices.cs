@@ -28,7 +28,6 @@ public class PnmServices: IPnmServices
         _bytes = File.ReadAllBytes(filePath);
         _typeFile = FindTypeFile();
         _filePath = filePath;
-
         _fileImg = FindPnmImg();
 
         var fileName = Path.GetFileName(filePath);

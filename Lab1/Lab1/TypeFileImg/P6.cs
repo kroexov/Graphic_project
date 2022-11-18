@@ -66,7 +66,7 @@ public class P6 : Pnm
 
     public override void ConvertColor(ColorSpace colorSpace)
     {
-        if (_colorSpace == ColorSpace.Rgb && colorSpace == ColorSpace.Rgb)
+        if (_colorSpace == colorSpace)
         {
             return;
         }
@@ -100,7 +100,7 @@ public class P6 : Pnm
 
     private double[] ConvertColorPixel(double value1, double value2, double value3, ColorSpace colorSpace)
     {
-        double[] pixel;
+        double[] pixel = new double[3];
 
         if (_colorSpace == ColorSpace.Rgb && colorSpace == ColorSpace.Rgb)
         {
@@ -118,7 +118,7 @@ public class P6 : Pnm
                 }
                 case ColorSpace.Hsv:
                 {
-                    pixel = RgbToHsv(value1, value2, value3);
+                    RgbToHsv(pixel, value1, value2, value3);
                     break;
                 }
                 case ColorSpace.YCbCr601:
@@ -233,14 +233,11 @@ public class P6 : Pnm
         return pixel;
     }
 
-    private double[] RgbToHsv(double red, double green, double blue)
+    private void RgbToHsv(double[] pixel, double red, double green, double blue)
     {
-        var pixel = new double[3];
         
         //начало конвертации
         //конец
-        
-        return pixel;
     }
 
     private double[] HsvToRgb(double h, double s, double l)
