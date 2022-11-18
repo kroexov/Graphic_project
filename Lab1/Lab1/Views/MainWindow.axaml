@@ -65,6 +65,14 @@
             <ToggleSwitch IsChecked="{Binding BlueChannel}" Margin="50 0 0 0" OnContent="On" OffContent="Off" FontSize="20" HorizontalContentAlignment="Center">Blue channel</ToggleSwitch>
             </StackPanel>
         </StackPanel>
+        <StackPanel VerticalAlignment="Top" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
+            <DockPanel>
+                <TextBox Width="150" Watermark="Значение гаммы"></TextBox>
+                <Button Width="250" Content="Применить"></Button>
+            </DockPanel>
+            <Button Width="400" Content="Применить как фильтр"></Button>
+            <Button Width="400" Content="Изменить изображение по гамме"></Button>
+        </StackPanel>
         <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
             <TextBlock Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Center" FontSize="20">Цветовые пространства</TextBlock>
             <ListBox Items="{Binding ColorSpaces}" SelectedItem="{Binding SelectedColorSpace}"></ListBox>
