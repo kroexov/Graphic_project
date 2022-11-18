@@ -13,13 +13,12 @@ public class PnmServices: IPnmServices
     private byte[] _bytes;
     private string _filePath;
     private Pnm _fileImg;
-    
 
     #endregion
 
     #region Public methods
 
-    public void ReadFile(string filePath)
+    public string ReadFile(string filePath)
     {
         if (!File.Exists(filePath))
         {
@@ -32,8 +31,14 @@ public class PnmServices: IPnmServices
 
         _fileImg = FindPnmImg();
 
+        var fileName = Path.GetFileName(filePath);
+        fileName = fileName.Substring(0, fileName.Length - 3) + "bmp";
+        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+        var fullFileName = pathSaveFile + "\\imgFiles\\" + fileName;
         var test  = _fileImg.CreateBitmap();
-        test.Save("C:\\Users\\dewor\\Desktop\\test1.bmp", ImageFormat.Bmp);
+        test.Save(fullFileName, ImageFormat.Bmp);
+        return fullFileName;
     }
 
     public void ChangeColorSpace(ColorSpace newColorSpace)

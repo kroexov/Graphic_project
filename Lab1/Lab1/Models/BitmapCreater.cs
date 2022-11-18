@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 
 namespace Lab1.Models
 {
-    public class BitmapCreate
+    public class BitmapCreater
     {
         #region Private fields
 

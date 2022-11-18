@@ -18,7 +18,7 @@ namespace Lab1
         {
             if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
             {
-                MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(new PortableAnyMapModel());
+                MainWindowViewModel mainWindowViewModel = new MainWindowViewModel(new PnmServices());
                 desktop.MainWindow = new MainWindow(mainWindowViewModel)
                 {
                     DataContext = mainWindowViewModel

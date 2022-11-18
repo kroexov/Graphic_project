@@ -91,7 +91,7 @@ public class PortableAnyMapModel
 
     public string AfterOpenFileLogic(string filePath)
     {
-        var cr = new BitmapCreate();
+        var cr = new BitmapCreater();
         var newImage = new Bitmap(3, 3);
         var fileName = Path.GetFileName(filePath);
         fileName = fileName.Substring(0, fileName.Length - 3) + "bmp";

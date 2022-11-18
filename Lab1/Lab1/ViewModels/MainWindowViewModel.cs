@@ -30,7 +30,7 @@ namespace Lab1.ViewModels
             "CMY"
         };
 
-        private PortableAnyMapModel _model;
+        private PnmServices _model;
 
         private bool _errorOccured = false;
         
@@ -44,10 +44,10 @@ namespace Lab1.ViewModels
 
         #region Constructor
 
-        public MainWindowViewModel(PortableAnyMapModel model)
+        public MainWindowViewModel(PnmServices model)
         {
             _model = model;
-            model.ModelErrorHappened += (s => OnErrorHappened(s));
+            //model.ModelErrorHappened += (s => OnErrorHappened(s));
             ImageDisplayViewModel = new ImageDisplayViewModel();
         }
 
@@ -70,7 +70,7 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _redChannel, value);
-                _model.ColorType = _redChannel;
+                //_model.ColorType = _redChannel;
             } 
         }
         
@@ -80,7 +80,7 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _greenChannel, value);
-                _model.ColorType = _greenChannel;
+                //_model.ColorType = _greenChannel;
             } 
         }
         
@@ -90,7 +90,7 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _blueChannel, value);
-                _model.ColorType = _blueChannel;
+                //_model.ColorType = _blueChannel;
             } 
         }
 
@@ -180,8 +180,9 @@ namespace Lab1.ViewModels
 
             if (isok)
             {
-                string pathFile = _model.AfterOpenFileLogic(path);
-                ImageDisplayViewModel.SetPath(pathFile);
+                string altpath = _model.ReadFile(path);
+                //string pathFile = _model.AfterOpenFileLogic(path);
+                ImageDisplayViewModel.SetPath(altpath);
             }
         }
 
