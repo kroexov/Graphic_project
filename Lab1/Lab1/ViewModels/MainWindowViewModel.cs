@@ -38,9 +38,9 @@ namespace Lab1.ViewModels
         
         private string _errorText = "Неизвестная ошибка";
 
-        private bool _redChannel = true;
-        private bool _greenChannel = true;
-        private bool _blueChannel = true;
+        private bool _firstChannel = true;
+        private bool _secondChannel = true;
+        private bool _thirdChannel = true;
 
         #endregion
 
@@ -64,37 +64,45 @@ namespace Lab1.ViewModels
             {
                 this.RaiseAndSetIfChanged(ref _selectedColorSpace, value);
                 _model.ChangeColorSpace((ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
-                //ImageDisplayViewModel.SetPath();
             }
         }
 
-        public bool RedChannel
+        public bool FirstChannel
         {
-            get => _redChannel;
+            get => _firstChannel;
             set
             {
-                this.RaiseAndSetIfChanged(ref _redChannel, value);
-                //_model.ColorType = _redChannel;
+                this.RaiseAndSetIfChanged(ref _firstChannel, value);
+                _model.ChangeColorChannel(new bool[3]
+                {
+                    _firstChannel, _secondChannel, _thirdChannel
+                });
             } 
         }
         
-        public bool GreenChannel
+        public bool SecondChannel
         {
-            get => _greenChannel;
+            get => _secondChannel;
             set
             {
-                this.RaiseAndSetIfChanged(ref _greenChannel, value);
-                //_model.ColorType = _greenChannel;
+                this.RaiseAndSetIfChanged(ref _secondChannel, value);
+                _model.ChangeColorChannel(new bool[3]
+                {
+                    _firstChannel, _secondChannel, _thirdChannel
+                });
             } 
         }
         
-        public bool BlueChannel
+        public bool ThirdChannel
         {
-            get => _blueChannel;
+            get => _thirdChannel;
             set
             {
-                this.RaiseAndSetIfChanged(ref _blueChannel, value);
-                //_model.ColorType = _blueChannel;
+                this.RaiseAndSetIfChanged(ref _thirdChannel, value);
+                _model.ChangeColorChannel(new bool[3]
+                {
+                    _firstChannel, _secondChannel, _thirdChannel
+                });
             } 
         }
 

@@ -60,9 +60,9 @@
         <StackPanel Grid.ColumnSpan="3">
             <TextBlock Foreground="Orange" Margin="0 10 0 0" HorizontalAlignment="Center" FontSize="40">App for Computer Graphics'22</TextBlock>
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0 30 0 0">
-            <ToggleSwitch IsChecked="{Binding RedChannel}" OnContent="On" OffContent="Off" FontSize="20" HorizontalContentAlignment="Center">Red Channel</ToggleSwitch>
-            <ToggleSwitch IsChecked="{Binding GreenChannel}" Margin="50 0 0 0" OnContent="On" OffContent="Off" FontSize="20" HorizontalContentAlignment="Center">Green Channel</ToggleSwitch>
-            <ToggleSwitch IsChecked="{Binding BlueChannel}" Margin="50 0 0 0" OnContent="On" OffContent="Off" FontSize="20" HorizontalContentAlignment="Center">Blue channel</ToggleSwitch>
+            <ToggleSwitch IsChecked="{Binding FirstChannel}" OnContent="On" OffContent="Off" FontSize="20" HorizontalContentAlignment="Center">First Channel</ToggleSwitch>
+            <ToggleSwitch IsChecked="{Binding SecondChannel}" Margin="50 0 0 0" OnContent="On" OffContent="Off" FontSize="20" HorizontalContentAlignment="Center">Second Channel</ToggleSwitch>
+            <ToggleSwitch IsChecked="{Binding ThirdChannel}" Margin="50 0 0 0" OnContent="On" OffContent="Off" FontSize="20" HorizontalContentAlignment="Center">Third channel</ToggleSwitch>
             </StackPanel>
         </StackPanel>
         <StackPanel VerticalAlignment="Top" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
