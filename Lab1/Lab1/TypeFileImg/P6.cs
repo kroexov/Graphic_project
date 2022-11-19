@@ -12,6 +12,7 @@ public class P6 : Pnm
     private ColorSpace _colorSpace;
     private bool[] _colorСhannel;
     private Bitmap _img;
+    private double[] tempPixel = new double[3];
 
     #endregion
 
@@ -44,11 +45,11 @@ public class P6 : Pnm
                 var value2 = Data[GetCoordinates(3*x + 1, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
                 var value3 = Data[GetCoordinates(3*x + 2, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
                 
-                var rgbPixel = ConvertColorPixel(value1, value2, value3, ColorSpace.Rgb);
+                ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
                 
-                var valueRed = 255 * rgbPixel[0];
-                var valueGreen = 255 * rgbPixel[1];
-                var valueBlue = 255 * rgbPixel[2];
+                var valueRed = 255 * tempPixel[0];
+                var valueGreen = 255 * tempPixel[1];
+                var valueBlue = 255 * tempPixel[2];
                 
                 Color newColor = Color.FromArgb((byte)Math.Round(valueRed),
                     (byte)Math.Round(valueGreen), 
@@ -83,12 +84,11 @@ public class P6 : Pnm
                 var value1 = Data[GetCoordinates(3*x, 3*y)];
                 var value2 = Data[GetCoordinates(3*x + 1, 3*y)];
                 var value3 = Data[GetCoordinates(3*x + 2, 3*y)];
+                ConvertColorPixel(tempPixel, value1, value2, value3, colorSpace);
                 
-                var newPixel = ConvertColorPixel(value1, value2, value3, colorSpace);
-                
-                Data[GetCoordinates(3*x, 3*y)] = newPixel[0];
-                Data[GetCoordinates(3*x + 1, 3*y)] = newPixel[1];
-                Data[GetCoordinates(3*x + 2, 3*y)] = newPixel[2];
+                Data[GetCoordinates(3*x, 3*y)] = tempPixel[0];
+                Data[GetCoordinates(3*x + 1, 3*y)] = tempPixel[1];
+                Data[GetCoordinates(3*x + 2, 3*y)] = tempPixel[2];
             }
         }
         SetColorSpace(colorSpace);
@@ -98,13 +98,14 @@ public class P6 : Pnm
 
     #region Private methods
 
-    private double[] ConvertColorPixel(double value1, double value2, double value3, ColorSpace colorSpace)
+    private void ConvertColorPixel(double[] pixel, double value1, double value2, double value3, ColorSpace colorSpace)
     {
-        double[] pixel = new double[3];
-
         if (_colorSpace == ColorSpace.Rgb && colorSpace == ColorSpace.Rgb)
         {
-            return new[] {value1, value2, value3};
+            pixel[0] = value1;
+            pixel[1] = value2;
+            pixel[2] = value3;
+            return;
         }
 
         if (_colorSpace == ColorSpace.Rgb)
@@ -113,7 +114,7 @@ public class P6 : Pnm
             {
                 case ColorSpace.Hsl:
                 {
-                    pixel = RgbToHsl(value1, value2, value3);
+                    RgbToHsl(pixel, value1, value2, value3);
                     break;
                 }
                 case ColorSpace.Hsv:
@@ -123,22 +124,22 @@ public class P6 : Pnm
                 }
                 case ColorSpace.YCbCr601:
                 {
-                    pixel = RgbToYСbСr601(value1, value2, value3);
+                    RgbToYСbСr601(pixel, value1, value2, value3);
                     break;
                 }
                 case ColorSpace.YCbCr709:
                 {
-                    pixel = RgbToYСbСr709(value1, value2, value3);
+                    RgbToYСbСr709(pixel, value1, value2, value3);
                     break;
                 }
                 case ColorSpace.YСoCg:
                 {
-                    pixel = RgbToYCoCg(value1, value2, value3);
+                    RgbToYCoCg(pixel, value1, value2, value3);
                     break;
                 }
                 case ColorSpace.Cmy:
                 {
-                    pixel = RgbToCmy(value1, value2, value3);
+                    RgbToCmy(pixel, value1, value2, value3);
                     break;
                 }
                 default:
@@ -151,81 +152,64 @@ public class P6 : Pnm
             {
                 case ColorSpace.Hsl:
                 {
-                    pixel = HslToRgb(value1, value2, value3);
+                    HslToRgb(pixel, value1, value2, value3);
                     break;
                 }
                 case ColorSpace.Hsv:
                 {
-                    pixel = HsvToRgb(value1, value2, value3);
+                    HsvToRgb(pixel, value1, value2, value3);
                     break;
                 }
                 case ColorSpace.YCbCr601:
                 {
-                    pixel = YСbСr601ToRgb(value1, value2, value3);
+                    YСbСr601ToRgb(pixel, value1, value2, value3);
                     break;
                 }
                 case ColorSpace.YCbCr709:
                 {
-                    pixel = YСbСr709ToRgb(value1, value2, value3);
+                    YСbСr709ToRgb(pixel, value1, value2, value3);
                     break;
                 }
                 case ColorSpace.YСoCg:
                 {
-                    pixel = YCoCgToRgb(value1, value2, value3);
+                    YCoCgToRgb(pixel, value1, value2, value3);
                     break;
                 }
                 case ColorSpace.Cmy:
                 {
-                    pixel = CmyToRgb(value1, value2, value3);
+                    CmyToRgb(pixel, value1, value2, value3);
                     break;
                 }
                 default:
                     throw new ArgumentOutOfRangeException(nameof(colorSpace), colorSpace, null);
             }
+            pixel[0] = (Convert.ToInt32(pixel[0] * 255))/255.0;
+            pixel[1] = (Convert.ToInt32(pixel[1] * 255))/255.0;
+            pixel[2] = (Convert.ToInt32(pixel[2] * 255))/255.0;
         }
-        
-        return pixel;
     }
 
-    private double[] RgbToCmy(double red, double green, double blue)
+    private void RgbToCmy(double[] pixel, double red, double green, double blue)
     {
-        var pixel = new double[3];
-        
-        //начало конвертации
         pixel[0] = 1 - red;
         pixel[1] = 1 - green;
         pixel[2] = 1 - blue;
-        //конец
-        
-        return pixel;
     }
 
-    private double[] CmyToRgb(double cyan, double magenta, double yellow)
+    private void CmyToRgb(double[] pixel, double cyan, double magenta, double yellow)
     {
-        var pixel = new double[3];
-        
-        //начало конвертации
         pixel[0] = 1 - cyan;
         pixel[1] = 1 - magenta;
         pixel[2] = 1 - yellow;
-        //конец
-        
-        return pixel;
     }
 
-    private double[] RgbToHsl(double red, double green, double blue)
+    private void RgbToHsl(double[] pixel, double red, double green, double blue)
     {
-        var pixel = new double[3];
-        
-        //начало конвертации
         double maxv = Math.Max(green, Math.Max(red, blue));
         double minv = Math.Min(green, Math.Min(red, blue));
         pixel[2] = (maxv + minv) / 2;
         pixel[1] = CountS(pixel[2], maxv, minv);
         pixel[0] = CountH(red, green, blue, minv, maxv);
-        //конец
-        
-        return pixel;
     }
 
     private double CountS(double L, double maxv, double minv)
@@ -263,11 +247,8 @@ public class P6 : Pnm
         return 0;
     }
 
-    private double[] HslToRgb(double h, double s, double l)
+    private void HslToRgb(double[] pixel, double h, double s, double l)
     {
-        var pixel = new double[3];
-        
-        //начало конвертации
         //пока считаем что H хранится от 0 до 1
         double q;
         if (l < 0.5)
@@ -295,9 +276,6 @@ public class P6 : Pnm
         pixel[0] = CalculateColor(p, q, t_r);
         pixel[1] = CalculateColor(p, q, t_g);
         pixel[2] = CalculateColor(p, q, t_b);
-        //конец
-        
-        return pixel;
     }
 
     private double CalculateColor(double p, double q, double t)
@@ -351,11 +329,8 @@ public class P6 : Pnm
         return 0;
     }
 
-    private double[] HsvToRgb(double h, double s, double v)
+    private void HsvToRgb(double[] pixel, double h, double s, double v)
     {
-        var pixel = new double[3];
-        
-        //начало конвертации
         int H = (int)(h * 360);
         int h_i = (H / 60) % 6;
 
@@ -397,24 +372,18 @@ public class P6 : Pnm
                 pixel[2] = v_dec;
                 break;
         }
-        //конец
-        
-        return pixel;
     }
 
-    private double[] RgbToYСbСr601(double red, double green, double blue)
+    private void RgbToYСbСr601(double[] pixel, double red, double green, double blue)
     {
-        var pixel = new double[3];
 
         pixel[0] = (16 + (65.481 * red + 128.553 * green + 24.966 * blue)) / 256;
         pixel[1] = (128 + (-37.797 * red - 74.203 * green + 112.0 * blue)) / 256;
         pixel[2] = (128 + (112.0 * red - 93.786 * green - 18.214 * blue)) / 256;
-        return pixel;
     }
 
-    private double[] YСbСr601ToRgb(double y, double Cb, double Cr)
+    private void YСbСr601ToRgb(double[] pixel, double y, double Cb, double Cr)
     {
-        var pixel = new double[3];
 
         pixel[0] = (255.0 / 219) * (y * 256 - 16) + (255.0 / 112) * 0.701 * (Cr * 256 - 128);
         pixel[0] /= 255;
@@ -423,13 +392,10 @@ public class P6 : Pnm
         pixel[1] /= 255;
         pixel[2] = (255.0 / 219) * (y * 256 - 16) + (255.0 / 112) * 0.886 * (Cb * 256 - 128);
         pixel[2] /= 255;
-        
-        return pixel;
     }
 
-    private double[] RgbToYСbСr709(double red, double green, double blue)
+    private void RgbToYСbСr709(double[] pixel, double red, double green, double blue)
     {
-        var pixel = new double[3];
 
         pixel[0] = (0.299 * red*255) + (0.587 * green*255) + (0.114 * blue*255);
         pixel[0] /= 255;
@@ -437,47 +403,31 @@ public class P6 : Pnm
         pixel[1] /= 255;
         pixel[2] = 128 + (0.5 * red*255) - (0.418688 * green*255) - (0.081312 * blue*255);
         pixel[2] /= 255;
-        return pixel;
     }
 
-    private double[] YСbСr709ToRgb(double y, double Cb, double Cr)
+    private void YСbСr709ToRgb(double[] pixel, double y, double Cb, double Cr)
     {
-        var pixel = new double[3];
-
         pixel[0] = y*255 + 1.402 * (Cr * 255 - 128);
         pixel[0] /= 255;
         pixel[1] = y*255 - 0.34414 * (Cb * 255 - 128) - 0.71414 * (Cr * 255 - 128);
         pixel[1] /= 255;
         pixel[2] = y*255 + 1.772 * (Cb * 255 - 128);
         pixel[2] /= 255;
-        return pixel;
     }
 
-    private double[] RgbToYCoCg(double red, double green, double blue)
+    private void RgbToYCoCg(double[] pixel, double red, double green, double blue)
     {
-        var pixel = new double[3];
-        
         // Y [0; 1] Co and Cg [-0.5; 0.5]
-        //начало конвертации
         pixel[0] = 0.25 * red + 0.5 * green + 0.25 * blue;
         pixel[1] = 0.5 * red - 0.5 * blue;
         pixel[2] = -0.25 * red + 0.5 * green - 0.25 * blue;
-        //конец
-        
-        return pixel;
     }
 
-    private double[] YCoCgToRgb(double y, double Co, double Cg)
+    private void YCoCgToRgb(double[] pixel, double y, double Co, double Cg)
     {
-        var pixel = new double[3];
-        
-        //начало конвертации
         pixel[0] = y + Co - Cg;
         pixel[1] = y + Cg;
         pixel[2] = y - Co - Cg;
-        //конец
-        
-        return pixel;
     }
     
     private void SetColorSpace(ColorSpace colorSpace)
