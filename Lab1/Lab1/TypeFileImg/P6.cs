@@ -242,22 +242,22 @@ public class P6 : Pnm
     {
         if (Equals(maxv, minv) || (Equals(maxv, r) && g >= b))
         {
-            return 1 / 6 * (g - b) / (maxv - minv);
+            return 1.0 / 6 * (g - b) / (maxv - minv);
         }
 
         if (maxv.Equals(r) && g < b)
         {
-            return 1 / 6 * (g - b) / (maxv - minv) + 1;
+            return 1.0 / 6 * (g - b) / (maxv - minv) + 1;
         }
 
         if (maxv.Equals(g))
         {
-            return 1 / 6 * (b - r) / (maxv - minv) + 1 / 3;
+            return 1.0 / 6 * (b - r) / (maxv - minv) + 1.0 / 3;
         }
 
-        if (maxv == b)
+        if (maxv.Equals(b))
         {
-            return 1 / 6 * (r - g) / (maxv - minv) + 2 / 3;
+            return 1.0 / 6 * (r - g) / (maxv - minv) + 2.0 / 3;
         }
 
         return 0;
@@ -268,6 +268,7 @@ public class P6 : Pnm
         var pixel = new double[3];
         
         //начало конвертации
+        //пока считаем что H хранится от 0 до 1
         double q;
         if (l < 0.5)
         {
@@ -280,7 +281,8 @@ public class P6 : Pnm
 
         double p = 2.0 * l - q;
         
-        double h_k = h / 360;
+        // double h_k = h / 360;
+        double h_k = h;
         
         double t_r = h_k + 1.0 / 3;
         t_r -= ((t_r > 1) ? 1 : 0);
