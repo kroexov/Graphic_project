@@ -444,11 +444,11 @@ public class P6 : Pnm
     {
         var pixel = new double[3];
 
-        pixel[0] = y + 1.402 * (Cr * 255 - 128);
+        pixel[0] = y*255 + 1.402 * (Cr * 255 - 128);
         pixel[0] /= 255;
-        pixel[1] = y - 0.34414 * (Cb * 255 - 128) - 0.71414 * (Cr * 255 - 128);
+        pixel[1] = y*255 - 0.34414 * (Cb * 255 - 128) - 0.71414 * (Cr * 255 - 128);
         pixel[1] /= 255;
-        pixel[2] = y + 1.772 * (Cb * 255 - 128);
+        pixel[2] = y*255 + 1.772 * (Cb * 255 - 128);
         pixel[2] /= 255;
         return pixel;
     }
