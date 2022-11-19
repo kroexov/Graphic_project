@@ -360,9 +360,9 @@ public class P6 : Pnm
         int h_i = (H / 60) % 6;
 
         double v_min = (1 - s) * v;
-        double a = (v - v_min) * (((H % 60) / 60) / 100.0);
+        double a = (v - v_min) * (((H % 60) / 60.0));
         double v_inc = v_min + a;
-        double v_dec = v_min - a;
+        double v_dec = v - a;
 
         switch (h_i)
         {
