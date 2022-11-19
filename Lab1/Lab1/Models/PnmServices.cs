@@ -44,7 +44,10 @@ public class PnmServices: IPnmServices
 
     public void ChangeColorSpace(ColorSpace newColorSpace)
     {
-        _fileImg.ConvertColor(newColorSpace);
+        if (_fileImg != null)
+        {
+            _fileImg.ConvertColor(newColorSpace);
+        }
     }
 
     public void ChangeColorChannel(bool[] newColorChannel)
