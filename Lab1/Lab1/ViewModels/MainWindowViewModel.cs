@@ -31,7 +31,7 @@ namespace Lab1.ViewModels
             "HSV",
             "YCbCr601",
             "YCbCr709",
-            "YCoCg",
+            "YСoCg",
             "CMY"
         };
 

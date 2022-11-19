@@ -451,17 +451,24 @@ public class P6 : Pnm
     {
         var pixel = new double[3];
         
+        // Y [0; 1] Co and Cg [-0.5; 0.5]
         //начало конвертации
+        pixel[0] = 0.25 * red + 0.5 * green + 0.25 * blue;
+        pixel[1] = 0.5 * red - 0.5 * blue;
+        pixel[2] = -0.25 * red + 0.5 * green - 0.25 * blue;
         //конец
         
         return pixel;
     }
 
-    private double[] YCoCgToRgb(double h, double s, double l)
+    private double[] YCoCgToRgb(double y, double Co, double Cg)
     {
         var pixel = new double[3];
         
         //начало конвертации
+        pixel[0] = y + Co - Cg;
+        pixel[1] = y + Cg;
+        pixel[2] = y - Co - Cg;
         //конец
         
         return pixel;
