@@ -430,20 +430,26 @@ public class P6 : Pnm
     private double[] RgbToYСbСr709(double red, double green, double blue)
     {
         var pixel = new double[3];
-        
-        //начало конвертации
-        //конец
-        
+
+        pixel[0] = (0.299 * red*255) + (0.587 * green*255) + (0.114 * blue*255);
+        pixel[0] /= 255;
+        pixel[1] = 128 - (0.168736 * red*255) - (0.331264 * green*255) + (0.5 * blue*255);
+        pixel[1] /= 255;
+        pixel[2] = 128 + (0.5 * red*255) - (0.418688 * green*255) - (0.081312 * blue*255);
+        pixel[2] /= 255;
         return pixel;
     }
 
-    private double[] YСbСr709ToRgb(double h, double s, double l)
+    private double[] YСbСr709ToRgb(double y, double Cb, double Cr)
     {
         var pixel = new double[3];
-        
-        //начало конвертации
-        //конец
-        
+
+        pixel[0] = y + 1.402 * (Cr * 255 - 128);
+        pixel[0] /= 255;
+        pixel[1] = y - 0.34414 * (Cb * 255 - 128) - 0.71414 * (Cr * 255 - 128);
+        pixel[1] /= 255;
+        pixel[2] = y + 1.772 * (Cb * 255 - 128);
+        pixel[2] /= 255;
         return pixel;
     }
 
