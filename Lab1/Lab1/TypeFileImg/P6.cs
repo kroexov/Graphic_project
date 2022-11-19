@@ -327,11 +327,52 @@ public class P6 : Pnm
         //конец
     }
 
-    private double[] HsvToRgb(double h, double s, double l)
+    private double[] HsvToRgb(double h, double s, double v)
     {
         var pixel = new double[3];
         
         //начало конвертации
+        int H = (int)(h * 360);
+        int h_i = (H / 60) % 6;
+
+        double v_min = (1 - s) * v;
+        double a = (v - v_min) * (((H % 60) / 60) / 100.0);
+        double v_inc = v_min + a;
+        double v_dec = v_min - a;
+
+        switch (h_i)
+        {
+            case 0:
+                pixel[0] = v;
+                pixel[1] = v_inc;
+                pixel[2] = v_min;
+                break;
+            case 1:
+                pixel[0] = v_dec;
+                pixel[1] = v;
+                pixel[2] = v_min;
+                break;
+            case 2:
+                pixel[0] = v_min;
+                pixel[1] = v;
+                pixel[2] = v_inc;
+                break;
+            case 3:
+                pixel[0] = v_min;
+                pixel[1] = v_dec;
+                pixel[2] = v;
+                break;
+            case 4:
+                pixel[0] = v_inc;
+                pixel[1] = v_min;
+                pixel[2] = v;
+                break;
+            case 5:
+                pixel[0] = v;
+                pixel[1] = v_min;
+                pixel[2] = v_dec;
+                break;
+        }
         //конец
         
         return pixel;
