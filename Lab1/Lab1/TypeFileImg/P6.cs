@@ -218,9 +218,49 @@ public class P6 : Pnm
         var pixel = new double[3];
         
         //начало конвертации
+        double maxv = Math.Max(green, Math.Max(red, blue));
+        double minv = Math.Min(green, Math.Min(red, blue));
+        pixel[2] = (maxv + minv) / 2;
+        pixel[1] = CountS(pixel[2], maxv, minv);
+        pixel[0] = CountH(red, green, blue, minv, maxv);
         //конец
         
         return pixel;
+    }
+
+    private double CountS(double L, double maxv, double minv)
+    {
+        if (L==0 || Equals(maxv, minv))
+        {
+            return 0;
+        }
+
+        return (L > 0 && L <= 0.5) ? (maxv - minv) / (2 * L) : (maxv - minv) / (2 - 2 * L);
+    }
+
+    private double CountH(double r, double g, double b, double minv, double maxv)
+    {
+        if (Equals(maxv, minv) || (Equals(maxv, r) && g >= b))
+        {
+            return 1 / 6 * (g - b) / (maxv - minv);
+        }
+
+        if (maxv.Equals(r) && g < b)
+        {
+            return 1 / 6 * (g - b) / (maxv - minv) + 1;
+        }
+
+        if (maxv.Equals(g))
+        {
+            return 1 / 6 * (b - r) / (maxv - minv) + 1 / 3;
+        }
+
+        if (maxv == b)
+        {
+            return 1 / 6 * (r - g) / (maxv - minv) + 2 / 3;
+        }
+
+        return 0;
     }
 
     private double[] HslToRgb(double h, double s, double l)
@@ -280,6 +320,7 @@ public class P6 : Pnm
 
     private void RgbToHsv(double[] pixel, double red, double green, double blue)
     {
+        
         //начало конвертации
         //конец
     }

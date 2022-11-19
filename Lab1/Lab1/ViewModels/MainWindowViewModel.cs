@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
@@ -17,6 +18,8 @@ namespace Lab1.ViewModels
         private string _data;
 
         private string _currentPath;
+
+        private string _gamma = "0";
 
         private string _selectedColorSpace = "RGB";
 
@@ -78,6 +81,15 @@ namespace Lab1.ViewModels
                     _firstChannel, _secondChannel, _thirdChannel
                 });
             } 
+        }
+
+        public string GammaValue
+        {
+            get => _gamma;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _gamma, value);
+            }
         }
         
         public bool SecondChannel
@@ -160,6 +172,21 @@ namespace Lab1.ViewModels
                 Data = File.ReadAllText(result.First());
                 _currentPath = result.First();
                 OpenFile(result.First());
+            }
+        }
+
+        public void ChangeGamma()
+        {
+            double result;
+
+            //Try parsing in the current culture
+            if (!double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
+                //Then try in US english
+                !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
+                //Then in neutral language
+                !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+            {
+                result = 0;
             }
         }
 

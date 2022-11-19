@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 using Lab1.ViewModels;
 
 namespace Lab1.Views
