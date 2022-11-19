@@ -29,8 +29,8 @@ namespace Lab1.ViewModels
             "RGB",
             "HSL",
             "HSV",
-            "YCbCr.601",
-            "YCbCr.709",
+            "YCbCr601",
+            "YCbCr709",
             "YCoCg",
             "CMY"
         };
