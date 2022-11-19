@@ -322,9 +322,33 @@ public class P6 : Pnm
 
     private void RgbToHsv(double[] pixel, double red, double green, double blue)
     {
-        
-        //начало конвертации
-        //конец
+        double maxv = Math.Max(green, Math.Max(red, blue));
+        double minv = Math.Min(green, Math.Min(red, blue));
+        pixel[2] = maxv;
+        pixel[1] = (maxv == 0) ? 0 : 1.0 - minv / maxv;
+        pixel[0] = countHHsv(red, green, blue, maxv, minv);
+    }
+
+    private double countHHsv(double r, double g, double b, double maxv, double minv)
+    {
+        if (maxv.Equals(r) && g >= b)
+        {
+            return 1.0 / 6 * (g - b) / (maxv - minv);
+        }
+        if (maxv.Equals(r) && g < b)
+        {
+            return 1.0 / 6 * (g - b) / (maxv - minv) + 1.0;
+        }
+        if (maxv.Equals(g))
+        {
+            return 1.0 / 6 * (b - r) / (maxv - minv) + 1.0/3;
+        }
+        if (maxv.Equals(b))
+        {
+            return 1.0 / 6 * (r - g) / (maxv - minv) + 2.0/3;
+        }
+
+        return 0;
     }
 
     private double[] HsvToRgb(double h, double s, double v)
@@ -381,19 +405,18 @@ public class P6 : Pnm
     private double[] RgbToYСbСr601(double red, double green, double blue)
     {
         var pixel = new double[3];
-        
-        //начало конвертации
-        //конец
-        
+
+        pixel[0] = (16 + (65.481 * red + 128.553 * green + 24.966 * blue)) / 256;
+        pixel[1] = (128 + (-37.797 * red - 74.203 * green + 112.0 * blue)) / 256;
+        pixel[2] = (128 + (112.0 * red - 93.786 * green - 18.214 * blue)) / 256;
         return pixel;
     }
 
-    private double[] YСbСr601ToRgb(double h, double s, double l)
+    private double[] YСbСr601ToRgb(double y, double Cb, double Cr)
     {
         var pixel = new double[3];
         
-        //начало конвертации
-        //конец
+        
         
         return pixel;
     }
