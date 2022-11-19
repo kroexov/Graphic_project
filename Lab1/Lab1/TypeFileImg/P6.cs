@@ -228,14 +228,58 @@ public class P6 : Pnm
         var pixel = new double[3];
         
         //начало конвертации
+        double q;
+        if (l < 0.5)
+        {
+            q = l * (1 + s);
+        }
+        else
+        {
+            q = l + s - (l * s);
+        }
+
+        double p = 2.0 * l - q;
+        
+        double h_k = h / 360;
+        
+        double t_r = h_k + 1.0 / 3;
+        t_r -= ((t_r > 1) ? 1 : 0);
+        
+        double t_g = h_k;
+        
+        double t_b = h_k - 1.0 / 3;
+        t_b += ((t_b < 0) ? 1 : 0);
+
+        pixel[0] = CalculateColor(p, q, t_r);
+        pixel[1] = CalculateColor(p, q, t_g);
+        pixel[2] = CalculateColor(p, q, t_b);
         //конец
         
         return pixel;
     }
 
+    private double CalculateColor(double p, double q, double t)
+    {
+        if (t < 1.0 / 6)
+        {
+            return p + ((q - p) * 6 * t);
+        }
+
+        if (t >= 1.0 / 6 && t < 1.0 / 2)
+        {
+            return q;
+        }
+
+        if (t >= 1.0 / 2 && t < 2.0 / 3)
+        {
+            return p + ((q - p) * (2.0 / 3 - t) * 6);
+        }
+
+        return p;
+    }
+
     private void RgbToHsv(double[] pixel, double red, double green, double blue)
     {
-        
         //начало конвертации
         //конец
     }
