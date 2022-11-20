@@ -10,8 +10,7 @@
         Title="Lab1"
         WindowState="Maximized"
         TransparencyLevelHint="AcrylicBlur"
-        Background="Transparent"
-        WindowState="Maximized">
+        Background="Transparent">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
