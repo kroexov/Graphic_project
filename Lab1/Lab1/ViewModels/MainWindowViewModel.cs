@@ -64,6 +64,8 @@ namespace Lab1.ViewModels
 
         #region Public properties
 
+        public PnmServices Services => _model;
+
         public string SelectedColorSpace
         {
             get => _selectedColorSpace;

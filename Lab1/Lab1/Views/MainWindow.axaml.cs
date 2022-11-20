@@ -29,7 +29,7 @@ namespace Lab1.Views
 
         private void ChooseAlgorithm(object? sender, RoutedEventArgs e)
         {
-            AlgorithmWindow algorithmWindow = new AlgorithmWindow();
+            AlgorithmWindow algorithmWindow = new AlgorithmWindow(_mvm.Services);
             algorithmWindow.Show();
         }
     }

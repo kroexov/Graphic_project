@@ -4,6 +4,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Lab1.ViewModels.AlgorithmWindow"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        WindowState="Maximized"
         Title="AlgorithmWindow">
-    Welcome to Avalonia!
+        <Grid>
+                <Image Stretch="None" Source="{Binding ImageToLoadPublic}"></Image>
+                <StackPanel Height="300" Width="200" HorizontalAlignment="Right" VerticalAlignment="Center">
+                <NumericUpDown Minimum="1" Maximum="8" Value="{Binding Bitn}"></NumericUpDown>
+                <TextBlock Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Center" FontSize="20">Алгоритмы</TextBlock>
+                <ListBox Items="{Binding Algorithms}" SelectedItem="{Binding SelectedAlg}"></ListBox>
+                <Button Width="200" Content="Выбрать алгоритм" Click="OnAlgChosen"></Button>
+        </StackPanel>
+        </Grid>
 </Window>

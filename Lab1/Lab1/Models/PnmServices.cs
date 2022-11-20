@@ -15,6 +15,7 @@ public class PnmServices: IPnmServices
     private string _filePath;
     private Pnm _fileImg;
     private bool _isGenerated;
+    private DitheringServices _ditheringServices = new DitheringServices();
 
     #endregion
 
@@ -64,6 +65,16 @@ public class PnmServices: IPnmServices
         test.Save(fullFileName, ImageFormat.Bmp);
         return fullFileName;
     }
+
+    public string UseDither(int bitn)
+    {
+        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+        var fullFileName = pathSaveFile + "\\imgFiles\\" + "image.psd-_12_.bmp";
+
+        return _ditheringServices.OrderedAlgorithm(fullFileName, bitn);
+    }
+    
     public void ChangeColorSpace(ColorSpace newColorSpace)
     {
         if (_fileImg != null)
@@ -105,7 +116,7 @@ public class PnmServices: IPnmServices
         
         var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
         pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-        var fullFileName = pathSaveFile + "\\imgFiles\\" + "gradient";
+        var fullFileName = pathSaveFile + "\\imgFiles\\" + "gradient.bmp";
         image.Save(fullFileName, ImageFormat.Bmp);
         return fullFileName;
     }
