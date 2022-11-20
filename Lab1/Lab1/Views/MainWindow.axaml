@@ -114,6 +114,14 @@
         </StackPanel>
         
         <StackPanel Grid.Row="2" Grid.Column="0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Width="100" Background="black" FontSize="20" TextAlignment="Center">Длина</TextBlock>
+                <NumericUpDown Minimum="100" Maximum="600" Width="250"></NumericUpDown>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Width="100" Background="black" FontSize="20" TextAlignment="Center">Ширина</TextBlock>
+                <NumericUpDown Minimum="100" Maximum="600" Width="250"></NumericUpDown>
+            </StackPanel>
             <Button Content="Сгенерировать градиент" Command="{Binding GenerateGradient}"></Button>
             <Button Content="Открыть изображение" Command="{Binding AddNewFile}"></Button>
         </StackPanel>
