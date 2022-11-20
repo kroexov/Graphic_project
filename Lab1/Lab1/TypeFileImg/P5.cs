@@ -50,5 +50,15 @@ public class P5 : Pnm
         throw new NotImplementedException();
     }
 
+    public override void SetColorChannel(bool[] newColorChannel)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override void SaveFile(byte[] saveFile)
+    {
+        throw new NotImplementedException();
+    }
+
     #endregion
 }

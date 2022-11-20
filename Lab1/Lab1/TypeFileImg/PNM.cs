@@ -9,7 +9,7 @@ public abstract class Pnm
     #region Private/protected fields
 
     protected FileHeaderInfo Header;
-    private int _index;
+    protected int _index;
     protected double[] Data;
 
     #endregion
@@ -19,6 +19,10 @@ public abstract class Pnm
     public abstract Bitmap CreateBitmap();
 
     public abstract void ConvertColor(ColorSpace colorSpace);
+
+    public abstract void SetColorChannel(bool[] newColorChannel);
+
+    public abstract void SaveFile(byte[] saveFile);
 
     #endregion
 

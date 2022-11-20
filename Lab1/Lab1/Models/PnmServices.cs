@@ -18,7 +18,7 @@ public class PnmServices: IPnmServices
 
     #region Public methods
 
-    public string ReadFile(string filePath)
+    public string ReadFile(string filePath, ColorSpace colorSpace = ColorSpace.Rgb)
     {
         if (!File.Exists(filePath))
         {
@@ -28,9 +28,19 @@ public class PnmServices: IPnmServices
         _bytes = File.ReadAllBytes(filePath);
         _typeFile = FindTypeFile();
         _filePath = filePath;
-        _fileImg = FindPnmImg();
+        _fileImg = FindPnmImg(colorSpace);
 
-        var fileName = Path.GetFileName(filePath);
+        return RefreshImage();
+    }
+
+    public void SaveFile()
+    {
+        _fileImg.SaveFile(_bytes);
+    }
+
+    public string RefreshImage()
+    {
+        var fileName = Path.GetFileName(_filePath);
         fileName = fileName.Substring(0, fileName.Length - 3) + "bmp";
         var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
         pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
@@ -38,10 +48,7 @@ public class PnmServices: IPnmServices
         var test  = _fileImg.CreateBitmap();
         test.Save(fullFileName, ImageFormat.Bmp);
         return fullFileName;
-        
-        
     }
-
     public void ChangeColorSpace(ColorSpace newColorSpace)
     {
         if (_fileImg != null)
@@ -52,7 +59,10 @@ public class PnmServices: IPnmServices
 
     public void ChangeColorChannel(bool[] newColorChannel)
     {
-        throw new NotImplementedException();
+        if (_fileImg != null)
+        {
+            _fileImg.SetColorChannel(newColorChannel);
+        }
     }
 
     #endregion
@@ -83,7 +93,7 @@ public class PnmServices: IPnmServices
         return TypeFile.IsFalseFile;
     }
 
-    private Pnm FindPnmImg()
+    private Pnm FindPnmImg(ColorSpace colorSpace)
     {
         switch (_typeFile)
         {
@@ -93,7 +103,7 @@ public class PnmServices: IPnmServices
             }
             case TypeFile.P6:
             {
-                return new P6(_bytes);
+                return new P6(_bytes, colorSpace);
             }
         }
 

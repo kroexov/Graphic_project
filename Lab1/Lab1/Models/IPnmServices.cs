@@ -3,7 +3,7 @@
 public interface IPnmServices
 {
     // Читает файл по пути и создает объект класса ImgFile
-    string ReadFile(string filePath);
+    string ReadFile(string filePath, ColorSpace colorSpace = ColorSpace.Rgb);
 
     void ChangeColorSpace(ColorSpace newColorSpace);
 

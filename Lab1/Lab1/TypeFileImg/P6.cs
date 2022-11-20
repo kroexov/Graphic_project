@@ -9,8 +9,8 @@ public class P6 : Pnm
 {
     #region Private fields
 
-    private ColorSpace _colorSpace;
-    private bool[] _colorСhannel;
+    private bool[] _currentColorСhannel;
+    private ColorSpace _currentColorSpace;
     private Bitmap _img;
     private double[] tempPixel = new double[3];
 
@@ -20,18 +20,19 @@ public class P6 : Pnm
 
     public P6(byte[] bytes) : base(bytes)
     {
-        _colorСhannel = new bool[] { true, true, true };
-        _colorSpace = ColorSpace.Rgb;
+        _currentColorСhannel = new bool[] { true, true, true };
+        _currentColorSpace = ColorSpace.Rgb;
+    }
+
+    public P6(byte[] bytes, ColorSpace colorSpace) : base(bytes)
+    {
+        _currentColorСhannel = new bool[] { true, true, true };
+        _currentColorSpace = colorSpace;
     }
 
     #endregion
 
     #region Public methods
-    
-    public void SetColorCanal(int numColorCanal)
-    {
-        _colorСhannel[numColorCanal] = !_colorСhannel[numColorCanal];
-    }
 
     public override Bitmap CreateBitmap()
     {
@@ -41,9 +42,9 @@ public class P6 : Pnm
         {
             for (var x = 0; x < Header.Width; x++)
             {
-                var value1 = Data[GetCoordinates(3*x, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
-                var value2 = Data[GetCoordinates(3*x + 1, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
-                var value3 = Data[GetCoordinates(3*x + 2, 3*y)]  * Convert.ToInt32(_colorСhannel[0]);
+                var value1 = Data[GetCoordinates(3*x, 3*y)]  * Convert.ToInt32(_currentColorСhannel[0]);
+                var value2 = Data[GetCoordinates(3*x + 1, 3*y)]  * Convert.ToInt32(_currentColorСhannel[0]);
+                var value3 = Data[GetCoordinates(3*x + 2, 3*y)]  * Convert.ToInt32(_currentColorСhannel[0]);
                 
                 ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
                 
@@ -67,12 +68,12 @@ public class P6 : Pnm
 
     public override void ConvertColor(ColorSpace colorSpace)
     {
-        if (_colorSpace == colorSpace)
+        if (_currentColorSpace == colorSpace)
         {
             return;
         }
         
-        if (_colorSpace != ColorSpace.Rgb && colorSpace != ColorSpace.Rgb)
+        if (_currentColorSpace != ColorSpace.Rgb && colorSpace != ColorSpace.Rgb)
         {
             ConvertColor(ColorSpace.Rgb);
         }
@@ -94,13 +95,42 @@ public class P6 : Pnm
         SetColorSpace(colorSpace);
     }
 
+    public override void SetColorChannel(bool[] newColorChannel)
+    {
+        _currentColorСhannel = newColorChannel;
+    }
+
+    public override void SaveFile(byte[] saveFile)
+    {
+        var c = -1;
+        if (_currentColorСhannel[0] && !_currentColorСhannel[1] && !_currentColorСhannel[2])
+            c = 0;
+        else if (!_currentColorСhannel[0] && _currentColorСhannel[1] && !_currentColorСhannel[2])
+            c = 1;
+        else if (!_currentColorСhannel[0] && !_currentColorСhannel[1] && _currentColorСhannel[2])
+            c = 2;
+
+        if (c != -1)
+        {
+            Array.Resize(ref saveFile, Header.Height * Header.Width);
+
+            for (var i = c; i < Header.Height * Header.Width * Header.PixelSize; i += 3)
+                saveFile[i + _index] = (byte)Math.Round(Data[i] * 255);
+
+            return;
+        }
+        
+        for (var i = 0; i < Header.Height * Header.Width * Header.PixelSize; i++)
+            saveFile[i + _index] = (byte)Math.Round(Data[i] * 255);
+    }
+
     #endregion
 
     #region Private methods
 
     private void ConvertColorPixel(double[] pixel, double value1, double value2, double value3, ColorSpace colorSpace)
     {
-        if (_colorSpace == ColorSpace.Rgb && colorSpace == ColorSpace.Rgb)
+        if (_currentColorSpace == ColorSpace.Rgb && colorSpace == ColorSpace.Rgb)
         {
             pixel[0] = value1;
             pixel[1] = value2;
@@ -108,7 +138,7 @@ public class P6 : Pnm
             return;
         }
 
-        if (_colorSpace == ColorSpace.Rgb)
+        if (_currentColorSpace == ColorSpace.Rgb)
         {
             switch (colorSpace)
             {
@@ -148,7 +178,7 @@ public class P6 : Pnm
         }
         else
         {
-            switch (_colorSpace)
+            switch (_currentColorSpace)
             {
                 case ColorSpace.Hsl:
                 {
@@ -432,7 +462,7 @@ public class P6 : Pnm
     
     private void SetColorSpace(ColorSpace colorSpace)
     {
-        _colorSpace = colorSpace;
+        _currentColorSpace = colorSpace;
     }
 
     #endregion
