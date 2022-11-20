@@ -67,6 +67,10 @@ namespace Lab1.ViewModels
             {
                 this.RaiseAndSetIfChanged(ref _selectedColorSpace, value);
                 _model.ChangeColorSpace((ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
+                if (_model.RefreshImage() != String.Empty)
+                {
+                    ImageDisplayViewModel.SetPath(_model.RefreshImage());
+                }
             }
         }
 
@@ -80,6 +84,11 @@ namespace Lab1.ViewModels
                 {
                     _firstChannel, _secondChannel, _thirdChannel
                 });
+                if (_model.RefreshImage() != String.Empty)
+                {
+                    ImageDisplayViewModel.SetPath(_model.RefreshImage());
+                }
+                
             } 
         }
 
@@ -102,6 +111,10 @@ namespace Lab1.ViewModels
                 {
                     _firstChannel, _secondChannel, _thirdChannel
                 });
+                if (_model.RefreshImage() != String.Empty)
+                {
+                    ImageDisplayViewModel.SetPath(_model.RefreshImage());
+                }
             } 
         }
         
@@ -115,6 +128,10 @@ namespace Lab1.ViewModels
                 {
                     _firstChannel, _secondChannel, _thirdChannel
                 });
+                if (_model.RefreshImage() != String.Empty)
+                {
+                    ImageDisplayViewModel.SetPath(_model.RefreshImage());
+                }
             } 
         }
 
@@ -198,30 +215,23 @@ namespace Lab1.ViewModels
             ofd.Filters.Add(new FileDialogFilter() {Name = "Файлы P5", Extensions = {"pgm"}});
             
             var result = await ofd.ShowAsync(new Window());
+            
             if (result != null)
             {
-                File.WriteAllText(result, Data);
+                File.WriteAllBytes(result,_model.SaveFile());
             }
         }
 
         public void OpenFile(string path)
         {
-            bool isok = true;
             try
             {
-                _model.ReadFile(path);
+                string altpath = _model.ReadFile(path, new bool[] {_firstChannel, _secondChannel, _thirdChannel}, (ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
+                ImageDisplayViewModel.SetPath(altpath);
             }
             catch (Exception e)
             {
-                isok = false;
                 OnErrorHappened(e.Message);
-            }
-
-            if (isok)
-            {
-                string altpath = _model.ReadFile(path);
-                //string pathFile = _model.AfterOpenFileLogic(path);
-                ImageDisplayViewModel.SetPath(altpath);
             }
         }
 

@@ -18,7 +18,7 @@ public class PnmServices: IPnmServices
 
     #region Public methods
 
-    public string ReadFile(string filePath, ColorSpace colorSpace = ColorSpace.Rgb)
+    public string ReadFile(string filePath, bool[] channels, ColorSpace colorSpace = ColorSpace.Rgb)
     {
         if (!File.Exists(filePath))
         {
@@ -29,17 +29,23 @@ public class PnmServices: IPnmServices
         _typeFile = FindTypeFile();
         _filePath = filePath;
         _fileImg = FindPnmImg(colorSpace);
+        _fileImg.SetColorChannel(channels);
 
         return RefreshImage();
     }
 
-    public void SaveFile()
+    public byte[] SaveFile()
     {
         _fileImg.SaveFile(_bytes);
+        return _bytes;
     }
 
     public string RefreshImage()
     {
+        if (_fileImg == null)
+        {
+            return String.Empty;
+        }
         var fileName = Path.GetFileName(_filePath);
         fileName = fileName.Substring(0, fileName.Length - 3) + "bmp";
         var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
