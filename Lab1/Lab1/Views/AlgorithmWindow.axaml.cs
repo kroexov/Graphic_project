@@ -1,4 +1,5 @@
-﻿using Avalonia;
+﻿using System.Collections.ObjectModel;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -9,13 +10,21 @@ public partial class AlgorithmWindow : Window
     public AlgorithmWindow()
     {
         InitializeComponent();
-#if DEBUG
-        this.AttachDevTools();
-#endif
     }
 
     private void InitializeComponent()
     {
         AvaloniaXamlLoader.Load(this);
     }
+    
+    private ObservableCollection<string> _spaces = new ObservableCollection<string>()
+    {
+        "Ordered (8x8)",
+        "HSL",
+        "HSV",
+        "YCbCr601",
+        "YCbCr709",
+        "YСoCg",
+        "CMY"
+    };
 }
