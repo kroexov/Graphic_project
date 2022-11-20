@@ -117,9 +117,13 @@ public class P6 : Pnm
 
             for (var i = 0; i < _index; i++)
                 saveFile[i] = origFile[i];
-            
 
-            for (var i = c; i < Header.Height * Header.Width; i++)
+            if (saveFile[1] == Convert.ToByte(54))
+            {
+                saveFile[1] = Convert.ToByte(53);
+            }
+
+            for (var i = 0; i < Header.Height * Header.Width; i++)
                 saveFile[i + _index] = (byte)Math.Round(Data[i*3 + c] * 255);
 
             return saveFile;

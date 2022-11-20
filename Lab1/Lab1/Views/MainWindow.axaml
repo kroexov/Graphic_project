@@ -8,7 +8,7 @@
         x:Class="Lab1.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="Lab1"
-        Width="1200" Height="800"
+        WindowState="Maximized"
         TransparencyLevelHint="AcrylicBlur"
         Background="Transparent">
 
