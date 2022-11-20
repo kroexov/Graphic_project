@@ -108,19 +108,19 @@
         <Popup Grid.Row="1" Grid.Column="1" IsOpen="{Binding IsErrorOccured}">
             <TextBlock Text="{Binding ErrorText}"/>
         </Popup>
-        <StackPanel HorizontalAlignment="Right" Grid.Row="2" Grid.Column="2">
+        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Grid.Row="2" Grid.Column="2">
             <Button Content="Выбрать алгоритм дизеринга" Click="ChooseAlgorithm" ></Button>
             <Button Content="Сохранить изображение" Command="{Binding SaveFile}" ></Button>
         </StackPanel>
         
         <StackPanel Grid.Row="2" Grid.Column="0">
             <StackPanel Orientation="Horizontal">
-                <TextBlock Width="100" Background="black" FontSize="20" TextAlignment="Center">Длина</TextBlock>
-                <NumericUpDown Minimum="100" Maximum="600" Width="250"></NumericUpDown>
+                <TextBlock Width="100" Background="black" FontSize="20" TextAlignment="Center">Высота</TextBlock>
+                <NumericUpDown Minimum="50" Maximum="600" Width="250" Value="{Binding Height}"></NumericUpDown>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <TextBlock Width="100" Background="black" FontSize="20" TextAlignment="Center">Ширина</TextBlock>
-                <NumericUpDown Minimum="100" Maximum="600" Width="250"></NumericUpDown>
+                <NumericUpDown Minimum="50" Maximum="600" Width="250" Value="{Binding Width}"></NumericUpDown>
             </StackPanel>
             <Button Content="Сгенерировать градиент" Command="{Binding GenerateGradient}"></Button>
             <Button Content="Открыть изображение" Command="{Binding AddNewFile}"></Button>

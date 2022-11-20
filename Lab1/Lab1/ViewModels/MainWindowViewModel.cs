@@ -17,6 +17,10 @@ namespace Lab1.ViewModels
 
         private string _data;
 
+        private int _width = 100;
+
+        private int _height = 100;
+
         private string _currentPath;
 
         private string _gamma = "2.2";
@@ -100,6 +104,24 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _gamma, value);
+            }
+        }
+        
+        public int Width
+        {
+            get => _width;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _width, value);
+            }
+        }
+        
+        public int Height
+        {
+            get => _height;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _height, value);
             }
         }
         
@@ -241,7 +263,7 @@ namespace Lab1.ViewModels
 
         public void GenerateGradient()
         {
-            
+            ImageDisplayViewModel.SetPath(_model.CreateGradientImage(_width, _height));
         }
         
         public void ChooseAlgorithm()

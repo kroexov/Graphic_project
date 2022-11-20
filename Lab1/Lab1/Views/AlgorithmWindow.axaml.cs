@@ -20,11 +20,8 @@ public partial class AlgorithmWindow : Window
     private ObservableCollection<string> _spaces = new ObservableCollection<string>()
     {
         "Ordered (8x8)",
-        "HSL",
-        "HSV",
-        "YCbCr601",
-        "YCbCr709",
-        "YСoCg",
-        "CMY"
+        "Random",
+        "Floyd-Steinberg",
+        "Atkinson"
     };
 }

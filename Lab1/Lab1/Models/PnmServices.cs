@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using Lab1.TypeFileImg;
@@ -13,6 +14,7 @@ public class PnmServices: IPnmServices
     private byte[] _bytes;
     private string _filePath;
     private Pnm _fileImg;
+    private bool _isGenerated;
 
     #endregion
 
@@ -20,6 +22,7 @@ public class PnmServices: IPnmServices
 
     public string ReadFile(string filePath, bool[] channels, ColorSpace colorSpace = ColorSpace.Rgb)
     {
+        _isGenerated = false;
         if (!File.Exists(filePath))
         {
             throw new FileNotFoundException();
@@ -36,6 +39,13 @@ public class PnmServices: IPnmServices
 
     public byte[] SaveFile()
     {
+        if (_isGenerated)
+        {
+            var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+            pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+            var fullFileName = pathSaveFile + "\\imgFiles\\" + "gradient.bmp";
+            return File.ReadAllBytes(fullFileName);
+        }
         return _fileImg.SaveFile(_bytes);
     }
 
@@ -68,6 +78,36 @@ public class PnmServices: IPnmServices
         {
             _fileImg.SetColorChannel(newColorChannel);
         }
+    }
+
+    public string CreateGradientImage(int width, int height)
+    {
+        _isGenerated = true;
+        var image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+
+        double step = 1.0 / width;
+
+        double currentValue = 0;
+
+        for (var x = 0; x < width; x++)
+        {
+            var value = currentValue * 255;
+            for (var y = 0; y < height; y++)
+            {
+                Color newColor = Color.FromArgb((byte)Math.Round(value),
+                    (byte)Math.Round(value),
+                    (byte)Math.Round(value));
+
+                image.SetPixel(x, y, newColor);
+            }
+            currentValue += step;
+        }
+        
+        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+        var fullFileName = pathSaveFile + "\\imgFiles\\" + "gradient";
+        image.Save(fullFileName, ImageFormat.Bmp);
+        return fullFileName;
     }
 
     #endregion
