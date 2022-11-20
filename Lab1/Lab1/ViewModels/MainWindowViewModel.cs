@@ -19,7 +19,7 @@ namespace Lab1.ViewModels
 
         private string _currentPath;
 
-        private string _gamma = "0";
+        private string _gamma = "2.2";
 
         private string _selectedColorSpace = "RGB";
 
