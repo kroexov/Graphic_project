@@ -25,5 +25,12 @@ namespace Lab1.Views
             ErrorWindow errorWindow = new ErrorWindow(error);
             errorWindow.Show();
         }
+
+
+        private void ChooseAlgorithm(object? sender, RoutedEventArgs e)
+        {
+            AlgorithmWindow algorithmWindow = new AlgorithmWindow();
+            algorithmWindow.Show();
+        }
     }
 }

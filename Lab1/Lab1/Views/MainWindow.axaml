@@ -8,9 +8,9 @@
         x:Class="Lab1.Views.MainWindow"
         Icon="/Assets/avalonia-logo.ico"
         Title="Lab1"
-        Width="1200" Height="800"
         TransparencyLevelHint="AcrylicBlur"
-        Background="Transparent">
+        Background="Transparent"
+        WindowState="Maximized">
 
     <Design.DataContext>
         <vm:MainWindowViewModel/>
@@ -30,7 +30,7 @@
         <Grid.Styles>
             
             <Style Selector="Button">
-                <Setter Property="Width" Value="300"></Setter>
+                <Setter Property="Width" Value="350"></Setter>
                 <Setter Property="Height" Value="40"></Setter>
                 <Setter Property="FontSize" Value="20"></Setter>
                 <Setter Property="Foreground" Value="#FFFFFFFF" />
@@ -108,11 +108,13 @@
         <Popup Grid.Row="1" Grid.Column="1" IsOpen="{Binding IsErrorOccured}">
             <TextBlock Text="{Binding ErrorText}"/>
         </Popup>
-        <StackPanel Grid.Row="2" Grid.Column="2">
+        <StackPanel HorizontalAlignment="Right" Grid.Row="2" Grid.Column="2">
+            <Button Content="Выбрать алгоритм дизеринга" Click="ChooseAlgorithm" ></Button>
             <Button Content="Сохранить изображение" Command="{Binding SaveFile}" ></Button>
         </StackPanel>
         
         <StackPanel Grid.Row="2" Grid.Column="0">
+            <Button Content="Сгенерировать градиент" Command="{Binding GenerateGradient}"></Button>
             <Button Content="Открыть изображение" Command="{Binding AddNewFile}"></Button>
         </StackPanel>
     </Grid>

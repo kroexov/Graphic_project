@@ -235,6 +235,16 @@ namespace Lab1.ViewModels
             }
         }
 
+        public void GenerateGradient()
+        {
+            
+        }
+        
+        public void ChooseAlgorithm()
+        {
+            
+        }
+
         #endregion
 
         #region Private methods
