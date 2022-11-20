@@ -100,7 +100,7 @@ public class P6 : Pnm
         _currentColorСhannel = newColorChannel;
     }
 
-    public override void SaveFile(byte[] saveFile)
+    public override byte[] SaveFile(byte[] origFile)
     {
         var c = -1;
         if (_currentColorСhannel[0] && !_currentColorСhannel[1] && !_currentColorСhannel[2])
@@ -110,18 +110,30 @@ public class P6 : Pnm
         else if (!_currentColorСhannel[0] && !_currentColorСhannel[1] && _currentColorСhannel[2])
             c = 2;
 
+        byte[]? saveFile;
         if (c != -1)
         {
-            Array.Resize(ref saveFile, Header.Height * Header.Width);
+            saveFile = new byte[Header.Height * Header.Width + _index];
 
-            for (var i = c; i < Header.Height * Header.Width * Header.PixelSize; i += 3)
-                saveFile[i + _index] = (byte)Math.Round(Data[i] * 255);
+            for (var i = 0; i < _index; i++)
+                saveFile[i] = origFile[i];
+            
 
-            return;
+            for (var i = c; i < Header.Height * Header.Width; i++)
+                saveFile[i + _index] = (byte)Math.Round(Data[i*3 + c] * 255);
+
+            return saveFile;
         }
         
+        saveFile = new byte[Header.Height * Header.Width * Header.PixelSize + _index];
+
+        for (var i = 0; i < _index; i++)
+            saveFile[i] = origFile[i];
+        
         for (var i = 0; i < Header.Height * Header.Width * Header.PixelSize; i++)
-            saveFile[i + _index] = (byte)Math.Round(Data[i] * 255);
+            saveFile[i + _index] = (byte)Math.Round(Data[i] * 255 * Convert.ToInt32(_currentColorСhannel[i % 3]));
+
+        return saveFile;
     }
 
     #endregion

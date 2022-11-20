@@ -55,9 +55,17 @@ public class P5 : Pnm
         throw new NotImplementedException();
     }
 
-    public override void SaveFile(byte[] saveFile)
+    public override byte[] SaveFile(byte[] origFile)
     {
-        throw new NotImplementedException();
+        var saveFile = new byte[Header.Height * Header.Width * Header.PixelSize + _index];
+
+        for (var i = 0; i < _index; i++)
+            saveFile[i] = origFile[i];
+        
+        for (var i = 0; i < Header.Height * Header.Width * Header.PixelSize; i++)
+            saveFile[i + _index] = (byte)Math.Round(Data[i] * 255);
+
+        return saveFile;
     }
 
     #endregion

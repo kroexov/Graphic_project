@@ -22,7 +22,7 @@ public abstract class Pnm
 
     public abstract void SetColorChannel(bool[] newColorChannel);
 
-    public abstract void SaveFile(byte[] saveFile);
+    public abstract byte[] SaveFile(byte[] origFile);
 
     #endregion
 
