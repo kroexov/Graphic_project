@@ -66,6 +66,31 @@ public class P6 : Pnm
         return image;
     }
 
+    public Bitmap CreateGradientImage(int width, int height)
+    {
+        var image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+
+        double step = 1.0 / width;
+
+        double currentValue = 0;
+
+        for (var x = 0; x < width; x++)
+        {
+            var value = currentValue * 255;
+            for (var y = 0; y < height; y++)
+            {
+                Color newColor = Color.FromArgb((byte)Math.Round(value),
+                    (byte)Math.Round(value),
+                    (byte)Math.Round(value));
+
+                image.SetPixel(x, y, newColor);
+            }
+            currentValue += step;
+        }
+        _img = image;
+        return image;
+    }
+
     public override void ConvertColor(ColorSpace colorSpace)
     {
         if (_currentColorSpace == colorSpace)
