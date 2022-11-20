@@ -36,8 +36,7 @@ public class PnmServices: IPnmServices
 
     public byte[] SaveFile()
     {
-        _fileImg.SaveFile(_bytes);
-        return _bytes;
+        return _fileImg.SaveFile(_bytes);
     }
 
     public string RefreshImage()

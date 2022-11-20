@@ -22,7 +22,7 @@ public abstract class Pnm
 
     public abstract void SetColorChannel(bool[] newColorChannel);
 
-    public abstract void SaveFile(byte[] saveFile);
+    public abstract byte[] SaveFile(byte[] origFile);
 
     #endregion
 
@@ -32,15 +32,16 @@ public abstract class Pnm
     {
         Header = new FileHeaderInfo(ExtractHeaderInfo(bytes));
         
+        if (Header.Width * Header.Height * Header.PixelSize  > bytes.Length - _index)
+        {
+            throw new Exception("Damaged file");
+        }
+        
         Data = new double[Header.Width * Header.Height * Header.PixelSize];
+
         for (var i = 0; i < Header.Width * Header.Height * Header.PixelSize; i++)
         {
             Data[i] = Convert.ToDouble(bytes[i + _index]) / 255.0;
-        }
-        
-        if (Header.Width * Header.Height > bytes.Length - _index)
-        {
-            throw new Exception("Damaged file");
         }
     }
 

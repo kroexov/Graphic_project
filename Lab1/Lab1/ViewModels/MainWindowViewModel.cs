@@ -67,9 +67,10 @@ namespace Lab1.ViewModels
             {
                 this.RaiseAndSetIfChanged(ref _selectedColorSpace, value);
                 _model.ChangeColorSpace((ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
-                if (_model.RefreshImage() != String.Empty)
+                var res = _model.RefreshImage();
+                if (res != string.Empty)
                 {
-                    ImageDisplayViewModel.SetPath(_model.RefreshImage());
+                    ImageDisplayViewModel.SetPath(res);
                 }
             }
         }
@@ -84,9 +85,10 @@ namespace Lab1.ViewModels
                 {
                     _firstChannel, _secondChannel, _thirdChannel
                 });
-                if (_model.RefreshImage() != String.Empty)
+                var res = _model.RefreshImage();
+                if (res != string.Empty)
                 {
-                    ImageDisplayViewModel.SetPath(_model.RefreshImage());
+                    ImageDisplayViewModel.SetPath(res);
                 }
                 
             } 
@@ -111,9 +113,10 @@ namespace Lab1.ViewModels
                 {
                     _firstChannel, _secondChannel, _thirdChannel
                 });
-                if (_model.RefreshImage() != String.Empty)
+                var res = _model.RefreshImage();
+                if (res != string.Empty)
                 {
-                    ImageDisplayViewModel.SetPath(_model.RefreshImage());
+                    ImageDisplayViewModel.SetPath(res);
                 }
             } 
         }
@@ -128,9 +131,10 @@ namespace Lab1.ViewModels
                 {
                     _firstChannel, _secondChannel, _thirdChannel
                 });
-                if (_model.RefreshImage() != String.Empty)
+                var res = _model.RefreshImage();
+                if (res != string.Empty)
                 {
-                    ImageDisplayViewModel.SetPath(_model.RefreshImage());
+                    ImageDisplayViewModel.SetPath(res);
                 }
             } 
         }
