@@ -126,6 +126,5 @@
             <Button Content="Открыть изображение" Command="{Binding AddNewFile}"></Button>
         </StackPanel>
     </Grid>
-
 </Window>
 

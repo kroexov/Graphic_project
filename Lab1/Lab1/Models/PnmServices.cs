@@ -16,6 +16,7 @@ public class PnmServices: IPnmServices
     private Pnm _fileImg;
     private bool _isGenerated;
     private DitheringServices _ditheringServices = new DitheringServices();
+    private string _selectedPath;
 
     #endregion
 
@@ -34,24 +35,26 @@ public class PnmServices: IPnmServices
         _filePath = filePath;
         _fileImg = FindPnmImg(colorSpace);
         _fileImg.SetColorChannel(channels);
+        _selectedPath = RefreshImage();
 
-        return RefreshImage();
+        return _selectedPath;
     }
 
     public byte[] SaveFile()
     {
         if (_isGenerated)
         {
-            var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
-            pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-            var fullFileName = pathSaveFile + "\\imgFiles\\" + "gradient.bmp";
-            return File.ReadAllBytes(fullFileName);
+            return File.ReadAllBytes(_selectedPath);
         }
         return _fileImg.SaveFile(_bytes);
     }
 
     public string RefreshImage()
     {
+        if (_isGenerated)
+        {
+            return _selectedPath;
+        }
         if (_fileImg == null)
         {
             return String.Empty;
@@ -68,11 +71,7 @@ public class PnmServices: IPnmServices
 
     public string UseDither(int bitn)
     {
-        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
-        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-        var fullFileName = pathSaveFile + "\\imgFiles\\" + "image.psd-_12_.bmp";
-
-        return _ditheringServices.OrderedAlgorithm(fullFileName, bitn);
+        return _ditheringServices.OrderedAlgorithm(_selectedPath, bitn);
     }
     
     public void ChangeColorSpace(ColorSpace newColorSpace)
@@ -118,6 +117,7 @@ public class PnmServices: IPnmServices
         pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
         var fullFileName = pathSaveFile + "\\imgFiles\\" + "gradient.bmp";
         image.Save(fullFileName, ImageFormat.Bmp);
+        _selectedPath = fullFileName;
         return fullFileName;
     }
 
