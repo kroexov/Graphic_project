@@ -220,7 +220,23 @@ namespace Lab1.ViewModels
 
         public void ApplyGamma()
         {
-            
+            double result;
+
+            //Try parsing in the current culture
+            if (!double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
+                //Then try in US english
+                !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
+                //Then in neutral language
+                !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+            {
+                result = 0;
+            }
+            _model.ConvertGamma(result);
+            var res = _model.RefreshImage();
+            if (res != string.Empty)
+            {
+                ImageDisplayViewModel.SetPath(res);
+            }
         }
 
         public async void SaveFile()
