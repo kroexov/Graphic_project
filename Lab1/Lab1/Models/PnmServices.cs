@@ -34,6 +34,22 @@ public class PnmServices: IPnmServices
         return RefreshImage();
     }
 
+    public void AssignGamma(double newGamma)
+    {
+        if (_fileImg != null)
+        {
+            _fileImg.SetGammaCoeffficent(newGamma);
+        }
+    }
+
+    public void ConvertGamma(double newGamma)
+    {
+        if (_fileImg != null)
+        {
+            _fileImg.ConvertGammaImage(newGamma);
+        }
+    }
+
     public byte[] SaveFile()
     {
         return _fileImg.SaveFile(_bytes);
