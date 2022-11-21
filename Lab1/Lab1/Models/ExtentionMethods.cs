@@ -11,6 +11,10 @@ public static class ExtentionMethods
         while (result < value)
         {
             result += step;
+            if (result > 255)
+            {
+                result = 255;
+            }
         }
         return (byte)result;
     }
@@ -22,6 +26,10 @@ public static class ExtentionMethods
         while (result > value)
         {
             result -= step;
+            if (result < 0)
+            {
+                result = 0;
+            }
         }
         return (byte)result;
     }

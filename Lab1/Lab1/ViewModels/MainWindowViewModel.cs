@@ -48,6 +48,7 @@ namespace Lab1.ViewModels
         private bool _firstChannel = true;
         private bool _secondChannel = true;
         private bool _thirdChannel = true;
+        private AlgorithmWindowViewModel _algorithmWindowViewModel;
 
         #endregion
 
@@ -56,6 +57,7 @@ namespace Lab1.ViewModels
         public MainWindowViewModel(PnmServices model)
         {
             _model = model;
+            _algorithmWindowViewModel = new AlgorithmWindowViewModel(model);
             model.ModelErrorHappened += (s => OnErrorHappened(s));
             ImageDisplayViewModel = new ImageDisplayViewModel();
         }
@@ -63,6 +65,15 @@ namespace Lab1.ViewModels
         #endregion
 
         #region Public properties
+
+        public AlgorithmWindowViewModel AlgorithmWindowViewModel
+        {
+            get => _algorithmWindowViewModel;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _algorithmWindowViewModel, value);
+            }
+        }
 
         public PnmServices Services => _model;
 

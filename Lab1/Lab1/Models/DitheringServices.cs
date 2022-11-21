@@ -28,8 +28,8 @@ public class DitheringServices
             for (var x = 0; x < width; x++)
             {
                 var color = oldimage.GetPixel(x, y);
-                var matrixh = height % 8; // 81 -> 1
-                var matrixw = width % 8; // 79 -> 7
+                var matrixh = y % 8; // 81 -> 1
+                var matrixw = x % 8; // 79 -> 7
                 var value1 = color.R;
                 var value2 = color.G;
                 var value3 = color.B;

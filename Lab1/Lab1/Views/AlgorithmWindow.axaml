@@ -2,18 +2,24 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:viewModels="clr-namespace:Lab1.ViewModels"
         mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
         x:Class="Lab1.ViewModels.AlgorithmWindow"
-        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        DataContext=""
         WindowState="Maximized"
         Title="AlgorithmWindow">
+        <Design.DataContext>
+                <viewModels:AlgorithmWindowViewModel/>
+        </Design.DataContext>
         <Grid>
-                <Image Stretch="None" Source="{Binding ImageToLoadPublic}"></Image>
+                <Border Height="600" Width="600" Background="white" VerticalAlignment="Center" HorizontalAlignment="Center">
+                        <Image Stretch="Uniform" Source="{Binding ImageToLoadPublic}"></Image>
+                </Border>
+                
                 <StackPanel Height="300" Width="200" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <NumericUpDown Minimum="1" Maximum="8" Value="{Binding Bitn}"></NumericUpDown>
                 <TextBlock Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Center" FontSize="20">Алгоритмы</TextBlock>
                 <ListBox Items="{Binding Algorithms}" SelectedItem="{Binding SelectedAlg}"></ListBox>
-                <Button Width="200" Content="Выбрать алгоритм" Click="OnAlgChosen"></Button>
         </StackPanel>
         </Grid>
 </Window>
