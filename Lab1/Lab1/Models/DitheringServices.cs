@@ -16,6 +16,8 @@ public class DitheringServices
         new byte[] { 60, 188, 28, 156, 52, 180, 20, 148 },
         new byte[] { 252, 124, 220, 92, 244, 116, 212, 84 },
     };
+    
+    private Random random = new Random();
     public string OrderedAlgorithm(string oldimagepath, int bitn)
     {
         Bitmap oldimage = (Bitmap) Image.FromFile(oldimagepath);
@@ -54,6 +56,104 @@ public class DitheringServices
         return fullFileName;
     }
 
+    public string FloydSteinbergAlgorithm(string oldimagepath, int bitn)
+    {
+        Bitmap oldimage = (Bitmap) Image.FromFile(oldimagepath);
+        int width = oldimage.Width;
+        int height = oldimage.Height;
+        
+        var image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                var color = oldimage.GetPixel(x, y);
+                var value1 = color.R;
+                var value2 = color.G;
+                var value3 = color.B;
+
+                value1 = value1.CastToClosest(bitn);
+                var diff1 = color.R - value1;
+                
+                value2 = value2.CastToClosest(bitn);
+                var diff2 = color.G - value2;
+                
+                value3 = value3.CastToClosest(bitn);
+                var diff3 = color.B - value3;
+                
+                //Прибавляем ошибки к другим пикселям
+                if (x + 1 < width)
+                {
+                    // pixel[y][x+1] += (7.0 / 16) * diff1;
+                }
+
+                if (y + 1 < height)
+                {
+                    if (x - 1 >= 0)
+                    {
+                        //pixel[y+1][x-1] += (3.0 / 16) * diff1;
+                    }
+                    // pixel[y+1][x] += (5.0 / 16) * diff1;
+                    if (x + 1 < width)
+                    {
+                        //pixel[y+1][x+1] += (1.0 / 16) * diff1;
+                    }
+                    
+                }
+
+                Color newColor = Color.FromArgb(value1,
+                    value2, 
+                    value3);
+                
+                image.SetPixel(x, y, newColor);
+            }
+            
+        }
+        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+        var fullFileName = pathSaveFile + "\\imgFiles\\" + "dithered.bmp";
+        image.Save(fullFileName, ImageFormat.Bmp);
+
+        return fullFileName;
+    }
+    
+    public string RandomAlgorithm(string oldimagepath, int bitn)
+    {
+        Bitmap oldimage = (Bitmap) Image.FromFile(oldimagepath);
+        int width = oldimage.Width;
+        int height = oldimage.Height;
+        
+        var image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                var color = oldimage.GetPixel(x, y);
+                var randomNumber = random.Next(0, 256);
+                var value1 = color.R;
+                var value2 = color.G;
+                var value3 = color.B;
+                
+                value1 = (value1 > randomNumber) ? value1.CastUp(bitn) : value1.CastDown(bitn);
+                value2 = (value2 > randomNumber) ? value2.CastUp(bitn) : value2.CastDown(bitn);
+                value3 = (value3 > randomNumber) ? value3.CastUp(bitn) : value3.CastDown(bitn);
+                
+                Color newColor = Color.FromArgb(value1,
+                    value2, 
+                    value3);
+                
+                image.SetPixel(x, y, newColor);
+            }
+            
+        }
+        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+        var fullFileName = pathSaveFile + "\\imgFiles\\" + "dithered.bmp";
+        image.Save(fullFileName, ImageFormat.Bmp);
+
+        return fullFileName;
+    }
     
     
     protected int GetCoordinates(int width, int x, int y)

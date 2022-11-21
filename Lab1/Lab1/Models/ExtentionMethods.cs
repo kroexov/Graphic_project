@@ -1,4 +1,5 @@
 ﻿using System;
+using DynamicData.Binding;
 
 namespace Lab1.Models;
 
@@ -24,5 +25,25 @@ public static class ExtentionMethods
             result -= step;
         }
         return (byte)result;
+    }
+
+    public static byte CastToClosest(this byte value, int bitn)
+    {
+        int step = 255 / ((int) Math.Pow(2, bitn) - 1);
+        int result = 0;
+        while (result < value)
+        {
+            result += step;
+        }
+
+        int prev_result = result - step;
+        if (Math.Abs(result - value) <= Math.Abs(prev_result - value))
+        {
+            return (byte)result;
+        }
+        else
+        {
+            return (byte)prev_result;
+        }
     }
 }
