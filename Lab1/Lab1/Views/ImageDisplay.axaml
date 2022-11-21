@@ -10,5 +10,5 @@
         <viewModels:ImageDisplayViewModel/>
     </Design.DataContext>
     
-    <Image Source="{Binding ImageToLoadPublic}"></Image>
+    <Image Source="{Binding ImageToLoadPublic}" PointerPressed="OnPointerPressed"></Image>
 </UserControl>
