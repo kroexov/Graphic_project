@@ -69,9 +69,19 @@ public class PnmServices: IPnmServices
         return fullFileName;
     }
 
-    public string UseDither(int bitn)
+    public string UseDither(int bitn, string selectedAlgorithm)
     {
-        return _ditheringServices.OrderedAlgorithm(_selectedPath, bitn);
+        switch (selectedAlgorithm)
+        {
+            case "Random":
+                return _ditheringServices.RandomAlgorithm(_selectedPath, bitn);
+            case "Floyd-Steinberg":
+                return _ditheringServices.FloydSteinbergAlgorithm(_selectedPath, bitn);
+            case "Atkinson":
+                return _ditheringServices.AtkinsonAlgorithm(_selectedPath, bitn);
+            default:
+                return _ditheringServices.OrderedAlgorithm(_selectedPath, bitn);
+        }
     }
     
     public void ChangeColorSpace(ColorSpace newColorSpace)

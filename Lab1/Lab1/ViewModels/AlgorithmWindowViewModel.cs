@@ -33,7 +33,7 @@ public class AlgorithmWindowViewModel : ViewModelBase
         {
             _selectedAlg = value;
             this.RaiseAndSetIfChanged(ref _selectedAlg, value);
-            SetPath(_services.UseDither(_bitn));
+            SetPath(_services.UseDither(_bitn, _selectedAlg));
         }
     }
     
@@ -44,7 +44,7 @@ public class AlgorithmWindowViewModel : ViewModelBase
         {
             _bitn = value;
             this.RaiseAndSetIfChanged(ref _bitn, value);
-            SetPath(_services.UseDither(_bitn));
+            SetPath(_services.UseDither(_bitn, _selectedAlg));
         }
     }
     

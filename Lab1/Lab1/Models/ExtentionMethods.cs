@@ -42,6 +42,10 @@ public static class ExtentionMethods
         while (result < value)
         {
             result += step;
+            if (result > 255)
+            {
+                result = 255;
+            }
         }
 
         int prev_result = result - step;
@@ -49,9 +53,7 @@ public static class ExtentionMethods
         {
             return (byte)result;
         }
-        else
-        {
-            return (byte)prev_result;
-        }
+
+        return (byte)prev_result;
     }
 }

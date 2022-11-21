@@ -55,68 +55,6 @@ public class DitheringServices
 
         return fullFileName;
     }
-
-    public string FloydSteinbergAlgorithm(string oldimagepath, int bitn)
-    {
-        Bitmap oldimage = (Bitmap) Image.FromFile(oldimagepath);
-        int width = oldimage.Width;
-        int height = oldimage.Height;
-        
-        var image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
-
-        for (var y = 0; y < height; y++)
-        {
-            for (var x = 0; x < width; x++)
-            {
-                var color = oldimage.GetPixel(x, y);
-                var value1 = color.R;
-                var value2 = color.G;
-                var value3 = color.B;
-
-                value1 = value1.CastToClosest(bitn);
-                var diff1 = color.R - value1;
-                
-                value2 = value2.CastToClosest(bitn);
-                var diff2 = color.G - value2;
-                
-                value3 = value3.CastToClosest(bitn);
-                var diff3 = color.B - value3;
-                
-                //Прибавляем ошибки к другим пикселям
-                if (x + 1 < width)
-                {
-                    // pixel[y][x+1] += (7.0 / 16) * diff1;
-                }
-
-                if (y + 1 < height)
-                {
-                    if (x - 1 >= 0)
-                    {
-                        //pixel[y+1][x-1] += (3.0 / 16) * diff1;
-                    }
-                    // pixel[y+1][x] += (5.0 / 16) * diff1;
-                    if (x + 1 < width)
-                    {
-                        //pixel[y+1][x+1] += (1.0 / 16) * diff1;
-                    }
-                    
-                }
-
-                Color newColor = Color.FromArgb(value1,
-                    value2, 
-                    value3);
-                
-                image.SetPixel(x, y, newColor);
-            }
-            
-        }
-        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
-        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-        var fullFileName = pathSaveFile + "\\imgFiles\\" + "dithered.bmp";
-        image.Save(fullFileName, ImageFormat.Bmp);
-
-        return fullFileName;
-    }
     
     public string RandomAlgorithm(string oldimagepath, int bitn)
     {
@@ -154,8 +92,182 @@ public class DitheringServices
 
         return fullFileName;
     }
+
+    public string FloydSteinbergAlgorithm(string oldimagepath, int bitn)
+    {
+        Bitmap oldimage = (Bitmap) Image.FromFile(oldimagepath);
+        int width = oldimage.Width;
+        int height = oldimage.Height;
+        
+        var image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                var color = oldimage.GetPixel(x, y);
+                var value1 = color.R;
+                var value2 = color.G;
+                var value3 = color.B;
+
+                value1 = value1.CastToClosest(bitn);
+                var diffR = color.R - value1;
+                
+                value2 = value2.CastToClosest(bitn);
+                var diffG = color.G - value2;
+                
+                value3 = value3.CastToClosest(bitn);
+                var diffB = color.B - value3;
+                
+                //Прибавляем ошибки к другим пикселям
+                if (x + 1 < width)
+                {
+                    AddErrorToPixel(x + 1, y, 7.0 / 16, diffR, diffG, diffB, oldimage);
+                    // pixel[y][x+1] += (7.0 / 16) * diff1;
+                }
+
+                if (y + 1 < height)
+                {
+                    if (x - 1 >= 0)
+                    {
+                        AddErrorToPixel(x - 1, y + 1, 3.0 / 16, diffR, diffG, diffB, oldimage);
+                        //pixel[y+1][x-1] += (3.0 / 16) * diff1;
+                    }
+                    AddErrorToPixel(x, y, 5.0 / 16, diffR, diffG, diffB, oldimage);
+                    // pixel[y+1][x] += (5.0 / 16) * diff1;
+                    if (x + 1 < width)
+                    {
+                        AddErrorToPixel(x + 1, y + 1, 1.0 / 16, diffR, diffG, diffB, oldimage);
+                        //pixel[y+1][x+1] += (1.0 / 16) * diff1;
+                    }
+                    
+                }
+
+                Color newColor = Color.FromArgb(value1,
+                    value2, 
+                    value3);
+                
+                image.SetPixel(x, y, newColor);
+            }
+            
+        }
+        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+        var fullFileName = pathSaveFile + "\\imgFiles\\" + "dithered.bmp";
+        image.Save(fullFileName, ImageFormat.Bmp);
+
+        return fullFileName;
+    }
+
+    private byte ConvertValueToByte(double value)
+    {
+        if (value < 0)
+        {
+            return Convert.ToByte(0);
+        }
+
+        if (value > 255)
+        {
+            return Convert.ToByte(255);
+        }
+
+        return Convert.ToByte(value);
+    }
+
+    private void AddErrorToPixel(int x, int y, double coef, int diffR, int diffG, int diffB, Bitmap oldImage)
+    {
+        var tmpColor = oldImage.GetPixel(x, y);
+        var tmpValue1 = tmpColor.R + coef * diffR;
+        byte tmpValue11 = ConvertValueToByte(tmpValue1);
+        var tmpValue2 = tmpColor.G + coef * diffG;
+        byte tmpValue22 = ConvertValueToByte(tmpValue2);
+        var tmpValue3 = tmpColor.B + coef * diffB;
+        byte tmpValue33 = ConvertValueToByte(tmpValue3);
+                    
+        tmpColor = Color.FromArgb(tmpValue11,
+            tmpValue22, 
+            tmpValue33);
+                
+        oldImage.SetPixel(x, y, tmpColor);
+    }
     
-    
+        public string AtkinsonAlgorithm(string oldimagepath, int bitn)
+    {
+        Bitmap oldimage = (Bitmap) Image.FromFile(oldimagepath);
+        int width = oldimage.Width;
+        int height = oldimage.Height;
+        
+        var image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
+
+        for (var y = 0; y < height; y++)
+        {
+            for (var x = 0; x < width; x++)
+            {
+                var color = oldimage.GetPixel(x, y);
+                var value1 = color.R;
+                var value2 = color.G;
+                var value3 = color.B;
+
+                value1 = value1.CastToClosest(bitn);
+                var diff1 = color.R - value1;
+                
+                value2 = value2.CastToClosest(bitn);
+                var diff2 = color.G - value2;
+                
+                value3 = value3.CastToClosest(bitn);
+                var diff3 = color.B - value3;
+                
+                //Прибавляем ошибки к другим пикселям
+                if (x + 1 < width)
+                {
+                    var tmpColor = oldimage.GetPixel(x + 1, y);
+                    var tmpValue1 = tmpColor.R + (7.0 / 16) * diff1;
+                    byte tmpValue11 = (tmpValue1 > 0) ? Convert.ToByte(tmpValue1) :  Convert.ToByte(0);
+                    var tmpValue2 = tmpColor.G + (7.0 / 16) * diff1;
+                    byte tmpValue22 = (tmpValue2 > 0) ? Convert.ToByte(tmpValue2) :  Convert.ToByte(0);
+                    var tmpValue3 = tmpColor.B + (7.0 / 16) * diff1;
+                    byte tmpValue33 = (tmpValue3 > 0) ? Convert.ToByte(tmpValue3) :  Convert.ToByte(0);
+                    
+                    tmpColor = Color.FromArgb(tmpValue11,
+                        tmpValue22, 
+                        tmpValue33);
+                
+                    image.SetPixel(x + 1, y, tmpColor);
+
+                    // pixel[y][x+1] += (7.0 / 16) * diff1;
+                }
+
+                if (y + 1 < height)
+                {
+                    if (x - 1 >= 0)
+                    {
+                        //pixel[y+1][x-1] += (3.0 / 16) * diff1;
+                    }
+                    // pixel[y+1][x] += (5.0 / 16) * diff1;
+                    if (x + 1 < width)
+                    {
+                        //pixel[y+1][x+1] += (1.0 / 16) * diff1;
+                    }
+                    
+                }
+
+                Color newColor = Color.FromArgb(value1,
+                    value2, 
+                    value3);
+                
+                image.SetPixel(x, y, newColor);
+            }
+            
+        }
+        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+        var fullFileName = pathSaveFile + "\\imgFiles\\" + "dithered.bmp";
+        image.Save(fullFileName, ImageFormat.Bmp);
+
+        return fullFileName;
+    }
+
+
     protected int GetCoordinates(int width, int x, int y)
     {
         return y * width + x;
