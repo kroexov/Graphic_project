@@ -211,6 +211,11 @@ namespace Lab1.ViewModels
             }
         }
 
+        public void ApplyGamma()
+        {
+            
+        }
+
         public async void SaveFile()
         {
             var ofd = new SaveFileDialog();
