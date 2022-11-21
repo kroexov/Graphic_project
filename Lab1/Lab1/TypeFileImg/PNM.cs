@@ -11,6 +11,8 @@ public abstract class Pnm
     protected FileHeaderInfo Header;
     protected int _index;
     protected double[] Data;
+    protected double[] _valueConvertSrgbToRgb = {0.04045, 12.92, 0.055, 1.055, 2.4};
+    protected double _gamma = 0;
 
     #endregion
 
@@ -24,9 +26,45 @@ public abstract class Pnm
 
     public abstract byte[] SaveFile(byte[] origFile);
 
+    public void SetGammaCoeffficent(double newGamma)
+    {
+        _gamma = newGamma;
+    }
+
+    public void ConvertGammaImage(double gammaConvertValue)
+    {
+        
+    }
+
     #endregion
 
     #region Private/protected methods
+    
+    protected double ConvertSrgbToRgb(double linearValue)
+    {
+        if (linearValue <= _valueConvertSrgbToRgb[0])
+        {
+            return linearValue / _valueConvertSrgbToRgb[1];
+        }
+
+        return Math.Pow((linearValue + _valueConvertSrgbToRgb[2]) / _valueConvertSrgbToRgb[3], _valueConvertSrgbToRgb[4]);
+    }
+
+    protected double ConvertRgbToSrgb(double rgbValue)
+    {
+        if (_gamma == 0)
+        {
+            if (rgbValue <= _valueConvertSrgbToRgb[0] / _valueConvertSrgbToRgb[1])
+            {
+                return _valueConvertSrgbToRgb[1] * rgbValue;
+            }
+
+            return Math.Pow(rgbValue, 1 / _valueConvertSrgbToRgb[4]) * _valueConvertSrgbToRgb[3] -
+                   _valueConvertSrgbToRgb[2];
+        }
+
+        return Math.Pow(rgbValue, 1 / _gamma);
+    }
 
     protected Pnm(byte[] bytes)
     {
@@ -41,7 +79,7 @@ public abstract class Pnm
 
         for (var i = 0; i < Header.Width * Header.Height * Header.PixelSize; i++)
         {
-            Data[i] = Convert.ToDouble(bytes[i + _index]) / 255.0;
+            Data[i] = ConvertSrgbToRgb(Convert.ToDouble(bytes[i + _index]) / 255.0);
         }
     }
 

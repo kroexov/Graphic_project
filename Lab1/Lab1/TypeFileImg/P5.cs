@@ -7,6 +7,7 @@ namespace Lab1.TypeFileImg;
 
 public class P5 : Pnm
 {
+    private double gamma = 2.2;
 
     #region Constructor
 
@@ -27,7 +28,7 @@ public class P5 : Pnm
         {
             for (var y = 0; y < Header.Height; y++)
             {
-                var valueColor = 255 * Data[GetCoordinates(x, y)];
+                var valueColor = 255 * ConvertRgbToSrgb(Data[GetCoordinates(x, y)]);
                 Color newColor = Color.FromArgb((byte)Math.Round(valueColor), (byte)Math.Round(valueColor), (byte)Math.Round(valueColor));
                 image.SetPixel(x, y, newColor);
             }

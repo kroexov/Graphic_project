@@ -19,7 +19,7 @@ namespace Lab1.ViewModels
 
         private string _currentPath;
 
-        private string _gamma = "2.2";
+        private string _gamma = "0";
 
         private string _selectedColorSpace = "RGB";
 
@@ -208,6 +208,13 @@ namespace Lab1.ViewModels
                 !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
             {
                 result = 0;
+            }
+            
+            _model.AssignGamma(result);
+            var res = _model.RefreshImage();
+            if (res != string.Empty)
+            {
+                ImageDisplayViewModel.SetPath(res);
             }
         }
 
