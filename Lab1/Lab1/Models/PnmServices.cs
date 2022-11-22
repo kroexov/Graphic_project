@@ -38,10 +38,10 @@ public class PnmServices: IPnmServices
     {
         if (_fileImg != null)
         {
-            _fileImg.SetGammaCoeffficent(newGamma);
-        }
+            _fileImg.SetGammaСoefficient(newGamma);
+        }   
     }
-
+    
     public void ConvertGamma(double newGamma)
     {
         if (_fileImg != null)
