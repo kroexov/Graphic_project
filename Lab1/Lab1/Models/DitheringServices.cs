@@ -209,46 +209,45 @@ public class DitheringServices
                 var value3 = color.B;
 
                 value1 = value1.CastToClosest(bitn);
-                var diff1 = color.R - value1;
+                var diffR = color.R - value1;
                 
                 value2 = value2.CastToClosest(bitn);
-                var diff2 = color.G - value2;
+                var diffG = color.G - value2;
                 
                 value3 = value3.CastToClosest(bitn);
-                var diff3 = color.B - value3;
+                var diffB = color.B - value3;
+
+                double coef = 1.0 / 8;
                 
                 //Прибавляем ошибки к другим пикселям
                 if (x + 1 < width)
                 {
-                    var tmpColor = oldimage.GetPixel(x + 1, y);
-                    var tmpValue1 = tmpColor.R + (7.0 / 16) * diff1;
-                    byte tmpValue11 = (tmpValue1 > 0) ? Convert.ToByte(tmpValue1) :  Convert.ToByte(0);
-                    var tmpValue2 = tmpColor.G + (7.0 / 16) * diff1;
-                    byte tmpValue22 = (tmpValue2 > 0) ? Convert.ToByte(tmpValue2) :  Convert.ToByte(0);
-                    var tmpValue3 = tmpColor.B + (7.0 / 16) * diff1;
-                    byte tmpValue33 = (tmpValue3 > 0) ? Convert.ToByte(tmpValue3) :  Convert.ToByte(0);
-                    
-                    tmpColor = Color.FromArgb(tmpValue11,
-                        tmpValue22, 
-                        tmpValue33);
+                    AddErrorToPixel(x + 1, y, coef, diffR, diffG, diffB, oldimage);
+                }
                 
-                    image.SetPixel(x + 1, y, tmpColor);
-
-                    // pixel[y][x+1] += (7.0 / 16) * diff1;
+                if (x + 2 < width)
+                {
+                    AddErrorToPixel(x + 2, y, coef, diffR, diffG, diffB, oldimage);
                 }
 
                 if (y + 1 < height)
                 {
                     if (x - 1 >= 0)
                     {
-                        //pixel[y+1][x-1] += (3.0 / 16) * diff1;
-                    }
-                    // pixel[y+1][x] += (5.0 / 16) * diff1;
-                    if (x + 1 < width)
-                    {
-                        //pixel[y+1][x+1] += (1.0 / 16) * diff1;
+                        AddErrorToPixel(x - 1, y + 1, coef, diffR, diffG, diffB, oldimage);
                     }
                     
+                    AddErrorToPixel(x, y, coef, diffR, diffG, diffB, oldimage);
+
+                    if (x + 1 < width)
+                    {
+                        AddErrorToPixel(x + 1, y + 1, coef, diffR, diffG, diffB, oldimage);
+                    }
+                }
+
+                if (y + 2 < height)
+                {
+                    AddErrorToPixel(x, y + 2, coef, diffR, diffG, diffB, oldimage);
                 }
 
                 Color newColor = Color.FromArgb(value1,
