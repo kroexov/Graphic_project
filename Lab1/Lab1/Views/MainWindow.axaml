@@ -110,7 +110,7 @@
         </Popup>
         <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Grid.Row="2" Grid.Column="2">
             <Button Content="Выбрать алгоритм дизеринга" Click="ChooseAlgorithm" ></Button>
-            <Button Content="Сохранить изображение" Command="{Binding SaveFile}" ></Button>
+            <Button Name="SaveButton" Click="SaveButton_OnClick" IsEnabled="{Binding AlgChosen}" Content="Сохранить изображение" Command="{Binding SaveFile}" ></Button>
         </StackPanel>
         
         <StackPanel Grid.Row="2" Grid.Column="0">

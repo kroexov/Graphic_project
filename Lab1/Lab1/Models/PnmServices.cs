@@ -71,6 +71,7 @@ public class PnmServices: IPnmServices
 
     public string UseDither(int bitn, string selectedAlgorithm)
     {
+        OnAlgChosen?.Invoke();
         switch (selectedAlgorithm)
         {
             case "Random":
@@ -180,6 +181,7 @@ public class PnmServices: IPnmServices
     
     #region Events
 
+    public event Action? OnAlgChosen;
     public event Action<string>? ModelErrorHappened;
 
     #endregion

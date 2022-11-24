@@ -27,6 +27,8 @@ namespace Lab1.ViewModels
 
         private string _selectedColorSpace = "RGB";
 
+        private bool _algChosen;
+
         private ObservableCollection<string> _items = new ObservableCollection<string>();
         private ObservableCollection<string> _spaces = new ObservableCollection<string>()
         {
@@ -59,7 +61,13 @@ namespace Lab1.ViewModels
             _model = model;
             _algorithmWindowViewModel = new AlgorithmWindowViewModel(model);
             model.ModelErrorHappened += (s => OnErrorHappened(s));
+            model.OnAlgChosen += ModelOnOnAlgChosen;
             ImageDisplayViewModel = new ImageDisplayViewModel();
+        }
+
+        private void ModelOnOnAlgChosen()
+        {
+            AlgChosen = true;
         }
 
         #endregion
@@ -75,7 +83,11 @@ namespace Lab1.ViewModels
             }
         }
 
-        public PnmServices Services => _model;
+        public bool AlgChosen
+        {
+            get => _algChosen;
+            set => this.RaiseAndSetIfChanged(ref _algChosen, value);
+        }
 
         public string SelectedColorSpace
         {
@@ -254,10 +266,12 @@ namespace Lab1.ViewModels
             ofd.Filters.Add(new FileDialogFilter() {Name = "Файлы P5", Extensions = {"pgm"}});
             
             var result = await ofd.ShowAsync(new Window());
-            
+            var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+            pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+            var fullFileName = pathSaveFile + "\\imgFiles\\" + "dithered.bmp";
             if (result != null)
             {
-                File.WriteAllBytes(result,_model.SaveFile());
+                File.WriteAllBytes(result,File.ReadAllBytes(fullFileName));
             }
         }
 

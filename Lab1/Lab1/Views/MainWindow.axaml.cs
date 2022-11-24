@@ -29,8 +29,14 @@ namespace Lab1.Views
 
         private void ChooseAlgorithm(object? sender, RoutedEventArgs e)
         {
+            SaveButton.IsEnabled = true;
             AlgorithmWindow algorithmWindow = new AlgorithmWindow(_mvm.AlgorithmWindowViewModel);
             algorithmWindow.Show();
+        }
+
+        private void SaveButton_OnClick(object? sender, RoutedEventArgs e)
+        {
+            SaveButton.IsEnabled = false;
         }
     }
 }
