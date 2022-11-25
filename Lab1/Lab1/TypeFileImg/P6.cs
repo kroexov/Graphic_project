@@ -46,9 +46,9 @@ public class P6 : Pnm
                 // var valueGreen = 255 * tempPixel[1];
                 // var valueBlue = 255 * tempPixel[2];
                 
-                var valueRed = 255 * ConvertRgbToSrgb(_tempPixel[0]);
-                var valueGreen = 255 * ConvertRgbToSrgb(_tempPixel[1]);
-                var valueBlue = 255 * ConvertRgbToSrgb(_tempPixel[2]);
+                var valueRed = 255 * AssignGamma(_tempPixel[0]);
+                var valueGreen = 255 * AssignGamma(_tempPixel[1]);
+                var valueBlue = 255 * AssignGamma(_tempPixel[2]);
                 
                 Color newColor = Color.FromArgb((byte)Math.Round(valueRed),
                     (byte)Math.Round(valueGreen), 
@@ -122,7 +122,7 @@ public class P6 : Pnm
             }
 
             for (var i = 0; i < Header.Height * Header.Width; i++)
-                saveFile[i + _index] = (byte)Math.Round(Data[i*3 + c] * 255);
+                saveFile[i + _index] = (byte)Math.Round((Data[i * 3 + c]) * 255);
 
             return saveFile;
         }
@@ -133,8 +133,8 @@ public class P6 : Pnm
             saveFile[i] = origFile[i];
         
         for (var i = 0; i < Header.Height * Header.Width * Header.PixelSize; i++)
-            saveFile[i + _index] = (byte)Math.Round(Data[i] * 255 * Convert.ToInt32(_currentColorСhannel[i % 3]));
-
+            saveFile[i + _index] = (byte)Math.Round((Data[i]) * 255 * Convert.ToInt32(_currentColorСhannel[i % 3]));
+        
         return saveFile;
     }
 

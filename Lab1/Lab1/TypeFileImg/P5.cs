@@ -28,7 +28,7 @@ public class P5 : Pnm
         {
             for (var y = 0; y < Header.Height; y++)
             {
-                var valueColor = 255 * ConvertRgbToSrgb(Data[GetCoordinates(x, y)]);
+                var valueColor = 255 * AssignGamma(Data[GetCoordinates(x, y)]);
                 Color newColor = Color.FromArgb((byte)Math.Round(valueColor), (byte)Math.Round(valueColor), (byte)Math.Round(valueColor));
                 image.SetPixel(x, y, newColor);
             }
@@ -52,8 +52,9 @@ public class P5 : Pnm
             saveFile[i] = origFile[i];
         
         for (var i = 0; i < Header.Height * Header.Width * Header.PixelSize; i++)
-            saveFile[i + _index] = (byte)Math.Round(Data[i] * 255);
+            saveFile[i + _index] = (byte)Math.Round((Data[i]) * 255);
 
+        
         return saveFile;
     }
 
