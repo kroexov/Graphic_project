@@ -40,6 +40,22 @@ public class PnmServices: IPnmServices
         return _selectedPath;
     }
 
+    public void AssignGamma(double newGamma)
+    {
+        if (_fileImg != null)
+        {
+            _fileImg.SetGammaСoefficient(newGamma);
+        }   
+    }
+    
+    public void ConvertGamma(double newGamma)
+    {
+        if (_fileImg != null)
+        {
+            _fileImg.ConvertGamma(newGamma);
+        }
+    }
+
     public byte[] SaveFile()
     {
         if (_isGenerated)

@@ -12,17 +12,11 @@ public class P6 : Pnm
     private bool[] _currentColorСhannel;
     private ColorSpace _currentColorSpace;
     private Bitmap _img;
-    private double[] tempPixel = new double[3];
+    private readonly double[] _tempPixel = new double[3];
 
     #endregion
 
     #region Constructor
-
-    public P6(byte[] bytes) : base(bytes)
-    {
-        _currentColorСhannel = new bool[] { true, true, true };
-        _currentColorSpace = ColorSpace.Rgb;
-    }
 
     public P6(byte[] bytes, ColorSpace colorSpace) : base(bytes)
     {
@@ -46,11 +40,15 @@ public class P6 : Pnm
                 var value2 = Data[GetCoordinates(3*x + 1, 3*y)]  * Convert.ToInt32(_currentColorСhannel[1]);
                 var value3 = Data[GetCoordinates(3*x + 2, 3*y)]  * Convert.ToInt32(_currentColorСhannel[2]);
                 
-                ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
+                ConvertColorPixel(_tempPixel, value1, value2, value3, ColorSpace.Rgb);
                 
-                var valueRed = 255 * tempPixel[0];
-                var valueGreen = 255 * tempPixel[1];
-                var valueBlue = 255 * tempPixel[2];
+                // var valueRed = 255 * tempPixel[0];
+                // var valueGreen = 255 * tempPixel[1];
+                // var valueBlue = 255 * tempPixel[2];
+                
+                var valueRed = 255 * AssignGamma(_tempPixel[0]);
+                var valueGreen = 255 * AssignGamma(_tempPixel[1]);
+                var valueBlue = 255 * AssignGamma(_tempPixel[2]);
                 
                 Color newColor = Color.FromArgb((byte)Math.Round(valueRed),
                     (byte)Math.Round(valueGreen), 
@@ -85,11 +83,11 @@ public class P6 : Pnm
                 var value1 = Data[GetCoordinates(3*x, 3*y)];
                 var value2 = Data[GetCoordinates(3*x + 1, 3*y)];
                 var value3 = Data[GetCoordinates(3*x + 2, 3*y)];
-                ConvertColorPixel(tempPixel, value1, value2, value3, colorSpace);
+                ConvertColorPixel(_tempPixel, value1, value2, value3, colorSpace);
                 
-                Data[GetCoordinates(3*x, 3*y)] = tempPixel[0];
-                Data[GetCoordinates(3*x + 1, 3*y)] = tempPixel[1];
-                Data[GetCoordinates(3*x + 2, 3*y)] = tempPixel[2];
+                Data[GetCoordinates(3*x, 3*y)] = _tempPixel[0];
+                Data[GetCoordinates(3*x + 1, 3*y)] = _tempPixel[1];
+                Data[GetCoordinates(3*x + 2, 3*y)] = _tempPixel[2];
             }
         }
         SetColorSpace(colorSpace);
@@ -124,7 +122,7 @@ public class P6 : Pnm
             }
 
             for (var i = 0; i < Header.Height * Header.Width; i++)
-                saveFile[i + _index] = (byte)Math.Round(Data[i*3 + c] * 255);
+                saveFile[i + _index] = (byte)Math.Round((Data[i * 3 + c]) * 255);
 
             return saveFile;
         }
@@ -135,14 +133,16 @@ public class P6 : Pnm
             saveFile[i] = origFile[i];
         
         for (var i = 0; i < Header.Height * Header.Width * Header.PixelSize; i++)
-            saveFile[i + _index] = (byte)Math.Round(Data[i] * 255 * Convert.ToInt32(_currentColorСhannel[i % 3]));
-
+            saveFile[i + _index] = (byte)Math.Round((Data[i]) * 255 * Convert.ToInt32(_currentColorСhannel[i % 3]));
+        
         return saveFile;
     }
 
     #endregion
 
     #region Private methods
+
+    
 
     private void ConvertColorPixel(double[] pixel, double value1, double value2, double value3, ColorSpace colorSpace)
     {
