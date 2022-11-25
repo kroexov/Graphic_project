@@ -46,7 +46,7 @@ public class PnmServices: IPnmServices
     {
         if (_fileImg != null)
         {
-            _fileImg.ConvertGammaImage(newGamma);
+            _fileImg.ConvertGamma(newGamma);
         }
     }
 
