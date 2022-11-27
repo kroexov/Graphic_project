@@ -12,6 +12,20 @@
                 <viewModels:AlgorithmWindowViewModel/>
         </Design.DataContext>
         <Grid>
+                <Grid.Styles>
+            
+                        <Style Selector="Button">
+                                <Setter Property="Width" Value="200"></Setter>
+                                <Setter Property="Height" Value="40"></Setter>
+                                <Setter Property="FontSize" Value="14"></Setter>
+                                <Setter Property="Foreground" Value="#FFFFFFFF" />
+                                <Setter Property="BorderThickness" Value="2" />
+                                <Setter Property="Background" Value="#FFDD4812" />
+                                <Setter Property="BorderBrush" Value="#FFFFFFFF" />
+                                <Setter Property="HorizontalContentAlignment" Value="Center"></Setter>
+                                <Setter Property="VerticalContentAlignment" Value="Center"></Setter>
+                        </Style>
+                </Grid.Styles>
                 <Border Height="600" Width="600" Background="white" VerticalAlignment="Center" HorizontalAlignment="Center">
                         <Image Stretch="Uniform" Source="{Binding ImageToLoadPublic}"></Image>
                 </Border>
@@ -20,6 +34,7 @@
                 <NumericUpDown Minimum="1" Maximum="8" Value="{Binding Bitn}"></NumericUpDown>
                 <TextBlock Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Center" FontSize="20">Алгоритмы</TextBlock>
                 <ListBox Items="{Binding Algorithms}" SelectedItem="{Binding SelectedAlg}"></ListBox>
-        </StackPanel>
+                <Button HorizontalAlignment="Center" Content="Применить алгоритм" Command="{Binding ApplyAlgorithm}"/>
+                </StackPanel>
         </Grid>
 </Window>
