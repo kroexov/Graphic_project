@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.IO;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
 using Lab1.Models;
@@ -62,5 +63,11 @@ public class AlgorithmWindowViewModel : ViewModelBase
     private void SetPath(string path)
     {
         ImageToLoadPublic = new Bitmap(path);
+    }
+
+    public void ApplyAlgorithm()
+    {
+        // dithered.bmp - наша картинка по этому адресу
+        // _services.UseDither(_bitn, _selectedAlg) - вызов функции дизеринга у PnmServices
     }
 }
