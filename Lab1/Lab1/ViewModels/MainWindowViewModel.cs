@@ -318,7 +318,9 @@ namespace Lab1.ViewModels
 
         public void GenerateGradient()
         {
-            ImageDisplayViewModel.SetPath(_model.CreateGradientImage(_width, _height));
+            string path = _model.CreateGradient(_width, _height);
+            string altpath = _model.ReadFile(path, new bool[] {_firstChannel, _secondChannel, _thirdChannel}, (ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
+            ImageDisplayViewModel.SetPath(altpath);
         }
         
         public void ChooseAlgorithm()

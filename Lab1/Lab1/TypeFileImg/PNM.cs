@@ -87,7 +87,6 @@ public abstract class Pnm
         }
     }
 
-
     private double ConvertFromOldGammaToNewGamma(double value, double oldConvertGamma)
     {
         if (oldConvertGamma == 0)

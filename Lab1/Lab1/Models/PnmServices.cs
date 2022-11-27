@@ -2,6 +2,7 @@
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Text;
 using Lab1.TypeFileImg;
 
 namespace Lab1.Models;
@@ -115,6 +116,33 @@ public class PnmServices: IPnmServices
         {
             _fileImg.SetColorChannel(newColorChannel);
         }
+    }
+
+    public string CreateGradient(int width, int height)
+    {
+        var header = "P5\n" + width + " " + height + "\n255\n";
+        var fileGradient = Encoding.UTF8.GetBytes(header);
+        Array.Resize(ref fileGradient, height * width + header.Length);
+        double step = 1.0 / width;
+
+        double currentValue = 0;
+
+        for (var x = 0; x < width; x++)
+        {
+            var value = currentValue * 255;
+            for (var y = 0; y < height; y++)
+            {
+                fileGradient[y * width + x + header.Length] = (byte)Math.Round(value);
+            }
+            currentValue += step;
+        }
+        
+        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+        var fullFileName = pathSaveFile + "\\imgFiles\\" + "gradient.pgm";
+        
+        File.WriteAllBytes(fullFileName , fileGradient);
+        return fullFileName;
     }
 
     public string CreateGradientImage(int width, int height)
