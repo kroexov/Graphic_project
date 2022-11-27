@@ -63,6 +63,7 @@ namespace Lab1.ViewModels
             model.ModelErrorHappened += (s => OnErrorHappened(s));
             model.OnAlgChosen += ModelOnOnAlgChosen;
             ImageDisplayViewModel = new ImageDisplayViewModel();
+            model.DitheredApplied += ImageDisplayViewModel.SetPath;
         }
 
         private void ModelOnOnAlgChosen()

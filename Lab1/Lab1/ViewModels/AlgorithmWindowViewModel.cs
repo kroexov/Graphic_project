@@ -67,7 +67,10 @@ public class AlgorithmWindowViewModel : ViewModelBase
 
     public void ApplyAlgorithm()
     {
-        // dithered.bmp - наша картинка по этому адресу
-        // _services.UseDither(_bitn, _selectedAlg) - вызов функции дизеринга у PnmServices
+        if (_selectedAlg == "Ordered" && _bitn ==1)
+        {
+            SetPath(_services.UseDither(_bitn, _selectedAlg));
+        }
+        _services.ApplyDithering();
     }
 }

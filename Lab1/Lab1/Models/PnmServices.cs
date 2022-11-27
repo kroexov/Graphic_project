@@ -68,10 +68,6 @@ public class PnmServices: IPnmServices
 
     public string RefreshImage()
     {
-        if (_isGenerated)
-        {
-            return _selectedPath;
-        }
         if (_fileImg == null)
         {
             return String.Empty;
@@ -105,6 +101,7 @@ public class PnmServices: IPnmServices
     public void ApplyDithering()
     {
         _fileImg.ChangeData();
+        DitheredApplied?.Invoke(RefreshImage());
     }
     
     public void ChangeColorSpace(ColorSpace newColorSpace)
@@ -232,6 +229,8 @@ public class PnmServices: IPnmServices
 
     public event Action? OnAlgChosen;
     public event Action<string>? ModelErrorHappened;
+
+    public event Action<string>? DitheredApplied;
 
     #endregion
 }
