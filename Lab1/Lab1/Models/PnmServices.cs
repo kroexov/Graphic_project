@@ -76,7 +76,7 @@ public class PnmServices: IPnmServices
         fileName = fileName.Substring(0, fileName.Length - 3) + "bmp";
         var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
         pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-        var fullFileName = pathSaveFile + "\\imgFiles\\" + fileName;
+        var fullFileName = pathSaveFile + "\\imgFiles\\EBE" + fileName;
         var test  = _fileImg.CreateBitmap();
         test.Save(fullFileName, ImageFormat.Bmp);
         return fullFileName;
@@ -101,7 +101,15 @@ public class PnmServices: IPnmServices
     public void ApplyDithering()
     {
         _fileImg.ChangeData();
-        DitheredApplied?.Invoke(RefreshImage());
+        
+        var fileName = Path.GetFileName(_filePath);
+        fileName = fileName.Substring(0, fileName.Length - 3) + "bmp";
+        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+        var fullFileName = pathSaveFile + "\\imgFiles\\algDithering" + fileName;
+        var test  = _fileImg.CreateBitmap();
+        test.Save(fullFileName, ImageFormat.Bmp);
+        DitheredApplied?.Invoke(fullFileName);
     }
     
     public void ChangeColorSpace(ColorSpace newColorSpace)

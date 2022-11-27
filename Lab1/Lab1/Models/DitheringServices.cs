@@ -17,18 +17,17 @@ public class DitheringServices
         new byte[] { 60, 188, 28, 156, 52, 180, 20, 148 },
         new byte[] { 252, 124, 220, 92, 244, 116, 212, 84 },
     };
-    
+
     private Random random = new Random();
     public string OrderedAlgorithm(string oldimagepath, int bitn)
     {
         Bitmap oldimage = (Bitmap) Image.FromFile(oldimagepath);
         int width = oldimage.Width;
         int height = oldimage.Height;
-        byte[] newData = new byte[3];
+        byte[] newData = new byte[width * height * 3];
         
         var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
         pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-        File.Create(pathSaveFile + "\\imgFiles\\" + "ditheredFinal");
         
         var image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
         for (var y = 0; y < height; y++)
@@ -46,14 +45,9 @@ public class DitheringServices
                 value2 = (value2 > matrix[matrixh][matrixw]) ? value2.CastUp(bitn) : value2.CastDown(bitn);
                 value3 = (value3 > matrix[matrixh][matrixw]) ? value3.CastUp(bitn) : value3.CastDown(bitn);
 
-                newData[0] = value1;
-                newData[1] = value2;
-                newData[2] = value3;
-                
-                using (var stream = new FileStream(pathSaveFile + "\\imgFiles\\" + "ditheredFinal", FileMode.Append))
-                {
-                    stream.Write(newData, 0, newData.Length);
-                }
+                newData[3 * (y * height + x)] = value1;
+                newData[3 * (y * height + x) + 1] = value2;
+                newData[3 * (y * height + x) + 2] = value3;
                 
                 Color newColor = Color.FromArgb(value1,
                     value2, 
@@ -63,6 +57,7 @@ public class DitheringServices
             }
             
         }
+        File.WriteAllBytes(pathSaveFile + "\\imgFiles\\" + "ditheredFinal.txt", newData);
         var fullFileName = pathSaveFile + "\\imgFiles\\" + "dithered.bmp";
         image.Save(fullFileName, ImageFormat.Bmp);
 
@@ -74,11 +69,10 @@ public class DitheringServices
         Bitmap oldimage = (Bitmap) Image.FromFile(oldimagepath);
         int width = oldimage.Width;
         int height = oldimage.Height;
-        byte[] newData = new byte[3];
+        byte[] newData = new byte[width * height * 3];
         
         var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
         pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-        File.Create(pathSaveFile + "\\imgFiles\\" + "ditheredFinal");
         
         var image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
         for (var y = 0; y < height; y++)
@@ -94,15 +88,10 @@ public class DitheringServices
                 value1 = (value1 > randomNumber) ? value1.CastUp(bitn) : value1.CastDown(bitn);
                 value2 = (value2 > randomNumber) ? value2.CastUp(bitn) : value2.CastDown(bitn);
                 value3 = (value3 > randomNumber) ? value3.CastUp(bitn) : value3.CastDown(bitn);
-                
-                newData[0] = value1;
-                newData[1] = value2;
-                newData[2] = value3;
-                
-                using (var stream = new FileStream(pathSaveFile + "\\imgFiles\\" + "ditheredFinal", FileMode.Append))
-                {
-                    stream.Write(newData, 0, newData.Length);
-                }
+
+                newData[3 * (y * height + x)] = value1;
+                newData[3 * (y * height + x) + 1] = value2;
+                newData[3 * (y * height + x) + 2] = value3;
                 
                 Color newColor = Color.FromArgb(value1,
                     value2, 
@@ -112,6 +101,7 @@ public class DitheringServices
             }
             
         }
+        File.WriteAllBytes(pathSaveFile + "\\imgFiles\\" + "ditheredFinal.txt", newData);
         var fullFileName = pathSaveFile + "\\imgFiles\\" + "dithered.bmp";
         image.Save(fullFileName, ImageFormat.Bmp);
 
@@ -123,11 +113,10 @@ public class DitheringServices
         Bitmap oldimage = (Bitmap) Image.FromFile(oldimagepath);
         int width = oldimage.Width;
         int height = oldimage.Height;
-        byte[] newData = new byte[3];
+        byte[] newData = new byte[width * height * 3];
         
         var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
         pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-        File.Create(pathSaveFile + "\\imgFiles\\" + "ditheredFinal");
         
         var image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
 
@@ -172,16 +161,11 @@ public class DitheringServices
                     }
                     
                 }
-                
-                newData[0] = value1;
-                newData[1] = value2;
-                newData[2] = value3;
-                
-                using (var stream = new FileStream(pathSaveFile + "\\imgFiles\\" + "ditheredFinal", FileMode.Append))
-                {
-                    stream.Write(newData, 0, newData.Length);
-                }
 
+                newData[3 * (y * height + x)] = value1;
+                newData[3 * (y * height + x) + 1] = value2;
+                newData[3 * (y * height + x) + 2] = value3;
+                
                 Color newColor = Color.FromArgb(value1,
                     value2, 
                     value3);
@@ -190,6 +174,7 @@ public class DitheringServices
             }
             
         }
+        File.WriteAllBytes(pathSaveFile + "\\imgFiles\\" + "ditheredFinal.txt", newData);
         var fullFileName = pathSaveFile + "\\imgFiles\\" + "dithered.bmp";
         image.Save(fullFileName, ImageFormat.Bmp);
 
@@ -233,11 +218,10 @@ public class DitheringServices
         Bitmap oldimage = (Bitmap) Image.FromFile(oldimagepath);
         int width = oldimage.Width;
         int height = oldimage.Height;
-        byte[] newData = new byte[3];
+        byte[] newData = new byte[width * height * 3];
         
         var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
         pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-        File.Create(pathSaveFile + "\\imgFiles\\" + "ditheredFinal");
         
         var image = new Bitmap(width, height, PixelFormat.Format24bppRgb);
 
@@ -291,15 +275,10 @@ public class DitheringServices
                 {
                     AddErrorToPixel(x, y + 2, coef, diffR, diffG, diffB, oldimage);
                 }
-                
-                newData[0] = value1;
-                newData[1] = value2;
-                newData[2] = value3;
-                
-                using (var stream = new FileStream(pathSaveFile + "\\imgFiles\\" + "ditheredFinal", FileMode.Append))
-                {
-                    stream.Write(newData, 0, newData.Length);
-                }
+
+                newData[3 * (y * height + x)] = value1;
+                newData[3 * (y * height + x) + 1] = value2;
+                newData[3 * (y * height + x) + 2] = value3;
 
                 Color newColor = Color.FromArgb(value1,
                     value2, 
@@ -309,12 +288,12 @@ public class DitheringServices
             }
             
         }
+        File.WriteAllBytes(pathSaveFile + "\\imgFiles\\" + "ditheredFinal.txt", newData);
         var fullFileName = pathSaveFile + "\\imgFiles\\" + "dithered.bmp";
         image.Save(fullFileName, ImageFormat.Bmp);
 
         return fullFileName;
     }
-
 
     protected int GetCoordinates(int width, int x, int y)
     {

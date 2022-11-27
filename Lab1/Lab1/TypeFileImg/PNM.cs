@@ -49,7 +49,7 @@ public abstract class Pnm
         var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
         pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
 
-        var newData = File.ReadAllBytes(pathSaveFile + "\\imgFiles\\" + "ditheredFinal");
+        var newData = File.ReadAllBytes(pathSaveFile + "\\imgFiles\\" + "ditheredFinal.txt");
         
         for (var i = 0; i < Header.Width * Header.Height * Header.PixelSize; i++)
         {
