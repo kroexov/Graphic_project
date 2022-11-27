@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.IO;
 using Lab1.Models;
 
 namespace Lab1.TypeFileImg;
@@ -40,6 +41,19 @@ public abstract class Pnm
         for (var i = 0; i < Header.Width * Header.Height * Header.PixelSize; i++)
         {
             Data[i] = ConvertFromOldGammaToNewGamma(Data[i], oldConvertGamma);
+        }
+    }
+
+    public void ChangeData()
+    {
+        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+
+        var newData = File.ReadAllBytes(pathSaveFile + "\\imgFiles\\" + "ditheredFinal");
+        
+        for (var i = 0; i < Header.Width * Header.Height * Header.PixelSize; i++)
+        {
+            Data[i] = Convert.ToDouble(newData[(3 / Header.PixelSize) * i]) / 255.0;
         }
     }
 

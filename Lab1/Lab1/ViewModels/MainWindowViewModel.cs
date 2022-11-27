@@ -292,14 +292,12 @@ namespace Lab1.ViewModels
             ofd.Filters.Add(new FileDialogFilter() {Name = "Другой файл", Extensions = {"*"}});
             ofd.Filters.Add(new FileDialogFilter() {Name = "Файлы P6", Extensions = {"ppm"}});
             ofd.Filters.Add(new FileDialogFilter() {Name = "Файлы P5", Extensions = {"pgm"}});
-            
+
             var result = await ofd.ShowAsync(new Window());
-            var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
-            pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-            var fullFileName = pathSaveFile + "\\imgFiles\\" + "dithered.bmp";
+            
             if (result != null)
             {
-                File.WriteAllBytes(result,File.ReadAllBytes(fullFileName));
+                File.WriteAllBytes(result,_model.SaveFile());
             }
         }
 

@@ -101,6 +101,11 @@ public class PnmServices: IPnmServices
                 return _ditheringServices.OrderedAlgorithm(_selectedPath, bitn);
         }
     }
+
+    public void ApplyDithering()
+    {
+        _fileImg.ChangeData();
+    }
     
     public void ChangeColorSpace(ColorSpace newColorSpace)
     {
