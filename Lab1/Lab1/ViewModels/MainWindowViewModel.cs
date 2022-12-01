@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using Lab1.Models;
 using Lab1.Views;
 using ReactiveUI;
@@ -44,6 +45,8 @@ namespace Lab1.ViewModels
         private bool _firstChannel = true;
         private bool _secondChannel = true;
         private bool _thirdChannel = true;
+        
+        private Bitmap? _sample;
 
         private string _firstChannelValue = "1.0";
         private string _secondChannelValue = "1.0";
@@ -84,6 +87,12 @@ namespace Lab1.ViewModels
                     ImageDisplayViewModel.SetPath(res);
                 }
             }
+        }
+        
+        public Bitmap? Sample
+        {
+            get => _sample;
+            private set => this.RaiseAndSetIfChanged(ref _sample, value);
         }
 
         public string Point1
@@ -324,6 +333,39 @@ namespace Lab1.ViewModels
             {
                 OnErrorHappened(e.Message);
             }
+        }
+        
+        public void SetPath(string path)
+        {
+            Sample = new Bitmap(path);
+        }
+
+        public void GenerateSample()
+        {
+            double value1, value2, value3;
+            
+            if (!double.TryParse(_firstChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value1) &&
+                !double.TryParse(_firstChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value1) &&
+                !double.TryParse(_firstChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value1))
+            {
+                value1 = 0;
+            }
+            
+            if (!double.TryParse(_secondChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value2) &&
+                !double.TryParse(_secondChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value2) &&
+                !double.TryParse(_secondChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value2))
+            {
+                value2 = 0;
+            }
+            
+            if (!double.TryParse(_thirdChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value3) &&
+                !double.TryParse(_thirdChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value3) &&
+                !double.TryParse(_thirdChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value3))
+            {
+                value3 = 0;
+            }
+            
+            SetPath(_model.CreateSample(new []{value1, value2, value3}));
         }
 
         public void DrawLine()

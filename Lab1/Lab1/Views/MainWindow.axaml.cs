@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Media.Imaging;
 using Avalonia.VisualTree;
 using Lab1.ViewModels;
 
@@ -54,6 +56,14 @@ namespace Lab1.Views
                 Point2.Text = _x.ToString("F1", CultureInfo.InvariantCulture) + " " + _y.ToString("F1", CultureInfo.InvariantCulture);
             }
         
+        }
+
+        private void Button_OnClick(object? sender, RoutedEventArgs e)
+        {
+            _mvm.GenerateSample();
+            MyImage.Source =
+                new Bitmap(AppDomain.CurrentDomain.BaseDirectory.Substring(0,
+                    AppDomain.CurrentDomain.BaseDirectory.Length - 17) + "\\imgFiles\\" + "sample.bmp");
         }
     }
 }

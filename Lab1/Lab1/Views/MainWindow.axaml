@@ -82,6 +82,10 @@
                 <TextBox Width="100" Text="{Binding SecondChannelValue}"></TextBox>
                 <TextBox Width="100" Text="{Binding ThirdChannelValue}"></TextBox>
             </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Посмотреть цвет" Click="Button_OnClick"/>
+                <Image Name="MyImage" HorizontalAlignment="Center" Width="20" Height="20" Source="{Binding Sample}"></Image>
+            </StackPanel>
         </StackPanel>
         
         <StackPanel VerticalAlignment="Top" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">

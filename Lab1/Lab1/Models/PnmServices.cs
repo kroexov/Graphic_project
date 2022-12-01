@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using Lab1.TypeFileImg;
@@ -93,6 +94,32 @@ public class PnmServices: IPnmServices
         {
             _fileImg.DrawLineWithAntialiasing(x1, y1, x2 + (x1 == x2 ? 1 : 0), y2 + (y1 == y2 ? 1 : 0), width, transparency, color[0], color[1], color[2]);
         }
+    }
+    
+    public string CreateSample(double[] color)
+    {
+        var image = new Bitmap(20, 20, PixelFormat.Format24bppRgb);
+
+        for (var x = 0; x < 20; x++)
+        {
+            var value1 = color[0] * 255;
+            var value2 = color[1] * 255;
+            var value3 = color[2] * 255;
+            for (var y = 0; y < 20; y++)
+            {
+                Color newColor = Color.FromArgb((byte)Math.Round(value1),
+                    (byte)Math.Round(value2),
+                    (byte)Math.Round(value3));
+
+                image.SetPixel(x, y, newColor);
+            }
+        }
+        
+        var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+        pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+        var fullFileName = pathSaveFile + "\\imgFiles\\" + "sample.bmp";
+        image.Save(fullFileName, ImageFormat.Bmp);
+        return fullFileName;
     }
 
     #endregion
