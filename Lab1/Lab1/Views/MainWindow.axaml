@@ -112,10 +112,9 @@
                     BorderBrush="Black"
                     CornerRadius="3"
                     Padding="4"
-                    MaxHeight="500"
-                    MaxWidth="500"
+                    VerticalAlignment="Top"
                     Margin="0 20 0 0">
-        <views:ImageDisplay PointerPressed="OnPointerPressed" DataContext="{Binding ImageDisplayViewModel}">
+        <views:ImageDisplay VerticalAlignment="Top" PointerPressed="OnPointerPressed" DataContext="{Binding ImageDisplayViewModel}">
         </views:ImageDisplay>
                 </Border>
         </StackPanel>
