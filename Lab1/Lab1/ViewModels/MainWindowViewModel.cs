@@ -362,6 +362,12 @@ namespace Lab1.ViewModels
             {
                 _model.DrawLine((int)_x1, (int)_y1, (int)_x2, (int)_y2, _lineWidth, opacity, new []{value1, value2, value3});
             }
+            
+            var res = _model.RefreshImage();
+            if (res != string.Empty)
+            {
+                ImageDisplayViewModel.SetPath(res);
+            }
         }
 
         #endregion

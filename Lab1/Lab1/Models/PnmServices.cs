@@ -88,21 +88,9 @@ public class PnmServices: IPnmServices
 
     public void DrawLine(int x1, int y1, int x2, int y2, int width = 1, double transparency = 1, double[] color = null)
     {
-        static void Swap<T>(ref T lhs, ref T rhs)
-        {
-            T temp;
-            temp = lhs;
-            lhs = rhs;
-            rhs = temp;
-        }
         
         if (_fileImg != null)
         {
-            if (y1 > y2)
-            {
-                Swap(ref y1, ref y2);
-                Swap(ref x1, ref x2);
-            }
             _fileImg.DrawLineWithAntialiasing(x1, y1, x2 + (x1 == x2 ? 1 : 0), y2 + (y1 == y2 ? 1 : 0), width, transparency, color[0], color[1], color[2]);
         }
     }
