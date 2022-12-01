@@ -45,7 +45,8 @@ public abstract class Pnm
     }
     
     // y1 <= y2
-    public void DrawLineWithAntialiasing(int x1, int y1, int x2, int y2, int width = 1, double transparency = 1, Color colorLine = new Color())
+    public void DrawLineWithAntialiasing(int x1, int y1, int x2, int y2, int width = 3, double transparency = 1,
+        double color1 = 1, double color2 = 1, double color3 = 1)
     {
         var lineWidth = 3 * (Math.Abs(x1 - x2) + width - (width % 2));
         var lineHeight = 3 * (y2 - y1 + width - (width % 2)); 
@@ -55,25 +56,24 @@ public abstract class Pnm
             r = (3 * width) / 2;
         else
             r = (3 * width - 1) / 2;
-        
+        int newX1, newY1, newX2, newY2;
         if (x1 < x2)
         {
-            var newX1 = r;
-            var newY1 = r;
-            var newX2 = lineWidth - (r + 1);
-            var newY2 = lineHeight - (r + 1);
+            newX1 = r + 1 - width % 2;
+            newY1 = r + 1 - width % 2;
+            newX2 = lineWidth - (r + 1 + 1 - width % 2);
+            newY2 = lineHeight - (r + 1 + 1 - width % 2);
             DrawCircle(newX1, newY1, newX2, newY2, r, ref dataLine, lineWidth);
         }
         else
         {
-            var newX1 = lineWidth - (r - 1);
-            var newY1 = r - 1;
-            var newX2 = r - 1;
-            var newY2 = lineHeight - (r + 1);
+            newX1 = lineWidth - (r + 1 + 1 - width % 2);
+            newY1 = r + 1 - width % 2;
+            newX2 = r + 1 - width % 2;
+            newY2 = lineHeight - (r + 1 + 1 - width % 2);
             DrawCircle(newX1, newY1, newX2, newY2, r, ref dataLine, lineWidth);
         }
 
-        var image = new Bitmap(103, 103, PixelFormat.Format24bppRgb);
         for (var i = 0; i < lineHeight / 3; i++)
         {
             for (var j = 0; j < lineWidth / 3; j++)
@@ -87,97 +87,109 @@ public abstract class Pnm
                                                  + dataLine[GetCoordinates(3 * j, 3 * i + 2, lineWidth)]
                                                  + dataLine[GetCoordinates(3 * j + 1, 3 * i + 2, lineWidth)]
                                                  + dataLine[GetCoordinates(3 * j + 2, 3 * i + 2, lineWidth)]) / 9;
-                
-                Color newColor = Color.FromArgb((byte)Math.Round(value),
-                    (byte)Math.Round(value), 
-                    (byte)Math.Round(value));
-                
-                image.SetPixel(j + 3, i + 3, newColor);
+
+                if (Header.FileFormat == "P6")
+                {
+                    Data[GetCoordinates(3 * (j + x1 - newX1), 3 * (i + y1 - newY1))] =
+                        transparency * Data[GetCoordinates(3 * (j + x1 - newX1), 3 * (i + y1 - newY1))]
+                        + (1 - transparency) * value * color1;
+                    Data[GetCoordinates(3 * (j + x1 - newX1), 3 * (i + y1 - newY1)) + 1] =
+                        transparency * Data[GetCoordinates(3 * (j + x1 - newX1), 3 * (i + y1 - newY1)) + 1]
+                        + (1 - transparency) * value * color2;
+                    Data[GetCoordinates(3 * (j + x1 - newX1), 3 * (i + y1 - newY1)) + 2] =
+                        transparency * Data[GetCoordinates(3 * (j + x1 - newX1), 3 * (i + y1 - newY1)) + 2]
+                        + (1 - transparency) * value * color3;
+                }
+                else if (Header.FileFormat == "P5")
+                {
+                    Data[GetCoordinates(j + x1 - newX1, i + y1 - newY1)] = 
+                        transparency * Data[GetCoordinates(j + x1 - newX1, i + y1 - newY1)]
+                        + (1 - transparency) * value * color1;
+                }
             } 
         }
-        
-        image.Save("C:\\аниме\\ff.bmp", ImageFormat.Bmp);
     }
-    private void DrawLine(int x1, int y1, int x2, int y2, ref byte[] dataLine, int dataWidth)
+    private void DrawLine(int x0, int y0, int x1, int y1, ref byte[] dataLine, int dataWidth)
     {
-        var dx = Math.Abs(x1 - x2);
-        var dy = y2 - y1;
-        var signX = x1 < x2 ? 1 : -1;
-        var signY = y1 < y2 ? 1 : -1;
-        var error = dx - dy;
-        dataLine[GetCoordinates(x2, y2, dataWidth)] = byte.MaxValue;
-        
-        while (x1 != x2 || y1 != y2)
+        static void Swap<T>(ref T lhs, ref T rhs)
         {
-            dataLine[GetCoordinates(x1, y1, dataWidth)] = byte.MaxValue;
-            var error2 = error * 2;
-            if (error2 > -dy)
+            T temp;
+            temp = lhs;
+            lhs = rhs;
+            rhs = temp;
+        }
+        
+        var steep = Math.Abs(y1 - y0) > Math.Abs(x1 - x0); // Проверяем рост отрезка по оси икс и по оси игрек
+        // Отражаем линию по диагонали, если угол наклона слишком большой
+        if (steep)
+        {
+            Swap(ref x0, ref y0); // Перетасовка координат вынесена в отдельную функцию для красоты
+            Swap(ref x1, ref y1);
+        }
+        // Если линия растёт не слева направо, то меняем начало и конец отрезка местами
+        if (x0 > x1)
+        {
+            Swap(ref x0, ref x1);
+            Swap(ref y0, ref y1);
+        }
+        var dx = x1 - x0;
+        var dy = Math.Abs(y1 - y0);
+        var error = dx / 2; // Здесь используется оптимизация с умножением на dx, чтобы избавиться от лишних дробей
+        var yStep = (y0 < y1) ? 1 : -1; // Выбираем направление роста координаты y
+        var y = y0;
+        for (var x = x0; x <= x1; x++)
+        {
+            dataLine[GetCoordinates(steep ? y : x, steep ? x : y, dataWidth)] = byte.MaxValue; // Не забываем вернуть координаты на место
+            error -= dy;
+            if (error < 0)
             {
-                error = -dy;
-                x1 += signX;
-            }
-            if (error2 < -dx)
-            {
+                y += yStep;
                 error += dx;
-                y1 += signY;
             }
         }
     }
 
     private void DrawCircle(int x0, int y0, int x1, int y1, int r, ref byte[] data, int dataWidth)
     {
-        var dx = x0 - x1;
-        var dy = y0 - y1;
-        
-        var x = 0;
-        var y = r;
-        var delta = 1 - 2 * r;
-        
-        DrawLine(x0, y0 - y,  x0 - dx, y0 - y - dy, ref data, dataWidth);
-        while(y >= 0) {
-            // DrawLine(x0 + x, y0 + y,  x0 + x - dx, y0 + y - dy, ref data, dataWidth);
-            // DrawLine(x0 + x, y0 - y,  x0 + x - dx, y0 - y - dy, ref data, dataWidth);
-            // DrawLine(x0 - x, y0 + y,  x0 - x - dx, y0 + y - dy, ref data, dataWidth);
-            // DrawLine(x0 - x, y0 - y,  x0 - x - dx, y0 - y - dy, ref data, dataWidth);
-            
-            // data[GetCoordinates(x0 + x, y0 + y, dataWidth)] = byte.MaxValue;
-            // data[GetCoordinates(x0 + x, y0 - y, dataWidth)] = byte.MaxValue;
-            // data[GetCoordinates(x0 - x, y0 + y, dataWidth)] = byte.MaxValue;
-            // data[GetCoordinates(x0 - x, y0 - y, dataWidth)] = byte.MaxValue;
-            
-            var error = 2 * (delta + y) - 1;
-            if(delta < 0 && error <= 0) {
-                ++x;
-                delta += 2 * x + 1;
-                continue;
-            }
-            error = 2 * (delta - x) - 1;
-            if(delta > 0 && error > 0) {
-                --y;
-                delta += 1 - 2 * y;
-                continue;
-            }
-            ++x;
-            delta += 2 * (x - y);
-            --y;
-        }
-        
-        var image = new Bitmap(data.Length / dataWidth + 20, dataWidth + 20, PixelFormat.Format24bppRgb);
-        for (var i = 0; i < data.Length / dataWidth; i++)
+        var dx = x1 - x0;
+        var dy = y1 - y0;
+
+        int x = r;
+        int y = 0;
+        int radiusError = 1 - x;
+        while (x >= y)
         {
-            for (var j = 0; j < dataWidth; j++)
+            DrawLine(x + x0, y + y0, x + x0 + dx, y + y0 + dy, ref data, dataWidth);
+            DrawLine(y + x0, x + y0, y + x0 + dx, x + y0 + dy, ref data, dataWidth);
+            DrawLine(-x + x0, y + y0, -x + x0 + dx, y + y0 + dy, ref data, dataWidth);
+            DrawLine(-y + x0, x + y0, -y + x0 + dx, x + y0 + dy, ref data, dataWidth);
+            DrawLine(-x + x0, -y + y0, -x + x0 + dx, -y + y0 + dy, ref data, dataWidth);
+            DrawLine(-y + x0, -x + y0, -y + x0 + dx, -x + y0 + dy, ref data, dataWidth);
+            DrawLine(x + x0, -y + y0, x + x0 + dx, -y + y0 + dy, ref data, dataWidth);
+            DrawLine(y + x0, -x + y0, y + x0 + dx, -x + y0 + dy, ref data, dataWidth);
+            
+            DrawLine(-x + 1 + x0, -y + y0, y + x0 + dx, x + y0 + dy - 1, ref data, dataWidth);
+            DrawLine(-y + x0, -x + y0 + 1, x + x0 + dx - 1, y + y0 + dy, ref data, dataWidth);
+
+            // data[GetCoordinates(x + x0, y + y0, dataWidth)] = byte.MaxValue;
+            // data[GetCoordinates(y + x0, x + y0, dataWidth)] = byte.MaxValue;
+            // data[GetCoordinates(-x + x0, y + y0, dataWidth)] = byte.MaxValue;
+            // data[GetCoordinates(-y + x0, x + y0, dataWidth)] = byte.MaxValue;
+            // data[GetCoordinates(-x + x0, -y + y0, dataWidth)] = byte.MaxValue;
+            // data[GetCoordinates(-y + x0, -x + y0, dataWidth)] = byte.MaxValue;
+            // data[GetCoordinates(x + x0, -y + y0, dataWidth)] = byte.MaxValue;
+            // data[GetCoordinates(y + x0, -x + y0, dataWidth)] = byte.MaxValue;
+            y++;
+            if (radiusError < 0)
             {
-                var value = Convert.ToDouble(data[GetCoordinates(j, i, dataWidth)]);
-                
-                Color newColor = Color.FromArgb((byte)Math.Round(value),
-                    (byte)Math.Round(value), 
-                    (byte)Math.Round(value));
-                
-                image.SetPixel(j + 10, i + 10, newColor);
-            } 
+                radiusError += 2 * y + 1;
+            }
+            else
+            {
+                x--;
+                radiusError += 2 * (y - x + 1);
+            }
         }
-        
-        image.Save("C:\\аниме\\test.bmp", ImageFormat.Bmp);
     }
 
     #endregion
