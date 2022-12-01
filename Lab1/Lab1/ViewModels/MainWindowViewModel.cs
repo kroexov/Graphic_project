@@ -37,6 +37,8 @@ namespace Lab1.ViewModels
 
         private PnmServices _model;
 
+        private int _lineWidth = 1;
+
         private bool _errorOccured = false;
         
         private string _errorText = "Неизвестная ошибка";
@@ -44,6 +46,15 @@ namespace Lab1.ViewModels
         private bool _firstChannel = true;
         private bool _secondChannel = true;
         private bool _thirdChannel = true;
+
+        private string _firstChannelValue = "1.0";
+        private string _secondChannelValue = "1.0";
+        private string _thirdChannelValue = "1.0";
+
+        private double _x1;
+        private double _x2;
+        private double _y1;
+        private double _y2;
 
         #endregion
 
@@ -72,6 +83,37 @@ namespace Lab1.ViewModels
                 {
                     ImageDisplayViewModel.SetPath(res);
                 }
+            }
+        }
+
+        public string Point1
+        {
+            get => _x1.ToString(CultureInfo.InvariantCulture) + " " + _y1.ToString(CultureInfo.InvariantCulture);
+            set
+            {
+                var numbers = value.Split();
+                this.RaiseAndSetIfChanged(ref _x1, Double.Parse(numbers[0], CultureInfo.InvariantCulture));
+                this.RaiseAndSetIfChanged(ref _y1, Double.Parse(numbers[1], CultureInfo.InvariantCulture));
+            }
+        }
+        
+        public string Point2
+        {
+            get => _x2.ToString(CultureInfo.InvariantCulture) + " " + _y2.ToString(CultureInfo.InvariantCulture);
+            set
+            { 
+                var numbers = value.Split();
+                this.RaiseAndSetIfChanged(ref _x2, Double.Parse(numbers[0], CultureInfo.InvariantCulture));
+                this.RaiseAndSetIfChanged(ref _y2, Double.Parse(numbers[1], CultureInfo.InvariantCulture));
+            }
+        }
+        
+        public int LineWidth
+        {
+            get => _lineWidth;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _lineWidth, value);
             }
         }
 
@@ -218,6 +260,24 @@ namespace Lab1.ViewModels
             }
         }
 
+        public string FirstChannelValue
+        {
+            get => _firstChannelValue;
+            set => this.RaiseAndSetIfChanged(ref _firstChannelValue, value);
+        }
+        
+        public string SecondChannelValue
+        {
+            get => _secondChannelValue;
+            set => this.RaiseAndSetIfChanged(ref _secondChannelValue, value);
+        }
+        
+        public string ThirdChannelValue
+        {
+            get => _thirdChannelValue;
+            set => this.RaiseAndSetIfChanged(ref _thirdChannelValue, value);
+        }
+
         public void ApplyGamma()
         {
             double result;
@@ -264,6 +324,37 @@ namespace Lab1.ViewModels
             catch (Exception e)
             {
                 OnErrorHappened(e.Message);
+            }
+        }
+
+        public void DrawLine()
+        {
+            double value1, value2, value3;
+            
+            if (!double.TryParse(_firstChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value1) &&
+                !double.TryParse(_firstChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value1) &&
+                !double.TryParse(_firstChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value1))
+            {
+                value1 = 0;
+            }
+            
+            if (!double.TryParse(_secondChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value2) &&
+                !double.TryParse(_secondChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value2) &&
+                !double.TryParse(_secondChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value2))
+            {
+                value2 = 0;
+            }
+            
+            if (!double.TryParse(_thirdChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value3) &&
+                !double.TryParse(_thirdChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value3) &&
+                !double.TryParse(_thirdChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value3))
+            {
+                value3 = 0;
+            }
+            
+            if (!_x1.Equals(_x2).Equals(_y1).Equals(_y2).Equals(0.0))
+            {
+                _model.DrawLine((int)_x1, (int)_y1, (int)_x2, (int)_y2, _lineWidth, new []{value1, value2, value3});
             }
         }
 

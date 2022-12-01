@@ -86,7 +86,7 @@ public class PnmServices: IPnmServices
         }
     }
 
-    public void DrawLine(int x1, int y1, int x2, int y2)
+    public void DrawLine(int x1, int y1, int x2, int y2, int lineWidth, double[] color)
     {
         _fileImg.DrawLineWithAntialiasing(x1, y1, x2, y2);
     }
