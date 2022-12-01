@@ -74,6 +74,8 @@
             </StackPanel>
             <TextBlock TextAlignment="Center" Width="300" Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Left" FontSize="20">Ширина линии</TextBlock>
             <NumericUpDown Minimum="1" HorizontalAlignment="Left" Maximum="30" Width="300" Value="{Binding LineWidth}"></NumericUpDown>
+            <TextBlock TextAlignment="Center" Width="300" Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Left" FontSize="20">Прозрачность</TextBlock>
+            <TextBox Width="300" HorizontalAlignment="Left" Text="{Binding Opacity}"></TextBox>
             <TextBlock TextAlignment="Center" Width="300" Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Left" FontSize="20">Выбор значений по каналам</TextBlock>
             <StackPanel Orientation="Horizontal">
                 <TextBox Width="100" Text="{Binding FirstChannelValue}"></TextBox>

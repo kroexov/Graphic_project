@@ -15,8 +15,6 @@ namespace Lab1.ViewModels
     {
         #region Private fields
 
-        private string _data;
-
         private string _currentPath;
 
         private string _gamma = "0";
@@ -50,6 +48,8 @@ namespace Lab1.ViewModels
         private string _firstChannelValue = "1.0";
         private string _secondChannelValue = "1.0";
         private string _thirdChannelValue = "1.0";
+
+        private string _opacity = "1.0";
 
         private double _x1;
         private double _x2;
@@ -209,11 +209,29 @@ namespace Lab1.ViewModels
                 this.RaiseAndSetIfChanged(ref _spaces, value);
             }
         }
-
-        public string Data
+        
+        public string FirstChannelValue
         {
-            get => _data;
-            set => this.RaiseAndSetIfChanged(ref _data, value);
+            get => _firstChannelValue;
+            set => this.RaiseAndSetIfChanged(ref _firstChannelValue, value);
+        }
+        
+        public string SecondChannelValue
+        {
+            get => _secondChannelValue;
+            set => this.RaiseAndSetIfChanged(ref _secondChannelValue, value);
+        }
+        
+        public string ThirdChannelValue
+        {
+            get => _thirdChannelValue;
+            set => this.RaiseAndSetIfChanged(ref _thirdChannelValue, value);
+        }
+        
+        public string Opacity
+        {
+            get => _opacity;
+            set => this.RaiseAndSetIfChanged(ref _opacity, value);
         }
 
         #endregion
@@ -232,7 +250,6 @@ namespace Lab1.ViewModels
             if (result != null)
             {
                 _items.Add(result.First());
-                Data = File.ReadAllText(result.First());
                 _currentPath = result.First();
                 OpenFile(result.First());
             }
@@ -258,24 +275,6 @@ namespace Lab1.ViewModels
             {
                 ImageDisplayViewModel.SetPath(res);
             }
-        }
-
-        public string FirstChannelValue
-        {
-            get => _firstChannelValue;
-            set => this.RaiseAndSetIfChanged(ref _firstChannelValue, value);
-        }
-        
-        public string SecondChannelValue
-        {
-            get => _secondChannelValue;
-            set => this.RaiseAndSetIfChanged(ref _secondChannelValue, value);
-        }
-        
-        public string ThirdChannelValue
-        {
-            get => _thirdChannelValue;
-            set => this.RaiseAndSetIfChanged(ref _thirdChannelValue, value);
         }
 
         public void ApplyGamma()
@@ -329,7 +328,7 @@ namespace Lab1.ViewModels
 
         public void DrawLine()
         {
-            double value1, value2, value3;
+            double value1, value2, value3, opacity;
             
             if (!double.TryParse(_firstChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value1) &&
                 !double.TryParse(_firstChannelValue, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value1) &&
@@ -352,9 +351,16 @@ namespace Lab1.ViewModels
                 value3 = 0;
             }
             
+            if (!double.TryParse(_opacity, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out opacity) &&
+                !double.TryParse(_opacity, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out opacity) &&
+                !double.TryParse(_opacity, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out opacity))
+            {
+                opacity = 0;
+            }
+            
             if (!_x1.Equals(_x2).Equals(_y1).Equals(_y2).Equals(0.0))
             {
-                _model.DrawLine((int)_x1, (int)_y1, (int)_x2, (int)_y2, _lineWidth, new []{value1, value2, value3});
+                _model.DrawLine((int)_x1, (int)_y1, (int)_x2, (int)_y2, _lineWidth, opacity, new []{value1, value2, value3});
             }
         }
 
