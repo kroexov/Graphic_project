@@ -26,6 +26,15 @@ namespace Lab1.ViewModels
             "YСoCg",
             "CMY"
         };
+        
+        private string _selectedScaling = "Closest point";
+        private ObservableCollection<string>  _scalings = new ObservableCollection<string>()
+        {
+            "Closest point",
+            "Bilinear",
+            "Lanczos3",
+            "BC-splines"
+        };
 
         private PnmServices _model;
 
@@ -64,6 +73,20 @@ namespace Lab1.ViewModels
                 {
                     ImageDisplayViewModel.SetPath(res);
                 }
+            }
+        }
+        
+        public ObservableCollection<string> Scalings
+        {
+            get => _scalings;
+        }
+        
+        public string SelectedScaling
+        {
+            get => _selectedScaling;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _selectedScaling, value);
             }
         }
 
@@ -131,6 +154,11 @@ namespace Lab1.ViewModels
             }
         }
         
+        public int Xoffset { get; set; }
+        public int Yoffset { get; set; }
+        public int ImageWidth { get; set; }
+        public int ImageHeight { get; set; }
+        
         public string ErrorText
         {
             get => _errorText;
@@ -196,6 +224,11 @@ namespace Lab1.ViewModels
             {
                 OnErrorHappened(e.Message);
             }
+        }
+
+        public void ResizeImage()
+        {
+            
         }
 
         #endregion

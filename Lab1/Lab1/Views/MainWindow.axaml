@@ -66,6 +66,22 @@
             </StackPanel>
         </StackPanel>
         
+        <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Grid.RowSpan="3">
+            <TextBlock Width="400" Foreground="Orange" FontSize="20">Новый размер изображения</TextBlock>
+            <DockPanel>
+                <NumericUpDown Width="200" Value="{Binding ImageWidth}"></NumericUpDown>
+                <NumericUpDown Width="200" Value="{Binding ImageHeight}"></NumericUpDown>
+            </DockPanel>
+            <TextBlock Width="400" Foreground="Orange" FontSize="20">Смещения по осям</TextBlock>
+            <DockPanel>
+                <NumericUpDown Width="200" Value="{Binding Xoffset}"></NumericUpDown>
+                <NumericUpDown Width="200" Value="{Binding Yoffset}"></NumericUpDown>
+            </DockPanel>
+            <TextBlock Foreground="Orange" Margin="0 20 0 20" HorizontalAlignment="Center" FontSize="20">Способы масштабирования</TextBlock>
+            <ListBox Items="{Binding Scalings}" SelectedItem="{Binding SelectedScaling}"></ListBox>
+            <Button Width="400" Content="Применить масштабирование" Command="{Binding ResizeImage}"></Button> 
+        </StackPanel>
+        
         <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
             <TextBlock Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Center" FontSize="20">Цветовые пространства</TextBlock>
             <ListBox Items="{Binding ColorSpaces}" SelectedItem="{Binding SelectedColorSpace}"></ListBox>
