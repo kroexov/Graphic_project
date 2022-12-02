@@ -420,27 +420,25 @@ public class P6 : Pnm
         }
     }
 
-    private void RgbToYСbСr601(double[] pixel, double red, double green, double blue)
-    {
-
-        pixel[0] = (16 + (65.481 * red + 128.553 * green + 24.966 * blue)) / 256;
-        pixel[1] = (128 + (-37.797 * red - 74.203 * green + 112.0 * blue)) / 256;
-        pixel[2] = (128 + (112.0 * red - 93.786 * green - 18.214 * blue)) / 256;
-    }
-
-    private void YСbСr601ToRgb(double[] pixel, double y, double Cb, double Cr)
-    {
-
-        pixel[0] = (255.0 / 219) * (y * 256 - 16) + (255.0 / 112) * 0.701 * (Cr * 256 - 128);
-        pixel[0] /= 255;
-        pixel[1] = (255.0 / 219) * (y * 256 - 16) - (255.0 / 112) * 0.886 * 0.114 / 0.587 * (Cb * 256 - 128) -
-                   (255.0 / 112) * 0.701 * 0.299 / 0.587 * (Cr * 256 - 128);
-        pixel[1] /= 255;
-        pixel[2] = (255.0 / 219) * (y * 256 - 16) + (255.0 / 112) * 0.886 * (Cb * 256 - 128);
-        pixel[2] /= 255;
-    }
-
+    // переделанные коэффициент-переводы в .709
     private void RgbToYСbСr709(double[] pixel, double red, double green, double blue)
+    {
+
+        pixel[0] = 0.2126 * red + 0.7152 * green + 0.722 * blue;
+        pixel[1] = -0.1146 * red - 0.3854 * green + 0.5 * blue;
+        pixel[2] = 0.5 * red - 0.4542 * green - 0.0458 * blue;
+    }
+
+    // переделанные коэффициент-переводы из .709
+    private void YСbСr709ToRgb(double[] pixel, double y, double Cb, double Cr)
+    {
+
+        pixel[0] = y + 1.5748 * Cr;
+        pixel[1] = y - 0.1873 * Cb - 0.4681 * Cr;
+        pixel[2] = y + 1.8556 * Cb;
+    }
+
+    private void RgbToYСbСr601(double[] pixel, double red, double green, double blue)
     {
 
         pixel[0] = (0.299 * red*255) + (0.587 * green*255) + (0.114 * blue*255);
@@ -451,7 +449,7 @@ public class P6 : Pnm
         pixel[2] /= 255;
     }
 
-    private void YСbСr709ToRgb(double[] pixel, double y, double Cb, double Cr)
+    private void YСbСr601ToRgb(double[] pixel, double y, double Cb, double Cr)
     {
         pixel[0] = y*255 + 1.402 * (Cr * 255 - 128);
         pixel[0] /= 255;
