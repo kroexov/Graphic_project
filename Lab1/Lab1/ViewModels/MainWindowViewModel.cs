@@ -26,6 +26,18 @@ namespace Lab1.ViewModels
             "YСoCg",
             "CMY"
         };
+        
+        private string _selectedFilter = "Threshold filtering";
+        private ObservableCollection<string>  _filters = new ObservableCollection<string>()
+        {
+            "Threshold filtering",
+            "Threshold filtering by Ocu",
+            "Median filtering",
+            "Gauss filtering",
+            "Box blur filtering",
+            "Sobel filtering",
+            "Contrast Adaptive Sharpening"
+        };
 
         private PnmServices _model;
 
@@ -66,6 +78,24 @@ namespace Lab1.ViewModels
                 }
             }
         }
+        
+        public ObservableCollection<string> Filters
+        {
+            get => _filters;
+        }
+        
+        public string SelectedFilter
+        {
+            get => _selectedFilter;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _selectedFilter, value);
+                RaisePropertyChanged(nameof(IsThreshold));
+                RaisePropertyChanged(nameof(IsRadius));
+                RaisePropertyChanged(nameof(IsSigma));
+                RaisePropertyChanged(nameof(IsSharpness));
+            }
+        }
 
         public bool FirstChannel
         {
@@ -85,6 +115,16 @@ namespace Lab1.ViewModels
                 
             } 
         }
+
+        public bool IsThreshold => _selectedFilter == "Threshold filtering";
+        public bool IsRadius => (_selectedFilter == "Median filtering" || _selectedFilter == "Box blur filtering");
+        public bool IsSigma => _selectedFilter == "Gauss filtering";
+        public bool IsSharpness => _selectedFilter == "Contrast Adaptive Sharpening";
+        
+        public double Sharpness { get; set; }
+        public int FiltrationThreshold { get; set; }
+        public double CoreRadius { get; set; }
+        public double Sigma { get; set; }
         
         public bool SecondChannel
         {
@@ -196,6 +236,11 @@ namespace Lab1.ViewModels
             {
                 OnErrorHappened(e.Message);
             }
+        }
+        
+        public void ApplySelectedFiler()
+        {
+            
         }
 
         #endregion
