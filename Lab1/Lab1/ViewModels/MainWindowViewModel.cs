@@ -46,6 +46,7 @@ namespace Lab1.ViewModels
             _model = model;
             model.ModelErrorHappened += (s => OnErrorHappened(s));
             ImageDisplayViewModel = new ImageDisplayViewModel();
+            HistogramDisplayViewModel = new HistogramDisplayViewModel();
         }
 
         #endregion
@@ -141,6 +142,8 @@ namespace Lab1.ViewModels
         }
         
         public ImageDisplayViewModel ImageDisplayViewModel { get; }
+        
+        public HistogramDisplayViewModel HistogramDisplayViewModel { get; }
 
         public ObservableCollection<string> ColorSpaces
         {
@@ -196,6 +199,17 @@ namespace Lab1.ViewModels
             {
                 OnErrorHappened(e.Message);
             }
+        }
+
+        public void CreateHistogram()
+        {
+            // test part, change this
+            var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+            pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+            var fullFileName = pathSaveFile + "imgFiles\\" + "11121310.bmp";
+            HistogramDisplayViewModel.SetPathForChannel1(fullFileName);
+            HistogramDisplayViewModel.SetPathForChannel2(fullFileName);
+            HistogramDisplayViewModel.SetPathForChannel3(fullFileName);
         }
 
         #endregion

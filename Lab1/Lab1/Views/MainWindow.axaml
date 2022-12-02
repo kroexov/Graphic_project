@@ -95,7 +95,10 @@
         </StackPanel>
         </Border>
         
-        
+        <StackPanel Grid.RowSpan="3" Grid.Row="0" Grid.Column="0">
+            <Button Content="Сгенерировать гистограммы" Command="{Binding CreateHistogram}"></Button>
+            <views:HistogramDisplay Name="Display" DataContext="{Binding HistogramDisplayViewModel}"></views:HistogramDisplay>
+        </StackPanel>
         <Popup Grid.Row="1" Grid.Column="1" IsOpen="{Binding IsErrorOccured}">
             <TextBlock Text="{Binding ErrorText}"/>
         </Popup>
