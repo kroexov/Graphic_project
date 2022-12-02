@@ -152,7 +152,7 @@ public class DitheringServices
                         AddErrorToPixel(x - 1, y + 1, 3.0 / 16, diffR, diffG, diffB, oldimage);
                         //pixel[y+1][x-1] += (3.0 / 16) * diff1;
                     }
-                    AddErrorToPixel(x, y, 5.0 / 16, diffR, diffG, diffB, oldimage);
+                    AddErrorToPixel(x, y+1, 5.0 / 16, diffR, diffG, diffB, oldimage);
                     // pixel[y+1][x] += (5.0 / 16) * diff1;
                     if (x + 1 < width)
                     {
@@ -262,8 +262,8 @@ public class DitheringServices
                     {
                         AddErrorToPixel(x - 1, y + 1, coef, diffR, diffG, diffB, oldimage);
                     }
-                    
-                    AddErrorToPixel(x, y, coef, diffR, diffG, diffB, oldimage);
+
+                    AddErrorToPixel(x, y + 1, coef, diffR, diffG, diffB, oldimage);
 
                     if (x + 1 < width)
                     {
