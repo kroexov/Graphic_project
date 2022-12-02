@@ -25,6 +25,21 @@ public class HistogramDisplayViewModel : ViewModelBase
         Channel1Histogram = new Bitmap(fileStream);
     }
     
+    public void ClearChannel1()
+    {
+        Channel1Histogram = null;
+    }
+    
+    public void ClearChannel2()
+    {
+        Channel2Histogram = null;
+    }
+    
+    public void ClearChannel3()
+    {
+        Channel3Histogram = null;
+    }
+    
     public void SetPathForChannel2(string path)
     {
         using var fileStream = File.OpenRead(path);

@@ -74,6 +74,10 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _firstChannel, value);
+                if (!value)
+                {
+                    HistogramDisplayViewModel.ClearChannel1();
+                }
                 _model.ChangeColorChannel(new bool[3]
                 {
                     _firstChannel, _secondChannel, _thirdChannel
@@ -93,6 +97,10 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _secondChannel, value);
+                if (!value)
+                {
+                    HistogramDisplayViewModel.ClearChannel2();
+                }
                 _model.ChangeColorChannel(new bool[3]
                 {
                     _firstChannel, _secondChannel, _thirdChannel
@@ -111,6 +119,10 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _thirdChannel, value);
+                if (!value)
+                {
+                    HistogramDisplayViewModel.ClearChannel3();
+                }
                 _model.ChangeColorChannel(new bool[3]
                 {
                     _firstChannel, _secondChannel, _thirdChannel
@@ -207,9 +219,20 @@ namespace Lab1.ViewModels
             var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
             pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
             var fullFileName = pathSaveFile + "imgFiles\\" + "11121310.bmp";
-            HistogramDisplayViewModel.SetPathForChannel1(fullFileName);
-            HistogramDisplayViewModel.SetPathForChannel2(fullFileName);
-            HistogramDisplayViewModel.SetPathForChannel3(fullFileName);
+            if (_firstChannel)
+            {
+                HistogramDisplayViewModel.SetPathForChannel1(fullFileName);
+            }
+            
+            if (_secondChannel)
+            {
+                HistogramDisplayViewModel.SetPathForChannel2(fullFileName);
+            }
+            
+            if (_thirdChannel)
+            {
+                HistogramDisplayViewModel.SetPathForChannel3(fullFileName);
+            }
         }
 
         #endregion
