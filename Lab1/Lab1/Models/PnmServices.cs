@@ -70,6 +70,16 @@ public class PnmServices: IPnmServices
         }
     }
 
+    public string HistogramColor()
+    {
+        if (_fileImg != null)
+        {
+            return _fileImg.CreateColorHistogram();
+        }
+
+        return string.Empty;
+    }
+
     #endregion
     
     #region Private methods
@@ -114,6 +124,8 @@ public class PnmServices: IPnmServices
 
         return null;
     }
+    
+    
 
     #endregion
     
