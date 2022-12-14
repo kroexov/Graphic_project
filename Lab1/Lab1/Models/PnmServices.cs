@@ -74,7 +74,13 @@ public class PnmServices: IPnmServices
     {
         if (_fileImg != null)
         {
-            _fileImg.AlgorithmFilter(typeFilter);
+            
+            var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+            pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+            var fullFileName = pathSaveFile + "\\SystemImage\\Filter.bmp";
+            
+            _fileImg.AlgorithmFilter(typeFilter).Save(fullFileName);
+            
         }
     }
 

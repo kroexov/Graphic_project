@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.IO;
 using Lab1.Models;
 
 namespace Lab1.TypeFileImg;
@@ -140,15 +141,36 @@ public class P6 : Pnm
         return saveFile;
     }
 
-    public override string AlgorithmFilter(TypeFilter typeFilter)
+    public override Bitmap AlgorithmFilter(TypeFilter typeFilter)
     {
-        throw new NotImplementedException();
+        switch (typeFilter)
+        {
+            case TypeFilter.ThresholdFiltering:
+                return ThresholdFiltering(100);
+            case TypeFilter.ThresholdFilteringByOcu:
+                return ThresholdFilteringByOsu();
+            case TypeFilter.MedianFiltering:
+                break;
+            case TypeFilter.GaussFiltering:
+                break;
+            case TypeFilter.BoxBlurFiltering:
+                break;
+            case TypeFilter.SobelFiltering:
+                break;
+            case TypeFilter.ContrastAdaptiveSharpening:
+                break;
+        }
+
+        return new Bitmap(100, 100);
     }
 
     #endregion
 
     #region Private methods
 
+    #region Convert color
+
+    
     private void ConvertColorPixel(double[] pixel, double value1, double value2, double value3, ColorSpace colorSpace)
     {
         if (_currentColorSpace == ColorSpace.Rgb && colorSpace == ColorSpace.Rgb)
@@ -239,7 +261,7 @@ public class P6 : Pnm
             pixel[2] = (Convert.ToInt32(pixel[2] * 255))/255.0;
         }
     }
-
+    
     private void RgbToCmy(double[] pixel, double red, double green, double blue)
     {
         pixel[0] = 1 - red;
@@ -478,6 +500,111 @@ public class P6 : Pnm
         pixel[1] = y + Cg;
         pixel[2] = y - Co - Cg;
     }
+    
+
+    #endregion
+
+    #region FilterAlgorithm
+
+    private Bitmap ThresholdFiltering(int threshold)
+    {
+        var image = new Bitmap(Header.Width, Header.Height, PixelFormat.Format24bppRgb);
+
+        for (var y = 0; y < Header.Height; y++)
+        {
+            for (var x = 0; x < Header.Width; x++)
+            {
+                var value1 = Data[GetCoordinates(3*x, 3*y)]  * Convert.ToInt32(_currentColorСhannel[0]);
+                var value2 = Data[GetCoordinates(3*x + 1, 3*y)]  * Convert.ToInt32(_currentColorСhannel[1]);
+                var value3 = Data[GetCoordinates(3*x + 2, 3*y)]  * Convert.ToInt32(_currentColorСhannel[2]);
+                
+                ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
+                
+                var valueRed = 255 * tempPixel[0];
+                var valueGreen = 255 * tempPixel[1];
+                var valueBlue = 255 * tempPixel[2];
+
+                var value = 0.299 * valueRed + 0.587 * valueGreen + 0.114 * valueBlue;
+
+                if (value < threshold)
+                {
+                    value = 0;
+                }
+                else
+                {
+                    value = 255;
+                }
+                
+                Color newColor = Color.FromArgb((byte)Math.Round(value),
+                    (byte)Math.Round(value), 
+                    (byte)Math.Round(value));
+                
+                image.SetPixel(x, y, newColor);
+            }
+        }
+        return image;
+    }
+
+    private Bitmap ThresholdFilteringByOsu()
+    {
+        var p = new double[256];
+
+        for (var i = 0; i < Header.PixelSize * Header.Height * Header.Width; i += 3)
+        {
+            var value1 = Data[i]  * Convert.ToInt32(_currentColorСhannel[0]);
+            var value2 = Data[i + 1]  * Convert.ToInt32(_currentColorСhannel[1]);
+            var value3 = Data[i + 2]  * Convert.ToInt32(_currentColorСhannel[2]);
+            ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
+            var valueRed = tempPixel[0] * 255;
+            var valueGreen = tempPixel[1] * 255;
+            var valueBlue = tempPixel[2] * 255;
+            
+            var value = Convert.ToInt32(Math.Round(0.299 * valueRed + 0.587 * valueGreen + 0.114 * valueBlue));
+            p[value]++;
+        }
+
+        for (int i = 0; i < 256; i++)
+        {
+            p[i] /= (Header.Height * Header.Width);
+        }
+
+        int bestThreshold = 0;
+        var bestSigma = 0.0;
+        for (var threshold = 0; threshold < 255; threshold++)
+        {
+            var q0 = 0.0;
+            var q1 = 0.0;
+            var nu0 = 0.0;
+            var nu1 = 0.0;
+            var nu = 0.0;
+            for (var i = 0; i < threshold; i++)
+            {
+                q0 += p[i];
+            }
+
+            q1 = 1 - q0;
+            for (var i = 0; i < threshold; i++)
+            {
+                nu0 += (i + 1) * p[i] / q0;
+            }
+            for (var i = threshold; i < 256; i++)
+            {
+                nu1 += (i + 1) * p[i] / q1;
+            }
+
+            var sigma = q0 * q1 * (nu0 - nu1) * (nu0 - nu1);
+
+            if (bestSigma < sigma)
+            {
+                bestSigma = sigma;
+                bestThreshold = threshold;
+            }
+        }
+
+        return ThresholdFiltering(bestThreshold);
+    }
+
+    #endregion
     
     private void SetColorSpace(ColorSpace colorSpace)
     {
