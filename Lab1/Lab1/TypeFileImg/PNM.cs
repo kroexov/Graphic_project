@@ -24,6 +24,8 @@ public abstract class Pnm
 
     public abstract byte[] SaveFile(byte[] origFile);
 
+    public abstract string AlgorithmFilter(TypeFilter typeFilter);
+
     #endregion
 
     #region Private/protected methods

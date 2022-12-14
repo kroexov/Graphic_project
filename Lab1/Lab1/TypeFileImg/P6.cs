@@ -140,6 +140,11 @@ public class P6 : Pnm
         return saveFile;
     }
 
+    public override string AlgorithmFilter(TypeFilter typeFilter)
+    {
+        throw new NotImplementedException();
+    }
+
     #endregion
 
     #region Private methods

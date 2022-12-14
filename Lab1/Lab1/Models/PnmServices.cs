@@ -70,6 +70,14 @@ public class PnmServices: IPnmServices
         }
     }
 
+    public void FilterImage(TypeFilter typeFilter)
+    {
+        if (_fileImg != null)
+        {
+            _fileImg.AlgorithmFilter(typeFilter);
+        }
+    }
+
     #endregion
     
     #region Private methods

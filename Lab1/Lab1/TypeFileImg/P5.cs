@@ -56,5 +56,10 @@ public class P5 : Pnm
         return saveFile;
     }
 
+    public override string AlgorithmFilter(TypeFilter typeFilter)
+    {
+        throw new NotImplementedException();
+    }
+
     #endregion
 }
