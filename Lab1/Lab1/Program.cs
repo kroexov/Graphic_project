@@ -20,11 +20,5 @@ namespace Lab1
                  .UsePlatformDetect()
                  .LogToTrace()
                  .UseReactiveUI();
-        /*public static void Main()
-        {
-            PnmServices pnm = new PnmServices();
-            .pnm.ReadFile("C:\\Users\\dewor\\Desktop\\ffffff.ppm", new []{true, true, true});
-            pnm.FilterImage(TypeFilter.ThresholdFilteringByOcu);
-        }*/
     }
 }

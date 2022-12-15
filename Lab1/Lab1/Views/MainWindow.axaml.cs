@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
@@ -29,7 +30,12 @@ namespace Lab1.Views
 
         private void ShowFilter(object? sender, RoutedEventArgs e)
         {
+            var fullFileName = _mvm.ApplySelectedFiler();
             ImageDisplayViewModel viewModel = new ImageDisplayViewModel();
+            if (!fullFileName.Equals(String.Empty) )
+            {
+                viewModel.SetPath(fullFileName);
+            }
             FilterCheckWindow filterCheckWindow = new FilterCheckWindow()
             {
                 DataContext = viewModel

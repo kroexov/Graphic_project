@@ -146,7 +146,7 @@ public class P6 : Pnm
         switch (typeFilter)
         {
             case TypeFilter.ThresholdFiltering:
-                return ThresholdFiltering(100);
+                return ThresholdFiltering(128);
             case TypeFilter.ThresholdFilteringByOcu:
                 return ThresholdFilteringByOsu();
             case TypeFilter.MedianFiltering:

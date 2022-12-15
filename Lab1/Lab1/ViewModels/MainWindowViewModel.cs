@@ -30,13 +30,13 @@ namespace Lab1.ViewModels
         private string _selectedFilter = "Threshold filtering";
         private ObservableCollection<string>  _filters = new ObservableCollection<string>()
         {
-            "Threshold filtering",
-            "Threshold filtering by Ocu",
-            "Median filtering",
-            "Gauss filtering",
-            "Box blur filtering",
-            "Sobel filtering",
-            "Contrast Adaptive Sharpening"
+            "ThresholdFiltering",
+            "ThresholdFilteringByOcu",
+            "MedianFiltering",
+            "GaussFiltering",
+            "BoxBlurFiltering",
+            "SobelFiltering",
+            "ContrastAdaptiveSharpening"
         };
 
         private PnmServices _model;
@@ -116,10 +116,10 @@ namespace Lab1.ViewModels
             } 
         }
 
-        public bool IsThreshold => _selectedFilter == "Threshold filtering";
-        public bool IsRadius => (_selectedFilter == "Median filtering" || _selectedFilter == "Box blur filtering");
-        public bool IsSigma => _selectedFilter == "Gauss filtering";
-        public bool IsSharpness => _selectedFilter == "Contrast Adaptive Sharpening";
+        public bool IsThreshold => _selectedFilter == "ThresholdFiltering";
+        public bool IsRadius => (_selectedFilter == "MedianFiltering" || _selectedFilter == "BoxBlurFiltering");
+        public bool IsSigma => _selectedFilter == "GaussFiltering";
+        public bool IsSharpness => _selectedFilter == "ContrastAdaptiveSharpening";
         
         public double Sharpness { get; set; }
         public int FiltrationThreshold { get; set; }
@@ -238,9 +238,10 @@ namespace Lab1.ViewModels
             }
         }
         
-        public void ApplySelectedFiler()
+        public string ApplySelectedFiler()
         {
-            
+            TypeFilter Filter = (TypeFilter) Enum.Parse(typeof(TypeFilter), _selectedFilter, true);
+            return _model.FilterImage(Filter);
         }
 
         #endregion
