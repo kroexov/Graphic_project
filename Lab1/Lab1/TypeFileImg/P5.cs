@@ -57,7 +57,7 @@ public class P5 : Pnm
         return saveFile;
     }
     
-    public override string CreateColorHistogram()
+    public override string CreateColorHistogram(double valueIgnore)
     {
         var histogramFirstChannel = new int[256];
         var histogramSecondChannel = new int[256];
@@ -95,12 +95,48 @@ public class P5 : Pnm
                 image.SetPixel(3*x + 2, y, Color.Blue);
             }
         }
+        var ignoreValuePixel = 0;
+        if (valueIgnore != 0)
+        {
+            ignoreValuePixel = Convert.ToInt32(Math.Round(256 * valueIgnore)) - 1;
+        }
+
+        var leftOffset = ignoreValuePixel;
+        for (var i = ignoreValuePixel; i < 256 && histogramFirstChannel[i] == 0; i++)
+        {
+            leftOffset = i;
+        }
+
+        var rightOffset = 255 - ignoreValuePixel;
+        for (var i = 255 - ignoreValuePixel; i >= 0 && histogramFirstChannel[i] == 0; i--)
+        {
+            rightOffset = i;
+        }
+
+        var usedValue = rightOffset - leftOffset;
+
+        if (usedValue > 0)
+        {
+            AutoContrast(rightOffset, leftOffset);
+        }
         
         var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
         pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-        var fullFileName = pathSaveFile + "\\systemImg\\histogram.bmp";
+        var fullFileName = pathSaveFile + "\\SystemImage\\histogram.bmp";
         image.Save(fullFileName, ImageFormat.Bmp);
         return fullFileName;
+    }
+
+    private void AutoContrast(int rightOffset, int leftOffset)
+    {
+        for (var i = 0; i < Header.Width * Header.Height * Header.PixelSize; i++)
+        {
+            var ans = Math.Round(Data[i] * 255);
+            ans = (ans - leftOffset) / (rightOffset - leftOffset);
+            ans = ans < 0 ? 0 : ans;
+            ans = ans > 1 ? 1 : ans;
+            Data[i] = ans;
+        }
     }
 
     #endregion

@@ -142,7 +142,7 @@ public class P6 : Pnm
         return saveFile;
     }
 
-    public override string CreateColorHistogram()
+    public override string CreateColorHistogram(double valueIgnore)
     {
         var histogramFirstChannel = new int[256];
         var histogramSecondChannel = new int[256];
@@ -180,10 +180,39 @@ public class P6 : Pnm
                 image.SetPixel(3*x + 2, y, Color.Blue);
             }
         }
+        var ignoreValuePixel = 0;
+        if (valueIgnore != 0)
+        {
+            ignoreValuePixel = Convert.ToInt32(Math.Round(256 * valueIgnore)) - 1;
+        }
+        
+
+        var leftOffset = ignoreValuePixel;
+        for (var i = ignoreValuePixel; i < 256 && histogramFirstChannel[i] == 0
+                                                  && histogramSecondChannel[i] == 0
+                                                  && histogramThirdChannel[i] == 0; i++)
+        {
+            leftOffset = i;
+        }
+
+        var rightOffset = 255 - ignoreValuePixel;
+        for (var i = 255 - ignoreValuePixel; i >= 0 && histogramFirstChannel[i] == 0
+                                                    && histogramSecondChannel[i] == 0
+                                                    && histogramThirdChannel[i] == 0; i--)
+        {
+            rightOffset = i;
+        }
+
+        var usedValue = rightOffset - leftOffset;
+
+        if (usedValue > 0)
+        {
+            AutoContrast(rightOffset, leftOffset);
+        }
         
         var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
         pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-        var fullFileName = pathSaveFile + "\\systemImg\\histogram.bmp";
+        var fullFileName = pathSaveFile + "\\SystemImage\\histogram.bmp";
         image.Save(fullFileName, ImageFormat.Bmp);
         return fullFileName;
     }
@@ -191,6 +220,38 @@ public class P6 : Pnm
     #endregion
 
     #region Private methods
+    
+    private void AutoContrast(int rightOffset, int leftOffset)
+    {
+        for (var i = 0; i < Header.Width * Header.Height * Header.PixelSize; i += 3)
+        {
+            var value1 = Data[i];
+            var value2 = Data[i + 1];
+            var value3 = Data[i + 2];
+            ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
+            var curColorSpace = _currentColorSpace;
+            _currentColorSpace = ColorSpace.Rgb;
+            value1 = Math.Round(tempPixel[0] * 255);
+            value2 = Math.Round(tempPixel[1] * 255);
+            value3 = Math.Round(tempPixel[2] * 255);
+            
+            value1 = (value1 - leftOffset) / (rightOffset - leftOffset);
+            value2 = (value2 - leftOffset) / (rightOffset - leftOffset);
+            value3 = (value3 - leftOffset) / (rightOffset - leftOffset);
+            value1 = value1 < 0 ? 0 : value1;
+            value2 = value2 < 0 ? 0 : value2;
+            value3 = value3 < 0 ? 0 : value3;
+            value1 = value1 > 1 ? 1 : value1;
+            value2 = value2 > 1 ? 1 : value2;
+            value3 = value3 > 1 ? 1 : value3;
+            
+            ConvertColorPixel(tempPixel, value1, value2, value3, curColorSpace);
+            _currentColorSpace = curColorSpace;
+            Data[i] = tempPixel[0];
+            Data[i + 1] = tempPixel[1];
+            Data[i + 2] = tempPixel[2];
+        }
+    }
 
     private void ConvertColorPixel(double[] pixel, double value1, double value2, double value3, ColorSpace colorSpace)
     {

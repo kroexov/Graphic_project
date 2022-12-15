@@ -70,11 +70,11 @@ public class PnmServices: IPnmServices
         }
     }
 
-    public string HistogramColor()
+    public string HistogramColor(double ignoreValue)
     {
         if (_fileImg != null)
         {
-            return _fileImg.CreateColorHistogram();
+            return _fileImg.CreateColorHistogram(ignoreValue);
         }
 
         return string.Empty;

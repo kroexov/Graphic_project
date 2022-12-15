@@ -24,7 +24,7 @@ public abstract class Pnm
 
     public abstract byte[] SaveFile(byte[] origFile);
 
-    public abstract string CreateColorHistogram();
+    public abstract string CreateColorHistogram(double valueIgnore);
 
     #endregion
 
