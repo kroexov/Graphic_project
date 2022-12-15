@@ -33,6 +33,8 @@ namespace Lab1.ViewModels
         
         private string _errorText = "Неизвестная ошибка";
 
+        private string _ignoranceRate = "0";
+
         private bool _firstChannel = true;
         private bool _secondChannel = true;
         private bool _thirdChannel = true;
@@ -111,6 +113,15 @@ namespace Lab1.ViewModels
                     ImageDisplayViewModel.SetPath(res);
                 }
             } 
+        }
+        
+        public string IgnoranceRate
+        {
+            get => _ignoranceRate;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _ignoranceRate, value);
+            }
         }
         
         public bool ThirdChannel
