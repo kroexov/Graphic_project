@@ -258,7 +258,11 @@ namespace Lab1.ViewModels
                 OnErrorHappened(e.Message);
             }
         }
-        
+
+        public void ChangeImageByFilter()
+        {
+            ImageDisplayViewModel.SetPath(ApplySelectedFiler());
+        }
         public string ApplySelectedFiler()
         {
             TypeFilter Filter = (TypeFilter) Enum.Parse(typeof(TypeFilter), _selectedFilter, true);
@@ -304,6 +308,7 @@ namespace Lab1.ViewModels
             }
             return _model.FilterImage(Filter, value);
         }
+        
 
         #endregion
 
