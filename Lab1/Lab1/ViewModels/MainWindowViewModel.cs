@@ -27,7 +27,7 @@ namespace Lab1.ViewModels
             "CMY"
         };
         
-        private string _selectedFilter = "Threshold filtering";
+        private string _selectedFilter = "ThresholdFiltering";
         private ObservableCollection<string>  _filters = new ObservableCollection<string>()
         {
             "ThresholdFiltering",

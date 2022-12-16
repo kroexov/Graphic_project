@@ -31,16 +31,18 @@ namespace Lab1.Views
         private void ShowFilter(object? sender, RoutedEventArgs e)
         {
             var fullFileName = _mvm.ApplySelectedFiler();
-            ImageDisplayViewModel viewModel = new ImageDisplayViewModel();
+            
             if (!fullFileName.Equals(String.Empty) )
             {
+                ImageDisplayViewModel viewModel = new ImageDisplayViewModel();
                 viewModel.SetPath(fullFileName);
+                FilterCheckWindow filterCheckWindow = new FilterCheckWindow()
+                {
+                    DataContext = viewModel
+                };
+                filterCheckWindow.Show();
             }
-            FilterCheckWindow filterCheckWindow = new FilterCheckWindow()
-            {
-                DataContext = viewModel
-            };
-            filterCheckWindow.Show();
+            
         }
     }
 }
