@@ -816,8 +816,8 @@ public class P6 : Pnm
         int xPosInImg;
         int yPosInImg;
 
-        var Mx = new int[] {-1, -2, -1, 0, 0, 0, 1, 2, 1 };
-        var My = new int[] {-1, 0, 1, -2, 0, 2, -1, 0, 1 };
+        var My = new int[] {-1, -2, -1, 0, 0, 0, 1, 2, 1 };
+        var Mx = new int[] {-1, 0, 1, -2, 0, 2, -1, 0, 1 };
         int d = 3;
         int kernelRadius = 1;
 
@@ -858,8 +858,8 @@ public class P6 : Pnm
                     var valueGreen = 255 * tempPixel[1];
                     var valueBlue = 255 * tempPixel[2];
                     
-                    //var value = 0.299 * valueRed + 0.587 * valueGreen + 0.114 * valueBlue;
-                    var value = 0.333 * valueRed + 0.333 * valueGreen + 0.333 * valueBlue;
+                    var value = 0.299 * valueRed + 0.587 * valueGreen + 0.114 * valueBlue;
+                    //var value = 0.333 * valueRed + 0.333 * valueGreen + 0.333 * valueBlue;
 
                     newValueX += value * Mx[i];
                     newValueY += value * My[i];
