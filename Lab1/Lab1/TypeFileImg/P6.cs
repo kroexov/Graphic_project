@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.IO;
 using Lab1.Models;
 
 namespace Lab1.TypeFileImg;
@@ -525,19 +525,13 @@ public class P6 : Pnm
                 var valueBlue = 255 * tempPixel[2];
 
                 var value = 0.299 * valueRed + 0.587 * valueGreen + 0.114 * valueBlue;
-
-                if (value < threshold)
-                {
-                    value = 0;
-                }
-                else
-                {
-                    value = 255;
-                }
                 
-                Color newColor = Color.FromArgb((byte)Math.Round(value),
-                    (byte)Math.Round(value), 
-                    (byte)Math.Round(value));
+                
+                value = (value < threshold ? 0 : 255);
+
+                Color newColor = Color.FromArgb((byte)value,
+                    (byte)value, 
+                    (byte)value);
                 
                 image.SetPixel(x, y, newColor);
             }
@@ -554,7 +548,9 @@ public class P6 : Pnm
             var value1 = Data[i]  * Convert.ToInt32(_currentColorСhannel[0]);
             var value2 = Data[i + 1]  * Convert.ToInt32(_currentColorСhannel[1]);
             var value3 = Data[i + 2]  * Convert.ToInt32(_currentColorСhannel[2]);
+            
             ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
+            
             var valueRed = tempPixel[0] * 255;
             var valueGreen = tempPixel[1] * 255;
             var valueBlue = tempPixel[2] * 255;
@@ -570,7 +566,7 @@ public class P6 : Pnm
 
         int bestThreshold = 0;
         var bestSigma = 0.0;
-        for (var threshold = 0; threshold < 255; threshold++)
+        for (var threshold = 1; threshold < 256; threshold++)
         {
             var q0 = 0.0;
             var q1 = 0.0;
@@ -593,7 +589,7 @@ public class P6 : Pnm
             }
 
             var sigma = q0 * q1 * (nu0 - nu1) * (nu0 - nu1);
-
+        
             if (bestSigma < sigma)
             {
                 bestSigma = sigma;
@@ -602,6 +598,70 @@ public class P6 : Pnm
         }
 
         return ThresholdFiltering(bestThreshold);
+    }
+
+    private Bitmap MedianFiltering(int kernelRadius)
+    {
+        var image = new Bitmap(Header.Width, Header.Height, PixelFormat.Format24bppRgb);
+        
+        //kernelRadius = i => (i,i) - центр сетки
+        int d = kernelRadius * 2 + 1;
+
+        var rValues = new List<double>(d * d);
+        var gValues = new List<double>(d * d);
+        var bValues = new List<double>(d * d);
+
+        int xPosInD;
+        int YPosInD;
+        int xPosInImg;
+        int yPosInImg;
+
+        for (var y = 0; y < Header.Height; y++)
+        {
+            for (var x = 0; x < Header.Width; x++)
+            {
+                for (int i = 0; i < d * d; i++)
+                {
+                    xPosInD = i % d;
+                    YPosInD = i / d;
+
+                    xPosInImg = x + (xPosInD - kernelRadius);
+                    xPosInImg = (xPosInImg < 0 ? 0 : xPosInImg);
+                    xPosInImg = (xPosInImg > Header.Width - 1 ? Header.Width - 1 : xPosInImg);
+                    
+                    yPosInImg = y + (YPosInD - kernelRadius);
+                    yPosInImg = (yPosInImg < 0 ? 0 : yPosInImg);
+                    yPosInImg = (yPosInImg > Header.Height - 1 ? Header.Height - 1 : yPosInImg);
+                    
+                    var value1 = Data[GetCoordinates(3*xPosInImg, 3*yPosInImg)]  * Convert.ToInt32(_currentColorСhannel[0]);
+                    var value2 = Data[GetCoordinates(3*xPosInImg + 1, 3*yPosInImg)]  * Convert.ToInt32(_currentColorСhannel[1]);
+                    var value3 = Data[GetCoordinates(3*xPosInImg + 2, 3*yPosInImg)]  * Convert.ToInt32(_currentColorСhannel[2]);
+                
+                    ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
+                
+                    var valueRed = 255 * tempPixel[0];
+                    var valueGreen = 255 * tempPixel[1];
+                    var valueBlue = 255 * tempPixel[2];
+
+                    rValues[i] = valueRed;
+                    gValues[i] = valueGreen;
+                    bValues[i] = valueBlue;
+                }
+                
+                rValues.Sort();
+                gValues.Sort();
+                bValues.Sort();
+
+                int medianIndex = d * d / 2;
+ 
+                Color newColor = Color.FromArgb((byte)rValues[medianIndex],
+                    (byte)gValues[medianIndex], 
+                    (byte)bValues[medianIndex]);
+                
+                image.SetPixel(x, y, newColor);
+            }
+        }
+        return image;
     }
 
     #endregion
