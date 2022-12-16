@@ -73,28 +73,6 @@ public class P5 : Pnm
             histogramThirdChannel[thirdChannel]++;
         }
 
-        var maxValue = histogramFirstChannel.Max();
-        if (maxValue < histogramSecondChannel.Max())
-            maxValue = histogramSecondChannel.Max();
-        if (maxValue < histogramThirdChannel.Max())
-            maxValue = histogramThirdChannel.Max();
-        
-        var image = new Bitmap(256*3, maxValue, PixelFormat.Format24bppRgb);
-        for (var x = 0; x < 256; x++)
-        {
-            for (var y = maxValue - histogramFirstChannel[x]; y < maxValue; y++)
-            {
-                image.SetPixel(3*x, y, Color.Red);
-            }
-            for (var y = maxValue - histogramSecondChannel[x]; y < maxValue; y++)
-            {
-                image.SetPixel(3*x + 1, y, Color.Lime);
-            }
-            for (var y = maxValue - histogramThirdChannel[x]; y < maxValue; y++)
-            {
-                image.SetPixel(3*x + 2, y, Color.Blue);
-            }
-        }
         var ignoreValuePixel = 0;
         if (valueIgnore != 0)
         {
@@ -118,6 +96,43 @@ public class P5 : Pnm
         if (usedValue > 0)
         {
             AutoContrast(rightOffset, leftOffset);
+        }
+        
+        histogramFirstChannel = new int[256];
+        histogramSecondChannel = new int[256];
+        histogramThirdChannel = new int[256];
+
+        for (var i = 0; i < Header.PixelSize * Header.Height * Header.Width; i += 3)
+        {
+            var firstChannel = Convert.ToInt32(Math.Round(Data[i] * 255));
+            var secondChannel = Convert.ToInt32(Math.Round(Data[i] * 255));
+            var thirdChannel = Convert.ToInt32(Math.Round(Data[i] * 255));
+            histogramFirstChannel[firstChannel]++;
+            histogramSecondChannel[secondChannel]++;
+            histogramThirdChannel[thirdChannel]++;
+        }
+
+        var maxValue = histogramFirstChannel.Max();
+        if (maxValue < histogramSecondChannel.Max())
+            maxValue = histogramSecondChannel.Max();
+        if (maxValue < histogramThirdChannel.Max())
+            maxValue = histogramThirdChannel.Max();
+        
+        var image = new Bitmap(256*3, maxValue, PixelFormat.Format24bppRgb);
+        for (var x = 0; x < 256; x++)
+        {
+            for (var y = maxValue - histogramFirstChannel[x]; y < maxValue; y++)
+            {
+                image.SetPixel(3*x, y, Color.Red);
+            }
+            for (var y = maxValue - histogramSecondChannel[x]; y < maxValue; y++)
+            {
+                image.SetPixel(3*x + 1, y, Color.Lime);
+            }
+            for (var y = maxValue - histogramThirdChannel[x]; y < maxValue; y++)
+            {
+                image.SetPixel(3*x + 2, y, Color.Blue);
+            }
         }
         
         var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
