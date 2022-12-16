@@ -107,7 +107,8 @@
             <TextBlock Width="400" Foreground="Orange" FontSize="20">Sharpness</TextBlock>
             <TextBox IsEnabled="{Binding IsSharpness}" Text="{Binding Sharpness}"></TextBox>
             
-            <Button Width="400" Content="Применить масштабирование" Command="{Binding ApplySelectedFiler}"></Button> 
+            <Button Width="400" Content="Предпросмотр фильтрации" Click="ShowFilter"></Button>
+            <Button Width="400" Content="Применить фильтрацию" Command="{Binding ApplySelectedFiler}"></Button> 
         </StackPanel>
         
         
