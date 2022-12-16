@@ -160,6 +160,12 @@ public class P6 : Pnm
                 secondChannel = Convert.ToInt32(Math.Round(Data[i + 1] * 255));
             if (!Data[i + 2].Equals(Double.NaN) & Data[i + 2] > 0)
                 thirdChannel = Convert.ToInt32(Math.Round(Data[i + 2] * 255));
+            if (Data[i] > 1)
+                firstChannel = 255;
+            if (Data[i + 1] > 1)
+                secondChannel = 255;
+            if (Data[i + 2] > 1)
+                thirdChannel = 255;
             histogramFirstChannel[firstChannel] += _currentColorСhannel[0] ? 1 : 0;
             histogramSecondChannel[secondChannel] += _currentColorСhannel[1] ? 1 : 0;
             histogramThirdChannel[thirdChannel] += _currentColorСhannel[2] ? 1 : 0;
@@ -202,9 +208,21 @@ public class P6 : Pnm
 
         for (var i = 0; i < Header.PixelSize * Header.Height * Header.Width; i += 3)
         {
-            var firstChannel = Convert.ToInt32(Math.Round(Data[i] * 255));
-            var secondChannel = Convert.ToInt32(Math.Round(Data[i + 1] * 255));
-            var thirdChannel = Convert.ToInt32(Math.Round(Data[i + 2] * 255));
+            var firstChannel = 0;
+            var secondChannel = 0;
+            var thirdChannel = 0;
+            if (!Data[i].Equals(Double.NaN) & Data[i] > 0)
+                firstChannel = Convert.ToInt32(Math.Round(Data[i] * 255));
+            if (!Data[i + 1].Equals(Double.NaN) & Data[i + 1] > 0)
+                secondChannel = Convert.ToInt32(Math.Round(Data[i + 1] * 255));
+            if (!Data[i + 2].Equals(Double.NaN) & Data[i + 2] > 0)
+                thirdChannel = Convert.ToInt32(Math.Round(Data[i + 2] * 255));
+            if (Data[i] > 1)
+                firstChannel = 255;
+            if (Data[i + 1] > 1)
+                secondChannel = 255;
+            if (Data[i + 2] > 1)
+                thirdChannel = 255;
             histogramFirstChannel[firstChannel] += _currentColorСhannel[0] ? 1 : 0;
             histogramSecondChannel[secondChannel] += _currentColorСhannel[1] ? 1 : 0;
             histogramThirdChannel[thirdChannel] += _currentColorСhannel[2] ? 1 : 0;
@@ -251,6 +269,12 @@ public class P6 : Pnm
             var value1 = (Data[i].Equals(Double.NaN) || Data[i] < 0)? 0 : Data[i];
             var value2 = (Data[i + 1].Equals(Double.NaN) || Data[i] < 0)? 0 : Data[i + 1];
             var value3 = (Data[i + 2].Equals(Double.NaN) || Data[i] < 0)? 0 : Data[i + 2];
+            if (Data[i] > 1)
+                value1 = 1.0;
+            if (Data[i + 1] > 1)
+                value2 = 1.0;
+            if (Data[i + 2] > 1)
+                value3 = 1.0;
             ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
             var curColorSpace = _currentColorSpace;
             _currentColorSpace = ColorSpace.Rgb;

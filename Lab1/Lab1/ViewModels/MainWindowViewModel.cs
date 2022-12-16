@@ -244,16 +244,8 @@ namespace Lab1.ViewModels
             {
                 HistogramDisplayViewModel.SetPathForChannel1(fullFileName);
             }
-            
-            if (_secondChannel)
-            {
-                HistogramDisplayViewModel.SetPathForChannel2(fullFileName);
-            }
-            
-            if (_thirdChannel)
-            {
-                HistogramDisplayViewModel.SetPathForChannel3(fullFileName);
-            }
+
+            ImageDisplayViewModel.SetPath(_model.RefreshImage());
         }
 
         #endregion
