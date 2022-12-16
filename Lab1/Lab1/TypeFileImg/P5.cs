@@ -56,7 +56,7 @@ public class P5 : Pnm
         return saveFile;
     }
 
-    public override Bitmap AlgorithmFilter(TypeFilter typeFilter)
+    public override Bitmap AlgorithmFilter(TypeFilter typeFilter, double value)
     {
         throw new NotImplementedException();
     }

@@ -49,6 +49,12 @@ namespace Lab1.ViewModels
         private bool _secondChannel = true;
         private bool _thirdChannel = true;
 
+        private int _filtrationThreshold;
+
+        private string _coreRadius;
+        private string _sigma;
+        private string _sharpness;
+
         #endregion
 
         #region Constructor
@@ -121,10 +127,25 @@ namespace Lab1.ViewModels
         public bool IsSigma => _selectedFilter == "GaussFiltering";
         public bool IsSharpness => _selectedFilter == "ContrastAdaptiveSharpening";
         
-        public double Sharpness { get; set; }
-        public int FiltrationThreshold { get; set; }
-        public double CoreRadius { get; set; }
-        public double Sigma { get; set; }
+        public string Sharpness{
+            get => _sharpness;
+            set => this.RaiseAndSetIfChanged(ref _sharpness, value);
+        }
+        public int FiltrationThreshold
+        {
+            get => _filtrationThreshold;
+            set => this.RaiseAndSetIfChanged(ref _filtrationThreshold, value);
+        }
+        public string CoreRadius
+        {
+            get => _coreRadius;
+            set => this.RaiseAndSetIfChanged(ref _coreRadius, value);
+        }
+        public string Sigma
+        {
+            get => _sigma;
+            set => this.RaiseAndSetIfChanged(ref _sigma, value);
+        }
         
         public bool SecondChannel
         {
@@ -241,7 +262,47 @@ namespace Lab1.ViewModels
         public string ApplySelectedFiler()
         {
             TypeFilter Filter = (TypeFilter) Enum.Parse(typeof(TypeFilter), _selectedFilter, true);
-            return _model.FilterImage(Filter);
+            double value = 0;
+            
+            switch (Filter)
+            {
+                case TypeFilter.ThresholdFiltering:
+                    value = _filtrationThreshold;
+                    break;
+                case TypeFilter.MedianFiltering:
+                    if (!double.TryParse(_coreRadius, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value) &&
+                        !double.TryParse(_coreRadius, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value) &&
+                        !double.TryParse(_coreRadius, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    {
+                        value = 0;
+                    }
+                    break;
+                case TypeFilter.BoxBlurFiltering:
+                    if (!double.TryParse(_coreRadius, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value) &&
+                        !double.TryParse(_coreRadius, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value) &&
+                        !double.TryParse(_coreRadius, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    {
+                        value = 0;
+                    }
+                    break;
+                case TypeFilter.GaussFiltering:
+                    if (!double.TryParse(_sigma, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value) &&
+                        !double.TryParse(_sigma, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value) &&
+                        !double.TryParse(_sigma, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    {
+                        value = 0;
+                    }
+                    break;
+                case TypeFilter.ContrastAdaptiveSharpening:
+                    if (!double.TryParse(_sharpness, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value) &&
+                        !double.TryParse(_sharpness, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value) &&
+                        !double.TryParse(_sharpness, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    {
+                        value = 0;
+                    }
+                    break;
+            }
+            return _model.FilterImage(Filter, value);
         }
 
         #endregion

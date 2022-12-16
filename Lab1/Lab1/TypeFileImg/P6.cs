@@ -142,18 +142,18 @@ public class P6 : Pnm
         return saveFile;
     }
 
-    public override Bitmap AlgorithmFilter(TypeFilter typeFilter)
+    public override Bitmap AlgorithmFilter(TypeFilter typeFilter, double value)
     {
         switch (typeFilter)
         {
             case TypeFilter.ThresholdFiltering:
-                return ThresholdFiltering(128);
+                return ThresholdFiltering(Convert.ToInt32(value));
             case TypeFilter.ThresholdFilteringByOcu:
                 return ThresholdFilteringByOsu();
             case TypeFilter.MedianFiltering:
-                return MedianFiltering(2);
+                return MedianFiltering(Convert.ToInt32(value));
             case TypeFilter.GaussFiltering:
-                return GaussFiltering(2);
+                return GaussFiltering(value);
             case TypeFilter.BoxBlurFiltering:
                 break;
             case TypeFilter.SobelFiltering:
@@ -452,7 +452,7 @@ public class P6 : Pnm
     private void RgbToYСbСr709(double[] pixel, double red, double green, double blue)
     {
 
-        pixel[0] = 0.2126 * red + 0.7152 * green + 0.722 * blue;
+        pixel[0] = 0.2126 * red + 0.7152 * green + 0.0722 * blue;
         pixel[1] = -0.1146 * red - 0.3854 * green + 0.5 * blue;
         pixel[2] = 0.5 * red - 0.4542 * green - 0.0458 * blue;
     }

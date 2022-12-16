@@ -24,7 +24,7 @@ public abstract class Pnm
 
     public abstract byte[] SaveFile(byte[] origFile);
 
-    public abstract Bitmap AlgorithmFilter(TypeFilter typeFilter);
+    public abstract Bitmap AlgorithmFilter(TypeFilter typeFilter, double value);
 
     #endregion
 
