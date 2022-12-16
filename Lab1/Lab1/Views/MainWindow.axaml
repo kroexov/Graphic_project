@@ -99,7 +99,7 @@
             <TextBlock Foreground="Orange" Margin="0 20 0 20" HorizontalAlignment="Center" FontSize="20">Алгоритмы фильтрации</TextBlock>
             <ListBox Items="{Binding Filters}" SelectedItem="{Binding SelectedFilter}"></ListBox>
             <TextBlock Width="400" Foreground="Orange" FontSize="20">Порог фильтрации</TextBlock>
-            <NumericUpDown IsEnabled="{Binding IsThreshold}" Maximum="255" Width="200" Value="{Binding FiltrationThreshold}"></NumericUpDown>
+            <NumericUpDown IsEnabled="{Binding IsThreshold}" Maximum="255" Minimum="0" Width="200" Value="{Binding FiltrationThreshold}"></NumericUpDown>
             <TextBlock Width="400" Foreground="Orange" FontSize="20">Радиус ядра</TextBlock>
             <TextBox IsEnabled="{Binding IsRadius}" Text="{Binding CoreRadius}"></TextBox>
             <TextBlock Width="400" Foreground="Orange" FontSize="20">Сигма</TextBlock>
@@ -108,7 +108,7 @@
             <TextBox IsEnabled="{Binding IsSharpness}" Text="{Binding Sharpness}"></TextBox>
             
             <Button Width="400" Content="Предпросмотр фильтрации" Click="ShowFilter"></Button>
-            <Button Width="400" Content="Применить фильтрацию" Command="{Binding ApplySelectedFiler}"></Button> 
+            <Button Width="400" Content="Применить фильтрацию" Command="{Binding ChangeImageByFilter}"></Button> 
         </StackPanel>
         
         

@@ -70,7 +70,7 @@ public class PnmServices: IPnmServices
         }
     }
 
-    public string FilterImage(TypeFilter typeFilter)
+    public string FilterImage(TypeFilter typeFilter, double value)
     {
         if (_fileImg != null)
         {
@@ -79,7 +79,7 @@ public class PnmServices: IPnmServices
             pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
             var fullFileName = pathSaveFile + "\\SystemImage\\Filter.bmp";
             
-            _fileImg.AlgorithmFilter(typeFilter).Save(fullFileName);
+            _fileImg.AlgorithmFilter(typeFilter, value).Save(fullFileName);
 
             return fullFileName;
         }
