@@ -70,7 +70,7 @@ public class PnmServices: IPnmServices
         }
     }
 
-    public string HistogramColor(double ignoreValue)
+    public string CreateHistogram(double ignoreValue)
     {
         if (_fileImg != null)
         {

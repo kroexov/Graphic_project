@@ -227,9 +227,19 @@ namespace Lab1.ViewModels
         public void CreateHistogram()
         {
             // test part, change this
-            var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
-            pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-            var fullFileName = pathSaveFile + "imgFiles\\" + "11121310.bmp";
+            double result;
+
+            //Try parsing in the current culture
+            if (!double.TryParse(_ignoranceRate, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
+                //Then try in US english
+                !double.TryParse(_ignoranceRate, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
+                //Then in neutral language
+                !double.TryParse(_ignoranceRate, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+            {
+                result = 0;
+            }
+
+            var fullFileName=_model.CreateHistogram(result);
             if (_firstChannel)
             {
                 HistogramDisplayViewModel.SetPathForChannel1(fullFileName);

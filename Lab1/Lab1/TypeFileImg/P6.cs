@@ -150,9 +150,16 @@ public class P6 : Pnm
 
         for (var i = 0; i < Header.PixelSize * Header.Height * Header.Width; i += 3)
         {
-            var firstChannel = Convert.ToInt32(Math.Round(Data[i] * 255));
-            var secondChannel = Convert.ToInt32(Math.Round(Data[i + 1] * 255));
-            var thirdChannel = Convert.ToInt32(Math.Round(Data[i + 2] * 255));
+            // это шаманство из-за NaN в алгоритмах HSL/HSV
+            var firstChannel = 0;
+            var secondChannel = 0;
+            var thirdChannel = 0;
+            if (!Data[i].Equals(Double.NaN) & Data[i] > 0)
+                firstChannel = Convert.ToInt32(Math.Round(Data[i] * 255));
+            if (!Data[i + 1].Equals(Double.NaN) & Data[i + 1] > 0)
+                secondChannel = Convert.ToInt32(Math.Round(Data[i + 1] * 255));
+            if (!Data[i + 2].Equals(Double.NaN) & Data[i + 2] > 0)
+                thirdChannel = Convert.ToInt32(Math.Round(Data[i + 2] * 255));
             histogramFirstChannel[firstChannel] += _currentColorСhannel[0] ? 1 : 0;
             histogramSecondChannel[secondChannel] += _currentColorСhannel[1] ? 1 : 0;
             histogramThirdChannel[thirdChannel] += _currentColorСhannel[2] ? 1 : 0;
@@ -225,9 +232,9 @@ public class P6 : Pnm
     {
         for (var i = 0; i < Header.Width * Header.Height * Header.PixelSize; i += 3)
         {
-            var value1 = Data[i];
-            var value2 = Data[i + 1];
-            var value3 = Data[i + 2];
+            var value1 = (Data[i].Equals(Double.NaN) || Data[i] < 0)? 0 : Data[i];
+            var value2 = (Data[i + 1].Equals(Double.NaN) || Data[i] < 0)? 0 : Data[i + 1];
+            var value3 = (Data[i + 2].Equals(Double.NaN) || Data[i] < 0)? 0 : Data[i + 2];
             ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
             var curColorSpace = _currentColorSpace;
             _currentColorSpace = ColorSpace.Rgb;
@@ -533,28 +540,33 @@ public class P6 : Pnm
     private void RgbToYСbСr709(double[] pixel, double red, double green, double blue)
     {
 
-        pixel[0] = 0.2126 * red + 0.7152 * green + 0.722 * blue;
-        pixel[1] = -0.1146 * red - 0.3854 * green + 0.5 * blue;
-        pixel[2] = 0.5 * red - 0.4542 * green - 0.0458 * blue;
+        pixel[0] = (0.2126 * red*255) + (0.7152 * green * 255) + (0.0722 * blue * 255);
+        pixel[0] /= 255;
+        pixel[1] = 128 - (0.1146 * red*255) - (0.3854 * green*255) + (0.5 * blue*255);
+        pixel[1] /= 255;
+        pixel[2] = 128 + (0.5 * red*255) - (0.4542 * green*255) - (0.0458 * blue*255);
+        pixel[2] /= 255;
+    }
+    
+    private void RgbToYСbСr601(double[] pixel, double red, double green, double blue)
+    {
+        pixel[0] = (0.299 * red*255) + (0.587 * green*255) + (0.114 * blue*255);
+        pixel[0] /= 255;
+        pixel[1] = 128 - (0.168736 * red*255) - (0.331264 * green*255) + (0.5 * blue*255);
+        pixel[1] /= 255;
+        pixel[2] = 128 + (0.5 * red*255) - (0.418688 * green*255) - (0.081312 * blue*255);
+        pixel[2] /= 255;
     }
 
     // переделанные коэффициент-переводы из .709
     private void YСbСr709ToRgb(double[] pixel, double y, double Cb, double Cr)
     {
 
-        pixel[0] = y + 1.5748 * Cr;
-        pixel[1] = y - 0.1873 * Cb - 0.4681 * Cr;
-        pixel[2] = y + 1.8556 * Cb;
-    }
-
-    private void RgbToYСbСr601(double[] pixel, double red, double green, double blue)
-    {
-
-        pixel[0] = (0.299 * red*255) + (0.587 * green*255) + (0.114 * blue*255);
+        pixel[0] = y*255 + 1.5748 * (Cr * 255 - 128);
         pixel[0] /= 255;
-        pixel[1] = 128 - (0.168736 * red*255) - (0.331264 * green*255) + (0.5 * blue*255);
+        pixel[1] = y*255 - 0.1873 * (Cb * 255 - 128) - 0.4681 * (Cr * 255 - 128);
         pixel[1] /= 255;
-        pixel[2] = 128 + (0.5 * red*255) - (0.418688 * green*255) - (0.081312 * blue*255);
+        pixel[2] = y*255 + 1.8556 * (Cb * 255 - 128);
         pixel[2] /= 255;
     }
 
