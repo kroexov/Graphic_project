@@ -155,9 +155,9 @@ public class P6 : Pnm
             case TypeFilter.GaussFiltering:
                 return GaussFiltering(2);
             case TypeFilter.BoxBlurFiltering:
-                break;
+                return BoxBlurFiltering(3);
             case TypeFilter.SobelFiltering:
-                break;
+                return SobelFiltering();
             case TypeFilter.ContrastAdaptiveSharpening:
                 break;
         }
@@ -744,6 +744,150 @@ public class P6 : Pnm
                     (byte)(newValueGreen), 
                     (byte)(newValueBlue));
 
+                image.SetPixel(x, y, newColor);
+            }
+        }
+        return image;
+    }
+        
+    private Bitmap BoxBlurFiltering(int kernelRadius)
+    {
+        var image = new Bitmap(Header.Width, Header.Height, PixelFormat.Format24bppRgb);
+        
+        int d = kernelRadius * 2 + 1;
+
+        int xPosInD;
+        int YPosInD;
+        int xPosInImg;
+        int yPosInImg;
+
+        for (var y = 0; y < Header.Height; y++)
+        {
+            for (var x = 0; x < Header.Width; x++)
+            {
+                double newValueRed = 0;
+                double newValueGreen = 0;
+                double newValueBlue = 0;
+                for (int i = 0; i < d * d; i++)
+                {
+                    xPosInD = i % d;
+                    YPosInD = i / d;
+
+                    xPosInImg = x + (xPosInD - kernelRadius);
+                    xPosInImg = (xPosInImg < 0 ? 0 : xPosInImg);
+                    xPosInImg = (xPosInImg > Header.Width - 1 ? Header.Width - 1 : xPosInImg);
+                    
+                    yPosInImg = y + (YPosInD - kernelRadius);
+                    yPosInImg = (yPosInImg < 0 ? 0 : yPosInImg);
+                    yPosInImg = (yPosInImg > Header.Height - 1 ? Header.Height - 1 : yPosInImg);
+                    
+                    var value1 = Data[GetCoordinates(3*xPosInImg, 3*yPosInImg)]  * Convert.ToInt32(_currentColorСhannel[0]);
+                    var value2 = Data[GetCoordinates(3*xPosInImg + 1, 3*yPosInImg)]  * Convert.ToInt32(_currentColorСhannel[1]);
+                    var value3 = Data[GetCoordinates(3*xPosInImg + 2, 3*yPosInImg)]  * Convert.ToInt32(_currentColorСhannel[2]);
+                
+                    ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
+                
+                    var valueRed = 255 * tempPixel[0];
+                    var valueGreen = 255 * tempPixel[1];
+                    var valueBlue = 255 * tempPixel[2];
+
+                    newValueRed += valueRed;
+                    newValueGreen += valueGreen;
+                    newValueBlue += valueBlue;
+
+                }
+
+                Color newColor = Color.FromArgb((byte)(newValueRed / (d * d)),
+                    (byte)(newValueGreen / (d * d)), 
+                    (byte)(newValueBlue / (d * d)));
+
+                image.SetPixel(x, y, newColor);
+            }
+        }
+        return image;
+    }
+    
+        private Bitmap SobelFiltering()
+    {
+        var image = new Bitmap(Header.Width, Header.Height, PixelFormat.Format24bppRgb);
+
+        int xPosInD;
+        int YPosInD;
+        int xPosInImg;
+        int yPosInImg;
+
+        var Mx = new int[] {-1, -2, -1, 0, 0, 0, 1, 2, 1 };
+        var My = new int[] {-1, 0, 1, -2, 0, 2, -1, 0, 1 };
+        int d = 3;
+        int kernelRadius = 1;
+
+        for (var y = 0; y < Header.Height; y++)
+        {
+            for (var x = 0; x < Header.Width; x++)
+            {
+                // double newValueRedX = 0;
+                // double newValueGreenX = 0;
+                // double newValueBlueX = 0;
+                //
+                // double newValueRedY = 0;
+                // double newValueGreenY = 0;
+                // double newValueBlueY = 0;
+
+                double newValueX = 0;
+                double newValueY = 0;
+                for (int i = 0; i < d * d; i++)
+                {
+                    xPosInD = i % d;
+                    YPosInD = i / d;
+
+                    xPosInImg = x + (xPosInD - kernelRadius);
+                    xPosInImg = (xPosInImg < 0 ? 0 : xPosInImg);
+                    xPosInImg = (xPosInImg > Header.Width - 1 ? Header.Width - 1 : xPosInImg);
+                    
+                    yPosInImg = y + (YPosInD - kernelRadius);
+                    yPosInImg = (yPosInImg < 0 ? 0 : yPosInImg);
+                    yPosInImg = (yPosInImg > Header.Height - 1 ? Header.Height - 1 : yPosInImg);
+                    
+                    var value1 = Data[GetCoordinates(3*xPosInImg, 3*yPosInImg)]  * Convert.ToInt32(_currentColorСhannel[0]);
+                    var value2 = Data[GetCoordinates(3*xPosInImg + 1, 3*yPosInImg)]  * Convert.ToInt32(_currentColorСhannel[1]);
+                    var value3 = Data[GetCoordinates(3*xPosInImg + 2, 3*yPosInImg)]  * Convert.ToInt32(_currentColorСhannel[2]);
+                
+                    ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
+                
+                    var valueRed = 255 * tempPixel[0];
+                    var valueGreen = 255 * tempPixel[1];
+                    var valueBlue = 255 * tempPixel[2];
+                    
+                    //var value = 0.299 * valueRed + 0.587 * valueGreen + 0.114 * valueBlue;
+                    var value = 0.333 * valueRed + 0.333 * valueGreen + 0.333 * valueBlue;
+
+                    newValueX += value * Mx[i];
+                    newValueY += value * My[i];
+
+                    // newValueRedX += valueRed * Mx[i];
+                    // newValueGreenX += valueGreen * Mx[i];
+                    // newValueBlueX += valueBlue * Mx[i];
+                    //
+                    // newValueRedY += valueRed * My[i];
+                    // newValueGreenY += valueGreen * My[i];
+                    // newValueBlueY += valueBlue * My[i];
+
+                }
+
+                // double newValueRed = Math.Sqrt(Math.Pow(newValueRedX, 2) + Math.Pow(newValueRedY, 2));
+                // double newValueGreen = Math.Sqrt(Math.Pow(newValueGreenX, 2) + Math.Pow(newValueGreenY, 2));
+                // double newValueBlue = Math.Sqrt(Math.Pow(newValueBlueX, 2) + Math.Pow(newValueBlueY, 2));
+                
+                double newValue = Math.Sqrt(Math.Pow(newValueX, 2) + Math.Pow(newValueY, 2));
+
+                // Color newColor = Color.FromArgb((byte)(newValueRed),
+                //     (byte)(newValueGreen), 
+                //     (byte)(newValueBlue));
+
+                Color newColor = Color.FromArgb((byte)(newValue),
+                    (byte)(newValue), 
+                    (byte)(newValue));
+                
                 image.SetPixel(x, y, newColor);
             }
         }
