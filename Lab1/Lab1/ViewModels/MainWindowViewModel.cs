@@ -5,6 +5,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using Lab1.Models;
 using Lab1.Views;
 using ReactiveUI;
@@ -16,6 +17,11 @@ namespace Lab1.ViewModels
         #region Private fields
 
         private string _selectedColorSpace = "RGB";
+
+        private double _width;
+        private double _height;
+        private double _xOffset;
+        private double _yOffset;
         private ObservableCollection<string> _spaces = new ObservableCollection<string>()
         {
             "RGB",
@@ -154,10 +160,38 @@ namespace Lab1.ViewModels
             }
         }
         
-        public int Xoffset { get; set; }
-        public int Yoffset { get; set; }
-        public int ImageWidth { get; set; }
-        public int ImageHeight { get; set; }
+        public double Xoffset
+        {
+            get => _xOffset;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _xOffset, value);
+            }
+        }
+        public double Yoffset
+        {
+            get => _yOffset;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _yOffset, value);
+            }
+        }
+        public double ImageWidth
+        {
+            get => _width;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _width, value);
+            }
+        }
+        public double ImageHeight
+        {
+            get => _height;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _height, value);
+            }
+        }
         
         public string ErrorText
         {
@@ -218,6 +252,8 @@ namespace Lab1.ViewModels
             try
             {
                 string altpath = _model.ReadFile(path, new bool[] {_firstChannel, _secondChannel, _thirdChannel}, (ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
+                WidthChanged?.Invoke(new Bitmap(altpath).Size.Width);
+                HeightChanged?.Invoke(new Bitmap(altpath).Size.Height);
                 ImageDisplayViewModel.SetPath(altpath);
             }
             catch (Exception e)
@@ -228,7 +264,7 @@ namespace Lab1.ViewModels
 
         public void ResizeImage()
         {
-            
+            _model.ResizeImage(Convert.ToInt32(_height), Convert.ToInt32(_width), _xOffset, _yOffset, _selectedScaling);
         }
 
         #endregion
@@ -250,6 +286,9 @@ namespace Lab1.ViewModels
         public event Action<string> OnErrorHappened;
         
         public event PropertyChangedEventHandler PropertyChanged;
+        
+        public event Action<double>? HeightChanged;
+        public event Action<double>? WidthChanged;
 
         #endregion
         

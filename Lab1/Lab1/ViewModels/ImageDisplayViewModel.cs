@@ -1,4 +1,5 @@
-﻿using Avalonia.Media.Imaging;
+﻿using Avalonia;
+using Avalonia.Media.Imaging;
 using ReactiveUI;
 
 namespace Lab1.ViewModels;
@@ -7,7 +8,7 @@ public class ImageDisplayViewModel : ViewModelBase
 {
     #region Private fields
 
-    private Bitmap? _imageToLoad;
+    private CroppedBitmap? _imageToLoad;
 
     #endregion
 
@@ -15,14 +16,15 @@ public class ImageDisplayViewModel : ViewModelBase
 
     public void SetPath(string path)
     {
-        ImageToLoadPublic = new Bitmap(path);
+        CroppedBitmap image = new CroppedBitmap(new Bitmap(path), PixelRect.Parse("0 0 500 500"));
+        ImageToLoadPublic = image;
     }
 
     #endregion
 
     #region Public properties
 
-    public Bitmap? ImageToLoadPublic
+    public CroppedBitmap? ImageToLoadPublic
     {
         get => _imageToLoad;
         private set => this.RaiseAndSetIfChanged(ref _imageToLoad, value);

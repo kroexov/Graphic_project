@@ -70,6 +70,12 @@ public class PnmServices: IPnmServices
         }
     }
 
+    public string ResizeImage(int height, int width, double xOffset, double yOffset, string selectedScaling)
+    {
+        
+        return String.Empty;
+    }
+
     #endregion
     
     #region Private methods
