@@ -56,5 +56,10 @@ public class P5 : Pnm
         return saveFile;
     }
 
+    public override Bitmap Scale(string scalingAlgorithm, double heightDiff, double widthDiff)
+    {
+        throw new NotImplementedException();
+    }
+
     #endregion
 }

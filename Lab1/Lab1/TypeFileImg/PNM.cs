@@ -23,6 +23,8 @@ public abstract class Pnm
     public abstract void SetColorChannel(bool[] newColorChannel);
 
     public abstract byte[] SaveFile(byte[] origFile);
+    
+    public abstract Bitmap Scale(string scalingAlgorithm, double heightDiff, double widthDiff);
 
     #endregion
 

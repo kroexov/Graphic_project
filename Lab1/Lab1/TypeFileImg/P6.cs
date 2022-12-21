@@ -140,6 +140,25 @@ public class P6 : Pnm
         return saveFile;
     }
 
+    public override Bitmap Scale(string scalingAlgorithm, double heightDiff, double widthDiff)
+    {
+        switch (scalingAlgorithm)
+        {
+            case "Closest point":
+                break;
+            case "Bilinear":
+                break;
+            case "Lanczos3":
+                break;
+            case "BC-splines":
+                break;
+            default:
+                return null;
+        }
+
+        return null;
+    }
+
     #endregion
 
     #region Private methods

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using Lab1.TypeFileImg;
@@ -72,6 +73,21 @@ public class PnmServices: IPnmServices
 
     public string ResizeImage(int height, int width, double xOffset, double yOffset, string selectedScaling)
     {
+        if (_fileImg != null)
+        {
+            // ignore all offsets
+            Bitmap prevImage = new Bitmap(_filePath);
+            var prevHeight = prevImage.Height;
+            var prevWidth = prevImage.Width;
+            
+            var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+            pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+            var fullFileName = pathSaveFile + "\\SystemImage\\Scaled.bmp";
+
+            _fileImg.Scale(selectedScaling, prevHeight / height, prevWidth / width);
+
+            return fullFileName;
+        }
         
         return String.Empty;
     }
