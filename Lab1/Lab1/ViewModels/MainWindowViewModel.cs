@@ -294,13 +294,21 @@ namespace Lab1.ViewModels
         {
             _model.ResizeImage(Convert.ToInt32(_height), Convert.ToInt32(_width), _xOffset, _yOffset, _selectedScaling);
             var path = _model.RefreshImage();
-            if (!path.Equals(String.Empty) && (_height > 500 && _width > 500))
+            if (!path.Equals(String.Empty) && (_height >= 500 && _width >= 500))
             {
                 ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(Convert.ToInt32(_width/2 - 250 + _xOffset), Convert.ToInt32(_height/2 - 250 + _yOffset), 500, 500)));
             }
             else if (!path.Equals(String.Empty) && _height < 500 && _width < 500)
             {
                 ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(0, 0, Convert.ToInt32(_width), Convert.ToInt32(_height))));
+            }
+            else if (!path.Equals(String.Empty) && _height >= 500 && _width < 500)
+            {
+                ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(0, Convert.ToInt32(_height/2 - 250 + _yOffset), Convert.ToInt32(_width), 500))); 
+            }
+            else if (!path.Equals(String.Empty) && _height < 500 && _width >= 500)
+            {
+                ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(Convert.ToInt32(_width/2 - 250 + _xOffset), 0, 500, Convert.ToInt32(_height)))); 
             }
         }
 
