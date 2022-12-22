@@ -191,7 +191,27 @@ public class P6 : Pnm
   
                 quantities[y2, x2]++;
 
-                // работает странно
+                if (newHeight > Header.Height && newWidth > Header.Width)
+                {
+                    for (int i = -extraPixHeight; i <= extraPixHeight; i++)
+                    {
+                        for (int j = -extraPixWidth; j <= extraPixWidth; j++)
+                        {
+                            if ((i!=0 || j!=0) && x2 + i >= 0 && x2 + i < newHeight && y2 + j >= 0 && y2 + j < newWidth)
+                            {
+                                valuesSum[y2+j, x2+i, 0] += col.A;
+                                valuesSum[y2+j, x2+i, 1] += col.R;
+                                valuesSum[y2+j, x2+i, 2] += col.G;
+                                valuesSum[y2+j, x2+i, 3] += col.B; 
+                                quantities[y2+j, x2 + i]++;
+                            }
+                        }
+                    }
+                }
+
+                else
+                {
+                    // работает странно
                 if (newHeight > Header.Height)
                 {
                     for (int i = 1; i <= extraPixHeight; i++)
@@ -241,6 +261,7 @@ public class P6 : Pnm
                         }
                         
                     }
+                }
                 }
             }
         }
