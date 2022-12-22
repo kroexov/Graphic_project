@@ -148,6 +148,7 @@ public class P6 : Pnm
                 ClosestPointScale(newHeight, newWidth);
                 break;
             case "Bilinear":
+                BilinearInterpolation(newHeight, newWidth);
                 break;
             case "Lanczos3":
                 break;
@@ -166,24 +167,106 @@ public class P6 : Pnm
 
         for (var y = 0; y < newHeight; y++)
         {
-            var oldY = (int)Math.Ceiling(y * (double)Header.Height / newHeight);
-            if (oldY == Header.Height)
-                oldY--;
+            var gy = ((double)y) / newHeight * (Header.Height - 1);
+            var gyi = (int)Math.Round(gy);
 
             for (var x = 0; x < newWidth; x++)
             {
-                var oldX = (int)Math.Ceiling(x * (double)Header.Width / newWidth);
+                var gx = ((double)x) / newWidth * (Header.Width - 1);
+                var gxi = (int)Math.Round(gx);
 
-                if (oldX == Header.Width)
-                    oldX--;
-                
-                var value1 = Data[GetCoordinates(3*oldX, 3*oldY)];
-                var value2 = Data[GetCoordinates(3*oldX + 1, 3*oldY)];
-                var value3 = Data[GetCoordinates(3*oldX + 2, 3*oldY)];
+                var value1 = Data[GetCoordinates(3*gxi, 3*gyi)];
+                var value2 = Data[GetCoordinates(3*gxi + 1, 3*gyi)];
+                var value3 = Data[GetCoordinates(3*gxi + 2, 3*gyi)];
 
                 newData[3 * y * newWidth + 3 * x] = value1;
                 newData[3 * y * newWidth + 3 * x + 1] = value2;
                 newData[3 * y * newWidth + 3 * x + 2] = value3;
+            }
+        }
+
+        Data = newData;
+        Header.Width = newWidth;
+        Header.Height = newHeight;
+    }
+
+    private static double Lerp(double s, double e, double t)
+    {
+        return s + (e - s) * t;
+    }
+
+    private static double Blerp(double c00, double c10, double c01, double c11, double tx, double ty) {
+        return Lerp(Lerp(c00, c10, tx), Lerp(c01, c11, tx), ty);
+    }
+    
+    private void BilinearInterpolation(int newHeight, int newWidth)
+    {
+        var newData = new double[Header.PixelSize * newHeight * newWidth];
+
+        for (var y = 0; y < newHeight; y++)
+        {
+            var gy = ((double)y) / newHeight * (Header.Height - 1);
+            var gyi = (int)Math.Round(gy);
+
+            var offsetY = 1;
+            if (gy - gyi < 0)
+            {
+                offsetY = -1;
+            }
+
+            for (var x = 0; x < newWidth; x++)
+            {
+                var gx = ((double)x) / newWidth * (Header.Width - 1);
+                var gxi = (int)Math.Round(gx);
+                
+                var offsetX = 1;
+                if (gx - gxi < 0)
+                {
+                    offsetX = -1;
+                }
+
+                var value1Pixel1 = Data[GetCoordinates(3 * gxi, 3*gyi)];
+                var value2Pixel1 = Data[GetCoordinates(3 * gxi + 1, 3*gyi)];
+                var value3Pixel1 = Data[GetCoordinates(3 * gxi + 2, 3*gyi)];
+                
+                var value1Pixel2 = Data[GetCoordinates(3 * ((gxi + offsetX) == Header.Width || gxi + offsetX == -1 ? gxi : gxi + offsetX),
+                    3*gyi)];
+                var value2Pixel2 = Data[GetCoordinates(3 * ((gxi + offsetX) == Header.Width || gxi + offsetX == -1 ? gxi : gxi + offsetX) + 1,
+                    3*gyi)];
+                var value3Pixel2 = Data[GetCoordinates(3 * ((gxi + offsetX) == Header.Width || gxi + offsetX == -1 ? gxi : gxi + offsetX) + 2,
+                    3*gyi)];
+                
+                var value1Pixel3 = Data[GetCoordinates(3 * (gxi),
+                    3 * (gyi + offsetY == Header.Height || gyi + offsetY == -1 ? gyi : gyi + offsetY))];
+                var value2Pixel3 = Data[GetCoordinates(3 * (gxi) + 1,
+                    3 * (gyi + offsetY == Header.Height || gyi + offsetY == -1 ? gyi : gyi + offsetY))];
+                var value3Pixel3 = Data[GetCoordinates(3 * (gxi) + 2,
+                    3 * (gyi + offsetY == Header.Height || gyi + offsetY == -1 ? gyi : gyi + offsetY))];
+                
+                var value1Pixel4 = Data[GetCoordinates(3 * ((gxi + offsetX) == Header.Width || gxi + offsetX == -1 ? gxi : gxi + offsetX),
+                    3 * (gyi + offsetY == Header.Height || gyi + offsetY == -1 ? gyi : gyi + offsetY))];
+                var value2Pixel4 = Data[GetCoordinates(3 * ((gxi + offsetX) == Header.Width || gxi + offsetX == -1 ? gxi : gxi + offsetX) + 1,
+                    3 * (gyi + offsetY == Header.Height || gyi + offsetY == -1 ? gyi : gyi + offsetY))];
+                var value3Pixel4 = Data[GetCoordinates(3 * ((gxi + offsetX) == Header.Width || gxi + offsetX == -1 ? gxi : gxi + offsetX) + 2,
+                    3 * (gyi + offsetY == Header.Height || gyi + offsetY == -1 ? gyi : gyi + offsetY))];
+
+                var newValue1 = Blerp(value1Pixel1, value1Pixel2, value1Pixel3, value1Pixel4,
+                    Math.Abs(gx - gxi), Math.Abs(gy - gyi));
+                var newValue2 = Blerp(value2Pixel1, value2Pixel2, value2Pixel3, value2Pixel4,
+                    Math.Abs(gx - gxi), Math.Abs(gy - gyi));
+                var newValue3 = Blerp(value3Pixel1, value3Pixel2, value3Pixel3, value3Pixel4,
+                    Math.Abs(gx - gxi), Math.Abs(gy - gyi));
+
+                newData[3 * y * newWidth + 3 * x] = newValue1 < 0 ? 0 : newValue1;
+                newData[3 * y * newWidth + 3 * x + 1] = newValue2 < 0 ? 0 : newValue2;
+                newData[3 * y * newWidth + 3 * x + 2] = newValue3 < 0 ? 0 : newValue3;
+
+                if (newValue1 <= 0 || newValue2 <= 0 || newValue3 <= 0)
+                {
+                    Console.WriteLine(newData[3 * y * newWidth + 3 * x]);
+                    Console.WriteLine(newData[3 * y * newWidth + 3 * x + 1]);
+                    Console.WriteLine(newData[3 * y * newWidth + 3 * x + 2]);
+                }
             }
         }
 
