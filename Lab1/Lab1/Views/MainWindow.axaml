@@ -97,7 +97,7 @@
                 MaxWidth="600">
             <StackPanel >
                 
-            <Border HorizontalAlignment="Center"
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center"
                     Background="FloralWhite"
                     BorderThickness="2" 
                     BorderBrush="Black"
@@ -106,7 +106,7 @@
                     MaxHeight="500"
                     MaxWidth="500"
                     Margin="0 20 0 0">
-        <views:ImageDisplay DataContext="{Binding ImageDisplayViewModel}">
+        <views:ImageDisplay  DataContext="{Binding ImageDisplayViewModel}">
         </views:ImageDisplay>
                 </Border>
         </StackPanel>
