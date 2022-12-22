@@ -161,6 +161,33 @@ public class P6 : Pnm
 
     #region Private methods
 
+    private void BcSplinesScale(int newHeight, int newWidth)
+    {
+        var newData = new double[Header.PixelSize * newHeight * newWidth];
+        for (var y = 0; y < newHeight; y++)
+        {
+            var oldY = (int)Math.Ceiling(y * (double)Header.Height / newHeight);
+            if (oldY == Header.Height)
+                oldY--;
+
+            for (var x = 0; x < newWidth; x++)
+            {
+                var oldX = (int)Math.Ceiling(x * (double)Header.Width / newWidth);
+
+                if (oldX == Header.Width)
+                    oldX--;
+                
+                var value1 = Data[GetCoordinates(3*oldX, 3*oldY)];
+                var value2 = Data[GetCoordinates(3*oldX + 1, 3*oldY)];
+                var value3 = Data[GetCoordinates(3*oldX + 2, 3*oldY)];
+
+                newData[3 * y * newWidth + 3 * x] = value1;
+                newData[3 * y * newWidth + 3 * x + 1] = value2;
+                newData[3 * y * newWidth + 3 * x + 2] = value3;
+            }
+        }
+    }
+
     private void ClosestPointScale(int newHeight, int newWidth)
     {
         var newData = new double[Header.PixelSize * newHeight * newWidth];

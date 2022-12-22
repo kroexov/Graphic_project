@@ -80,6 +80,10 @@
             </DockPanel>
             <TextBlock Foreground="Orange" Margin="0 20 0 20" HorizontalAlignment="Center" FontSize="20">Способы масштабирования</TextBlock>
             <ListBox Items="{Binding Scalings}" SelectedItem="{Binding SelectedScaling}"></ListBox>
+            <StackPanel Orientation="Horizontal">
+            <TextBox Width="100" Text="{Binding BValue}" Watermark="B"/>
+            <TextBox Width="100" Text="{Binding CValue}" Watermark="C"/>
+            </StackPanel>
             <Button Width="400" Content="Применить масштабирование" Command="{Binding ResizeImage}"></Button> 
         </StackPanel>
         
