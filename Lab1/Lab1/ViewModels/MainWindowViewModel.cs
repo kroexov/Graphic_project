@@ -23,6 +23,8 @@ namespace Lab1.ViewModels
         private double _height;
         private double _xOffset;
         private double _yOffset;
+        private string B;
+        private string C;
         private ObservableCollection<string> _spaces = new ObservableCollection<string>()
         {
             "RGB",
@@ -86,6 +88,24 @@ namespace Lab1.ViewModels
         public ObservableCollection<string> Scalings
         {
             get => _scalings;
+        }
+
+        public string BValue
+        {
+            get => B;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref B, value);
+            }
+        }
+        
+        public string CValue
+        {
+            get => C;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref C, value);
+            }
         }
         
         public string SelectedScaling
