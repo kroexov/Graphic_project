@@ -140,12 +140,12 @@ public class P6 : Pnm
         return saveFile;
     }
 
-    public override Bitmap Scale(string scalingAlgorithm, int newHeight, int newWidth)
+    public override void Scale(string scalingAlgorithm, int newHeight, int newWidth)
     {
         switch (scalingAlgorithm)
         {
             case "Closest point":
-                return ClosestPointScale(newHeight, newWidth);
+                ClosestPointScale(newHeight, newWidth);
                 break;
             case "Bilinear":
                 break;
@@ -154,18 +154,14 @@ public class P6 : Pnm
             case "BC-splines":
                 break;
         }
-
-        return new Bitmap(100, 100);
     }
 
     #endregion
 
     #region Private methods
 
-    private Bitmap ClosestPointScale(int newHeight, int newWidth)
+    private void ClosestPointScale(int newHeight, int newWidth)
     {
-        var newImage = new Bitmap(newWidth, newHeight, PixelFormat.Format24bppRgb);
-
         var newData = new double[Header.PixelSize * newHeight * newWidth];
 
         for (var y = 0; y < newHeight; y++)
@@ -194,8 +190,6 @@ public class P6 : Pnm
         Data = newData;
         Header.Width = newWidth;
         Header.Height = newHeight;
-
-        return newImage;
     }
 
     private void ConvertColorPixel(double[] pixel, double value1, double value2, double value3, ColorSpace colorSpace)
