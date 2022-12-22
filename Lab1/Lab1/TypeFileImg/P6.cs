@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.Intrinsics.Arm;
@@ -155,6 +156,7 @@ public class P6 : Pnm
                 LanczosInterpolation(newHeight, newWidth);
                 break;
             case "BC-splines":
+                BcSplinesScale(newHeight, newWidth, 0, 0.5);
                 break;
         }
     }
@@ -163,31 +165,131 @@ public class P6 : Pnm
 
     #region Private methods
 
-    private void BcSplinesScale(int newHeight, int newWidth)
+    private void BcSplinesScale(int newHeight, int newWidth, double B, double C)
     {
+        if (newHeight == Header.Height && newWidth == Header.Width)
+        {
+            return;
+        }
         var newData = new double[Header.PixelSize * newHeight * newWidth];
+            
         for (var y = 0; y < newHeight; y++)
         {
-            var oldY = (int)Math.Ceiling(y * (double)Header.Height / newHeight);
-            if (oldY == Header.Height)
-                oldY--;
+            var gy = ((double)y) / newHeight * (Header.Height - 1);
+            var gy0 = (int)Math.Ceiling(gy);
+            if (gy0 == Header.Height)
+            {
+                gy0 -= 1;
+            }
+
+            var gy1 = (gy0 + 1 >= Header.Height) ? gy0 - 1 : gy0 + 1;
 
             for (var x = 0; x < newWidth; x++)
             {
-                var oldX = (int)Math.Ceiling(x * (double)Header.Width / newWidth);
+                var gx = ((double)x) / newWidth * (Header.Width - 1);
+                var gx0 = (int)Math.Ceiling(gx);
+                if (gx0 == Header.Width)
+                {
+                    gx0 -= 1;
+                }
+                var gx1 = (gx0 + 1 >= Header.Width) ? gx0 - 1 : gx0 + 1;
 
-                if (oldX == Header.Width)
-                    oldX--;
+                var d = Math.Sqrt(Math.Pow(gx - gx1, 2) + Math.Pow(gy - gy0, 2));
                 
-                var value1 = Data[GetCoordinates(3*oldX, 3*oldY)];
-                var value2 = Data[GetCoordinates(3*oldX + 1, 3*oldY)];
-                var value3 = Data[GetCoordinates(3*oldX + 2, 3*oldY)];
+                // gx, gy - P
+                // gxi, gyi - P0
+                // gxi + 1, gyi - P1 -> d = math.sqrt(diffx^2 + diffy^2)
+                // gxi, gyi + 1 - P2
+                // gxi + 1, gyi + 1 - P3
+                
+                
+                var oldP1value1 = Data[GetCoordinates(3*gx0, 3*gy0)];
+                var oldP1value2 = Data[GetCoordinates(3*gx0 + 1, 3*gy0)];
+                var oldP1value3 = Data[GetCoordinates(3*gx0 + 2, 3*gy0)];
+                
+                var oldP2value1 = Data[GetCoordinates(3*gx0, 3*gy1)];
+                var oldP2value2 = Data[GetCoordinates(3*gx0 + 1, 3*gy1)];
+                var oldP2value3 = Data[GetCoordinates(3*gx0 + 2, 3*gy1)];
+                
+                var oldP3value1 = Data[GetCoordinates(3*gx1, 3*gy0)];
+                var oldP3value2 = Data[GetCoordinates(3*gx1 + 1, 3*gy0)];
+                var oldP3value3 = Data[GetCoordinates(3*gx1 + 2, 3*gy0)];
+                
+                var oldP4value1 = Data[GetCoordinates(3*gx1, 3*gy1)];
+                var oldP4value2 = Data[GetCoordinates(3*gx1 + 1, 3*gy1)];
+                var oldP4value3 = Data[GetCoordinates(3*gx1 + 2, 3*gy1)];
 
-                newData[3 * y * newWidth + 3 * x] = value1;
-                newData[3 * y * newWidth + 3 * x + 1] = value2;
-                newData[3 * y * newWidth + 3 * x + 2] = value3;
+                var newValue1 =
+                    ((-B / 6 - C) * oldP1value1 + (-3 * B / 2 - C + 2) * oldP2value1
+                                                + (3 * B / 2 + C - 2) * oldP3value1 + (B / 6 + C) * oldP4value1) *
+                    Math.Pow(d, 3)
+
+                    + ((B / 2 + 2 * C) * oldP1value1 + (2 * B + C - 3) * oldP2value1 +
+                        (-5 * B / 2 - 2 * C + 3) * oldP3value1 - C * oldP4value1) *
+                    Math.Pow(d, 2)
+
+                    + ((-B / 2 - C) * oldP1value1 + (B / 2 + C) * oldP3value1) *
+                    d
+
+                    + B / 6 * oldP1value1 + (-B / 3 + 1) * oldP2value1 + B / 6 * oldP3value1;
+                
+                var newValue2 =
+                    ((-B / 6 - C) * oldP1value2 + (-3 * B / 2 - C + 2) * oldP2value2
+                                                + (3 * B / 2 + C - 2) * oldP3value2 + (B / 6 + C) * oldP4value2) *
+                    Math.Pow(d, 3)
+
+                    + ((B / 2 + 2 * C) * oldP1value2 + (2 * B + C - 3) * oldP2value2 +
+                        (-5 * B / 2 - 2 * C + 3) * oldP3value2 - C * oldP4value2) *
+                    Math.Pow(d, 2)
+
+                    + ((-B / 2 - C) * oldP1value2 + (B / 2 + C) * oldP3value2) *
+                    d
+
+                    + B / 6 * oldP1value2 + (-B / 3 + 1) * oldP2value2 + B / 6 * oldP3value2;
+                
+                var newValue3 =
+                    ((-B / 6 - C) * oldP1value3 + (-3 * B / 2 - C + 2) * oldP2value3
+                                                + (3 * B / 2 + C - 2) * oldP3value3 + (B / 6 + C) * oldP4value3) *
+                    Math.Pow(d, 3)
+
+                    + ((B / 2 + 2 * C) * oldP1value3 + (2 * B + C - 3) * oldP2value3 +
+                        (-5 * B / 2 - 2 * C + 3) * oldP3value3 - C * oldP4value3) *
+                    Math.Pow(d, 2)
+
+                    + ((-B / 2 - C) * oldP1value3 + (B / 2 + C) * oldP3value3) *
+                    d
+
+                    + B / 6 * oldP1value3 + (-B / 3 + 1) * oldP2value3 + B / 6 * oldP3value3;
+                
+                var rndValues1 = new List<double>{
+                    oldP1value1,
+                    oldP2value1,
+                    oldP3value1,
+                    oldP4value1
+                };
+                var rndValues2 = new List<double>{
+                    oldP1value2,
+                    oldP2value2,
+                    oldP3value2,
+                    oldP4value2
+                };
+
+                var rndValues3 = new List<double>{
+                    oldP1value3,
+                    oldP2value3,
+                    oldP3value3,
+                    oldP4value3
+                };
+                
+                Random rnd = new Random();
+                newData[3 * y * newWidth + 3 * x] = newValue1 < 0 ? rndValues1[rnd.Next(0,3)] : newValue1;
+                newData[3 * y * newWidth + 3 * x + 1] = newValue2 < 0 ? rndValues2[rnd.Next(0,3)] : newValue2;
+                newData[3 * y * newWidth + 3 * x + 2] = newValue3 < 0 ? rndValues3[rnd.Next(0,3)] : newValue3;
             }
         }
+        Data = newData;
+        Header.Width = newWidth;
+        Header.Height = newHeight;
     }
 
     private void ClosestPointScale(int newHeight, int newWidth)
