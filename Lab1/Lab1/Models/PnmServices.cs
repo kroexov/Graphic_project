@@ -71,21 +71,12 @@ public class PnmServices: IPnmServices
         }
     }
 
-    public string ResizeImage(int height, int width, double xOffset, double yOffset, string selectedScaling)
+    public void ResizeImage(int height, int width, double xOffset, double yOffset, string selectedScaling)
     {
         if (_fileImg != null)
         {
-            // ignore all offsets
-            var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
-            pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
-            var fullFileName = pathSaveFile + "\\SystemImage\\Scaled.bmp";
-
-            _fileImg.Scale(selectedScaling, height, width).Save(fullFileName);
-
-            return fullFileName;
+            _fileImg.Scale(selectedScaling, height, width);
         }
-        
-        return String.Empty;
     }
 
     #endregion

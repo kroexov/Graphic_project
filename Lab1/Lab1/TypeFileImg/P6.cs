@@ -165,130 +165,36 @@ public class P6 : Pnm
     private Bitmap ClosestPointScale(int newHeight, int newWidth)
     {
         var newImage = new Bitmap(newWidth, newHeight, PixelFormat.Format24bppRgb);
-        int extraPixWidth = newWidth / (2*Header.Width);
-        int extraPixHeight = newHeight / (2*Header.Height);
-        double[,,] valuesSum = new double[newWidth, newHeight, 4];
-        int[,] quantities = new int[newWidth, newHeight];
-        
-        for (int y = 0; y < Header.Width; y++)
+
+        var newData = new double[Header.PixelSize * newHeight * newWidth];
+
+        for (var y = 0; y < newHeight; y++)
         {
-            int y2 = (int)Math.Ceiling(y * (double)newWidth/Header.Width);
-  
-            if (y2 >= newWidth)
-                y2 = newWidth - 1;
-  
-            for (int x = 0; x < Header.Height; x++)
+            var oldY = (int)Math.Ceiling(y * (double)Header.Height / newHeight);
+            if (oldY == Header.Height)
+                oldY--;
+
+            for (var x = 0; x < newWidth; x++)
             {
-                int x2 = (int)Math.Ceiling(x * (double)newHeight/Header.Height);
-  
-                if (x2 >= newHeight)
-                    x2 = newHeight - 1;
-                var col = _img.GetPixel(y, x);
-                valuesSum[y2, x2, 0] += col.A;
-                valuesSum[y2, x2, 1] += col.R;
-                valuesSum[y2, x2, 2] += col.G;
-                valuesSum[y2, x2, 3] += col.B;
-  
-                quantities[y2, x2]++;
+                var oldX = (int)Math.Ceiling(x * (double)Header.Width / newWidth);
 
-                if (newHeight > Header.Height && newWidth > Header.Width)
-                {
-                    for (int i = -extraPixHeight; i <= extraPixHeight; i++)
-                    {
-                        for (int j = -extraPixWidth; j <= extraPixWidth; j++)
-                        {
-                            if ((i!=0 || j!=0) && x2 + i >= 0 && x2 + i < newHeight && y2 + j >= 0 && y2 + j < newWidth)
-                            {
-                                valuesSum[y2+j, x2+i, 0] += col.A;
-                                valuesSum[y2+j, x2+i, 1] += col.R;
-                                valuesSum[y2+j, x2+i, 2] += col.G;
-                                valuesSum[y2+j, x2+i, 3] += col.B; 
-                                quantities[y2+j, x2 + i]++;
-                            }
-                        }
-                    }
-                }
-
-                else
-                {
-                    // работает странно
-                if (newHeight > Header.Height)
-                {
-                    for (int i = 1; i <= extraPixHeight; i++)
-                    {
-                        if (x2-i >=0)
-                        {
-                            valuesSum[y2, x2-i, 0] += col.A;
-                            valuesSum[y2, x2-i, 1] += col.R;
-                            valuesSum[y2, x2-i, 2] += col.G;
-                            valuesSum[y2, x2-i, 3] += col.B; 
-                            quantities[y2, x2 - i]++;
-                        }
-
-                        if (x2 + i < newHeight)
-                        {
-                            valuesSum[y2, x2+i, 0] += col.A;
-                            valuesSum[y2, x2+i, 1] += col.R;
-                            valuesSum[y2, x2+i, 2] += col.G;
-                            valuesSum[y2, x2+i, 3] += col.B;
-                            quantities[y2, x2+i]++;
-                        }
-                        
-                    }
-                }
+                if (oldX == Header.Width)
+                    oldX--;
                 
-                // работает странно
-                if (newWidth > Header.Width)
-                {
-                    for (int i = 1; i <= extraPixWidth; i++)
-                    {
-                        if (y2+i < newWidth)
-                        {
-                            valuesSum[y2+i, x2, 0] += col.A;
-                            valuesSum[y2+i, x2, 1] += col.R;
-                            valuesSum[y2+i, x2, 2] += col.G;
-                            valuesSum[y2+i, x2, 3] += col.B;
-                            quantities[y2+i, x2]++;
-                        }
+                var value1 = Data[GetCoordinates(3*oldX, 3*oldY)];
+                var value2 = Data[GetCoordinates(3*oldX + 1, 3*oldY)];
+                var value3 = Data[GetCoordinates(3*oldX + 2, 3*oldY)];
 
-                        if (y2 - i >= 0)
-                        {
-                            valuesSum[y2-i, x2, 0] += col.A;
-                            valuesSum[y2-i, x2, 1] += col.R;
-                            valuesSum[y2-i, x2, 2] += col.G;
-                            valuesSum[y2-i, x2, 3] += col.B;
-                            quantities[y2-i, x2]++;
-                        }
-                        
-                    }
-                }
-                }
-            }
-        }
-  
-        for (int y = 0; y < newImage.Width; y++)
-        {
-            for (int x = 0; x < newImage.Height; x++)
-            {
-                if (quantities[y, x] == 0)
-                {
-                    newImage.SetPixel(y, x, Color.FromArgb(0,0,0,0));
-                }
-                else
-                {
-                    int A = (int)(valuesSum[y, x, 0] / quantities[y, x]);
-                    int R = (int)(valuesSum[y, x, 1] / quantities[y, x]);
-                    int G = (int)(valuesSum[y, x, 2] / quantities[y, x]);
-                    int B = (int)(valuesSum[y, x, 3] / quantities[y, x]);
-                    newImage.SetPixel(y, x, Color.FromArgb(A, R, G, B));
-                }
+                newData[3 * y * newWidth + 3 * x] = value1;
+                newData[3 * y * newWidth + 3 * x + 1] = value2;
+                newData[3 * y * newWidth + 3 * x + 2] = value3;
             }
         }
 
-        _img = newImage;
+        Data = newData;
         Header.Width = newWidth;
         Header.Height = newHeight;
-  
+
         return newImage;
     }
 
