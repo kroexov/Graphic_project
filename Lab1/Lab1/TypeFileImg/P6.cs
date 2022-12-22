@@ -140,11 +140,12 @@ public class P6 : Pnm
         return saveFile;
     }
 
-    public override Bitmap Scale(string scalingAlgorithm, double heightDiff, double widthDiff)
+    public override Bitmap Scale(string scalingAlgorithm, int newHeight, int newWidth)
     {
         switch (scalingAlgorithm)
         {
             case "Closest point":
+                return ClosestPointScale(newHeight, newWidth);
                 break;
             case "Bilinear":
                 break;
@@ -152,16 +153,123 @@ public class P6 : Pnm
                 break;
             case "BC-splines":
                 break;
-            default:
-                return null;
         }
 
-        return null;
+        return new Bitmap(100, 100);
     }
 
     #endregion
 
     #region Private methods
+
+    private Bitmap ClosestPointScale(int newHeight, int newWidth)
+    {
+        var newImage = new Bitmap(newWidth, newHeight, PixelFormat.Format24bppRgb);
+        int extraPixWidth = newWidth / (2*Header.Width);
+        int extraPixHeight = newHeight / (2*Header.Height);
+        double[,,] valuesSum = new double[newWidth, newHeight, 4];
+        int[,] quantities = new int[newWidth, newHeight];
+        
+        for (int y = 0; y < Header.Width; y++)
+        {
+            int y2 = (int)Math.Ceiling(y * (double)newWidth/Header.Width);
+  
+            if (y2 >= newWidth)
+                y2 = newWidth - 1;
+  
+            for (int x = 0; x < Header.Height; x++)
+            {
+                int x2 = (int)Math.Ceiling(x * (double)newHeight/Header.Height);
+  
+                if (x2 >= newHeight)
+                    x2 = newHeight - 1;
+                var col = _img.GetPixel(y, x);
+                valuesSum[y2, x2, 0] += col.A;
+                valuesSum[y2, x2, 1] += col.R;
+                valuesSum[y2, x2, 2] += col.G;
+                valuesSum[y2, x2, 3] += col.B;
+  
+                quantities[y2, x2]++;
+
+                // работает странно
+                if (newHeight > Header.Height)
+                {
+                    for (int i = 1; i <= extraPixHeight; i++)
+                    {
+                        if (x2-i >=0)
+                        {
+                            valuesSum[y2, x2-i, 0] += col.A;
+                            valuesSum[y2, x2-i, 1] += col.R;
+                            valuesSum[y2, x2-i, 2] += col.G;
+                            valuesSum[y2, x2-i, 3] += col.B; 
+                            quantities[y2, x2 - i]++;
+                        }
+
+                        if (x2 + i < newHeight)
+                        {
+                            valuesSum[y2, x2+i, 0] += col.A;
+                            valuesSum[y2, x2+i, 1] += col.R;
+                            valuesSum[y2, x2+i, 2] += col.G;
+                            valuesSum[y2, x2+i, 3] += col.B;
+                            quantities[y2, x2+i]++;
+                        }
+                        
+                    }
+                }
+                
+                // работает странно
+                if (newWidth > Header.Width)
+                {
+                    for (int i = 1; i <= extraPixWidth; i++)
+                    {
+                        if (y2+i < newWidth)
+                        {
+                            valuesSum[y2+i, x2, 0] += col.A;
+                            valuesSum[y2+i, x2, 1] += col.R;
+                            valuesSum[y2+i, x2, 2] += col.G;
+                            valuesSum[y2+i, x2, 3] += col.B;
+                            quantities[y2+i, x2]++;
+                        }
+
+                        if (y2 - i >= 0)
+                        {
+                            valuesSum[y2-i, x2, 0] += col.A;
+                            valuesSum[y2-i, x2, 1] += col.R;
+                            valuesSum[y2-i, x2, 2] += col.G;
+                            valuesSum[y2-i, x2, 3] += col.B;
+                            quantities[y2-i, x2]++;
+                        }
+                        
+                    }
+                }
+            }
+        }
+  
+        for (int y = 0; y < newImage.Width; y++)
+        {
+            for (int x = 0; x < newImage.Height; x++)
+            {
+                if (quantities[y, x] == 0)
+                {
+                    newImage.SetPixel(y, x, Color.FromArgb(0,0,0,0));
+                }
+                else
+                {
+                    int A = (int)(valuesSum[y, x, 0] / quantities[y, x]);
+                    int R = (int)(valuesSum[y, x, 1] / quantities[y, x]);
+                    int G = (int)(valuesSum[y, x, 2] / quantities[y, x]);
+                    int B = (int)(valuesSum[y, x, 3] / quantities[y, x]);
+                    newImage.SetPixel(y, x, Color.FromArgb(A, R, G, B));
+                }
+            }
+        }
+
+        _img = newImage;
+        Header.Width = newWidth;
+        Header.Height = newHeight;
+  
+        return newImage;
+    }
 
     private void ConvertColorPixel(double[] pixel, double value1, double value2, double value3, ColorSpace colorSpace)
     {

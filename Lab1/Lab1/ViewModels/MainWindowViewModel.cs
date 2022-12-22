@@ -264,7 +264,11 @@ namespace Lab1.ViewModels
 
         public void ResizeImage()
         {
-            _model.ResizeImage(Convert.ToInt32(_height), Convert.ToInt32(_width), _xOffset, _yOffset, _selectedScaling);
+            var path = _model.ResizeImage(Convert.ToInt32(_height), Convert.ToInt32(_width), _xOffset, _yOffset, _selectedScaling);
+            if (!path.Equals(String.Empty))
+            {
+                ImageDisplayViewModel.SetPath(path);
+            }
         }
 
         #endregion

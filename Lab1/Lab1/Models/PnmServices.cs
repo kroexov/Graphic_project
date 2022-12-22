@@ -76,15 +76,11 @@ public class PnmServices: IPnmServices
         if (_fileImg != null)
         {
             // ignore all offsets
-            Bitmap prevImage = new Bitmap(_filePath);
-            var prevHeight = prevImage.Height;
-            var prevWidth = prevImage.Width;
-            
             var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
             pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
             var fullFileName = pathSaveFile + "\\SystemImage\\Scaled.bmp";
 
-            _fileImg.Scale(selectedScaling, prevHeight / height, prevWidth / width);
+            _fileImg.Scale(selectedScaling, height, width).Save(fullFileName);
 
             return fullFileName;
         }
