@@ -20,6 +20,11 @@ public class ImageDisplayViewModel : ViewModelBase
         ImageToLoadPublic = image;
     }
 
+    public void SetImage(CroppedBitmap image)
+    {
+        ImageToLoadPublic = image;
+    }
+
     #endregion
 
     #region Public properties

@@ -4,6 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Media.Imaging;
 using Lab1.Models;
@@ -254,7 +255,14 @@ namespace Lab1.ViewModels
                 string altpath = _model.ReadFile(path, new bool[] {_firstChannel, _secondChannel, _thirdChannel}, (ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
                 WidthChanged?.Invoke(new Bitmap(altpath).Size.Width);
                 HeightChanged?.Invoke(new Bitmap(altpath).Size.Height);
-                ImageDisplayViewModel.SetPath(altpath);
+                if (!altpath.Equals(String.Empty) && (_height > 500 && _width > 500))
+                {
+                    ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(altpath), new PixelRect(Convert.ToInt32(_width/2 - 250 + _xOffset), Convert.ToInt32(_height/2 - 250 + _yOffset), 500, 500)));
+                }
+                else if (!altpath.Equals(String.Empty) && _height < 500 && _width < 500)
+                {
+                    ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(altpath), new PixelRect(0, 0, Convert.ToInt32(_width), Convert.ToInt32(_height))));
+                }
             }
             catch (Exception e)
             {
@@ -266,9 +274,13 @@ namespace Lab1.ViewModels
         {
             _model.ResizeImage(Convert.ToInt32(_height), Convert.ToInt32(_width), _xOffset, _yOffset, _selectedScaling);
             var path = _model.RefreshImage();
-            if (!path.Equals(String.Empty))
+            if (!path.Equals(String.Empty) && (_height > 500 && _width > 500))
             {
-                ImageDisplayViewModel.SetPath(path);
+                ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(Convert.ToInt32(_width/2 - 250 + _xOffset), Convert.ToInt32(_height/2 - 250 + _yOffset), 500, 500)));
+            }
+            else if (!path.Equals(String.Empty) && _height < 500 && _width < 500)
+            {
+                ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(0, 0, Convert.ToInt32(_width), Convert.ToInt32(_height))));
             }
         }
 
