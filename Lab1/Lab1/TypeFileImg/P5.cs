@@ -56,7 +56,7 @@ public class P5 : Pnm
         return saveFile;
     }
 
-    public override void Scale(string scalingAlgorithm, int height, int width)
+    public override void Scale(string scalingAlgorithm, int height, int width, double B = 0, double C = 0.5)
     {
         switch (scalingAlgorithm)
         {

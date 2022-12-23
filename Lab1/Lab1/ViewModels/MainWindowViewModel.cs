@@ -292,6 +292,24 @@ namespace Lab1.ViewModels
 
         public void ResizeImage()
         {
+            if (_selectedScaling.Equals("BC-splines"))
+            {
+                double Bvalue;
+                double Cvalue;
+                if (!double.TryParse(B, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out Bvalue) &&
+                    !double.TryParse(B, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out Bvalue) &&
+                    !double.TryParse(B, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out Bvalue))
+                {
+                    Bvalue = 0;
+                }
+                if (!double.TryParse(C, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out Cvalue) &&
+                    !double.TryParse(C, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out Cvalue) &&
+                    !double.TryParse(C, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out Cvalue))
+                {
+                    Cvalue = 0;
+                }
+                _model.ResizeImage(Convert.ToInt32(_height), Convert.ToInt32(_width), _xOffset, _yOffset, _selectedScaling, Bvalue, Cvalue);
+            }
             _model.ResizeImage(Convert.ToInt32(_height), Convert.ToInt32(_width), _xOffset, _yOffset, _selectedScaling);
             var path = _model.RefreshImage();
             if (!path.Equals(String.Empty) && (_height >= 500 && _width >= 500))

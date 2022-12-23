@@ -142,7 +142,7 @@ public class P6 : Pnm
         return saveFile;
     }
 
-    public override void Scale(string scalingAlgorithm, int newHeight, int newWidth)
+    public override void Scale(string scalingAlgorithm, int newHeight, int newWidth, double B = 0, double C = 0.5)
     {
         switch (scalingAlgorithm)
         {
@@ -156,7 +156,7 @@ public class P6 : Pnm
                 LanczosInterpolation(newHeight, newWidth);
                 break;
             case "BC-splines":
-                BcSplinesScale(newHeight, newWidth, 0, 0.5);
+                BcSplinesScale(newHeight, newWidth, B, C);
                 break;
         }
     }

@@ -71,11 +71,11 @@ public class PnmServices: IPnmServices
         }
     }
 
-    public void ResizeImage(int height, int width, double xOffset, double yOffset, string selectedScaling)
+    public void ResizeImage(int height, int width, double xOffset, double yOffset, string selectedScaling, double B = 0, double C = 0.5)
     {
         if (_fileImg != null)
         {
-            _fileImg.Scale(selectedScaling, height, width);
+            _fileImg.Scale(selectedScaling, height, width, B, C);
         }
     }
 

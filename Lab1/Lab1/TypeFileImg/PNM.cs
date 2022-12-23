@@ -24,7 +24,7 @@ public abstract class Pnm
 
     public abstract byte[] SaveFile(byte[] origFile);
     
-    public abstract void Scale(string scalingAlgorithm, int newHeight, int newWidth);
+    public abstract void Scale(string scalingAlgorithm, int newHeight, int newWidth, double B = 0, double C = 0.5);
 
     #endregion
 
