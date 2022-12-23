@@ -175,8 +175,8 @@ public class P6 : Pnm
             
         for (var y = 0; y < newHeight; y++)
         {
-            var gy = ((double)y) / newHeight * (Header.Height - 1);
-            var gy0 = (int)Math.Ceiling(gy);
+            var gy = ((double)y) / newHeight * (Header.Height);
+            var gy0 = (int)Math.Round(gy);
             if (gy0 == Header.Height)
             {
                 gy0 -= 1;
@@ -186,8 +186,8 @@ public class P6 : Pnm
 
             for (var x = 0; x < newWidth; x++)
             {
-                var gx = ((double)x) / newWidth * (Header.Width - 1);
-                var gx0 = (int)Math.Ceiling(gx);
+                var gx = ((double)x) / newWidth * (Header.Width);
+                var gx0 = (int)Math.Round(gx);
                 if (gx0 == Header.Width)
                 {
                     gx0 -= 1;
@@ -303,17 +303,17 @@ public class P6 : Pnm
 
         for (var y = 0; y < newHeight; y++)
         {
-            var gy = ((double)y) / newHeight * (Header.Height - 1);
+            var gy = ((double)y) / newHeight * (Header.Height);
             var gyi = (int)Math.Round(gy);
 
             for (var x = 0; x < newWidth; x++)
             {
-                var gx = ((double)x) / newWidth * (Header.Width - 1);
+                var gx = ((double)x) / newWidth * (Header.Width);
                 var gxi = (int)Math.Round(gx);
 
-                var value1 = Data[GetCoordinates(3*gxi, 3*gyi)];
-                var value2 = Data[GetCoordinates(3*gxi + 1, 3*gyi)];
-                var value3 = Data[GetCoordinates(3*gxi + 2, 3*gyi)];
+                var value1 = Data[GetCoordinates(3*Clamp(gxi, Header.Width - 1), 3*Clamp(gyi, Header.Height - 1))];
+                var value2 = Data[GetCoordinates(3*Clamp(gxi, Header.Width - 1) + 1, 3*Clamp(gyi, Header.Height - 1))];
+                var value3 = Data[GetCoordinates(3*Clamp(gxi, Header.Width - 1) + 2, 3*Clamp(gyi, Header.Height - 1))];
 
                 newData[3 * y * newWidth + 3 * x] = value1;
                 newData[3 * y * newWidth + 3 * x + 1] = value2;
@@ -343,71 +343,49 @@ public class P6 : Pnm
         }
         
         var newData = new double[Header.PixelSize * newHeight * newWidth];
+        
+        double gy;
+        int gyi;
+        double gx;
+        int gxi;
+        
+        var valuePixel = new double[3];
+        var valueY = new double[2];
+        var valueX = new double[2];
 
         for (var y = 0; y < newHeight; y++)
         {
-            var gy = ((double)y) / newHeight * (Header.Height - 1);
-            var gyi = (int)Math.Ceiling(gy);
+            gy = (double)y / newHeight * (Header.Height);
+            gyi = (int)Math.Round(gy);
 
-            var offsetY = 1;
-            if (gy - gyi < 0)
-            {
-                offsetY = -1;
-            }
+            var offsetY = gy - gyi < 0 ? -1 : 0;
 
             for (var x = 0; x < newWidth; x++)
             {
-                var gx = ((double)x) / newWidth * (Header.Width - 1);
-                var gxi = (int)Math.Ceiling(gx);
+                gx = (double)x / newWidth * (Header.Width);
+                gxi = (int)Math.Round(gx);
                 
-                var offsetX = 1;
-                if (gx - gxi < 0)
+                var offsetX = gx - gxi < 0 ? -1 : 0;
+
+                for (var colorChannel = 0; colorChannel < 3; colorChannel++)
                 {
-                    offsetX = -1;
+                    for (var yWindow = offsetY; yWindow < 2 + offsetY; yWindow++)
+                    {
+                        for (var xWindow = offsetX; xWindow < 2 + offsetX; xWindow++)
+                        {
+                            var value = Data[GetCoordinates(3 * Clamp((gxi + xWindow), Header.Width - 1) + colorChannel, 3 * Clamp(gyi + yWindow, Header.Height - 1))];
+                            valueX[xWindow - offsetX] = value;
+                        }
+                    
+                        valueY[yWindow - offsetY] = Lerp(valueX[0], valueX[1], gx - gxi - offsetX);
+                    }
+                    
+                    valuePixel[colorChannel] = Lerp(valueY[0], valueY[1], gy - gyi - offsetY);
                 }
-
-                var value1Pixel1 = Data[GetCoordinates(3 * gxi, 3*gyi)];
-                var value2Pixel1 = Data[GetCoordinates(3 * gxi + 1, 3*gyi)];
-                var value3Pixel1 = Data[GetCoordinates(3 * gxi + 2, 3*gyi)];
                 
-                var value1Pixel2 = Data[GetCoordinates(3 * ((gxi + offsetX) == Header.Width || gxi + offsetX == -1 ? gxi : gxi + offsetX),
-                    3*gyi)];
-                var value2Pixel2 = Data[GetCoordinates(3 * ((gxi + offsetX) == Header.Width || gxi + offsetX == -1 ? gxi : gxi + offsetX) + 1,
-                    3*gyi)];
-                var value3Pixel2 = Data[GetCoordinates(3 * ((gxi + offsetX) == Header.Width || gxi + offsetX == -1 ? gxi : gxi + offsetX) + 2,
-                    3*gyi)];
-                
-                var value1Pixel3 = Data[GetCoordinates(3 * (gxi),
-                    3 * (gyi + offsetY == Header.Height || gyi + offsetY == -1 ? gyi : gyi + offsetY))];
-                var value2Pixel3 = Data[GetCoordinates(3 * (gxi) + 1,
-                    3 * (gyi + offsetY == Header.Height || gyi + offsetY == -1 ? gyi : gyi + offsetY))];
-                var value3Pixel3 = Data[GetCoordinates(3 * (gxi) + 2,
-                    3 * (gyi + offsetY == Header.Height || gyi + offsetY == -1 ? gyi : gyi + offsetY))];
-                
-                var value1Pixel4 = Data[GetCoordinates(3 * ((gxi + offsetX) == Header.Width || gxi + offsetX == -1 ? gxi : gxi + offsetX),
-                    3 * (gyi + offsetY == Header.Height || gyi + offsetY == -1 ? gyi : gyi + offsetY))];
-                var value2Pixel4 = Data[GetCoordinates(3 * ((gxi + offsetX) == Header.Width || gxi + offsetX == -1 ? gxi : gxi + offsetX) + 1,
-                    3 * (gyi + offsetY == Header.Height || gyi + offsetY == -1 ? gyi : gyi + offsetY))];
-                var value3Pixel4 = Data[GetCoordinates(3 * ((gxi + offsetX) == Header.Width || gxi + offsetX == -1 ? gxi : gxi + offsetX) + 2,
-                    3 * (gyi + offsetY == Header.Height || gyi + offsetY == -1 ? gyi : gyi + offsetY))];
-
-                var newValue1 = Blerp(value1Pixel1, value1Pixel2, value1Pixel3, value1Pixel4,
-                    Math.Abs(gx - gxi), Math.Abs(gy - gyi));
-                var newValue2 = Blerp(value2Pixel1, value2Pixel2, value2Pixel3, value2Pixel4,
-                    Math.Abs(gx - gxi), Math.Abs(gy - gyi));
-                var newValue3 = Blerp(value3Pixel1, value3Pixel2, value3Pixel3, value3Pixel4,
-                    Math.Abs(gx - gxi), Math.Abs(gy - gyi));
-
-                newData[3 * y * newWidth + 3 * x] = newValue1 < 0 ? 0 : newValue1;
-                newData[3 * y * newWidth + 3 * x + 1] = newValue2 < 0 ? 0 : newValue2;
-                newData[3 * y * newWidth + 3 * x + 2] = newValue3 < 0 ? 0 : newValue3;
-
-                if (newValue1 <= 0 || newValue2 <= 0 || newValue3 <= 0)
-                {
-                    Console.WriteLine(newData[3 * y * newWidth + 3 * x]);
-                    Console.WriteLine(newData[3 * y * newWidth + 3 * x + 1]);
-                    Console.WriteLine(newData[3 * y * newWidth + 3 * x + 2]);
-                }
+                newData[3 * y * newWidth + 3 * x] = valuePixel[0] < 0 ? 0 : (valuePixel[0] > 1 ? 1 : valuePixel[0]);
+                newData[3 * y * newWidth + 3 * x + 1] = valuePixel[1] < 0 ? 0 : (valuePixel[1] > 1 ? 1 : valuePixel[1]);
+                newData[3 * y * newWidth + 3 * x + 2] = valuePixel[2] < 0 ? 0 : (valuePixel[2] > 1 ? 1 : valuePixel[2]);
             }
         }
 
@@ -463,35 +441,43 @@ public class P6 : Pnm
         }
         
         var newData = new double[Header.PixelSize * newHeight * newWidth];
+        double gy;
+        int gyi;
+        double gx;
+        int gxi;
+        
+        var valuePixel = new double[3];
+        var valueY = new double[6];
+        var valueX = new double[6];
 
         for (var y = 0; y < newHeight; y++)
         {
-            var gy = ((double)y) / newHeight * (Header.Height - 1);
-            var gyi = (int)Math.Floor(gy);
+            gy = ((double)y) / newHeight * (Header.Height - 1);
+            gyi = (int)Math.Round(gy);
+            
+            var offsetY = gy - gyi < 0 ? -1 : 0;
 
             for (var x = 0; x < newWidth; x++)
             {
-                var gx = ((double)x) / newWidth * (Header.Width - 1);
-                var gxi = (int)Math.Floor(gx);
-
-                var valuePixel = new double[3];
-                var valueY = new double[6];
-                var valueX = new double[6];
-
+                gx = ((double)x) / newWidth * (Header.Width - 1);
+                gxi = (int)Math.Round(gx);
+                
+                var offsetX = gx - gxi < 0 ? -1 : 0;
+                
                 for (var colorChannel = 0; colorChannel < 3; colorChannel++){
 
-                    for (var yWindow = -2; yWindow < 4; yWindow++)
+                    for (var yWindow = -2 + offsetY; yWindow < 4 + offsetY; yWindow++)
                     {
-                        for (var xWindow = -2; xWindow < 4; xWindow++)
+                        for (var xWindow = -2 + offsetX; xWindow < 4 + offsetX; xWindow++)
                         {
                             var value = Data[GetCoordinates(3 * Clamp((gxi + xWindow), Header.Width - 1) + colorChannel, 3 * Clamp(gyi + yWindow, Header.Height - 1))];
-                            valueX[xWindow + 2] = value;
+                            valueX[xWindow + 2 - offsetX] = value;
                         }
                     
-                        valueY[yWindow + 2] = F(valueX, 2.0 + gx - gxi);
+                        valueY[yWindow + 2 - offsetY] = F(valueX, 2 + gx - gxi - offsetX);
                     }
                     
-                    valuePixel[colorChannel] = F(valueY, 2.0 + gy - gyi);
+                    valuePixel[colorChannel] = F(valueY, 2 + gy - gyi - offsetY);
                 }
 
                 newData[3 * y * newWidth + 3 * x] = valuePixel[0] < 0 ? 0 : (valuePixel[0] > 1 ? 1 : valuePixel[0]);
