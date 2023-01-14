@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using Lab1.TypeFileImg;
@@ -71,12 +70,14 @@ public class PnmServices: IPnmServices
         }
     }
 
-    public void ResizeImage(int height, int width, double xOffset, double yOffset, string selectedScaling, double B = 0, double C = 0.5)
+    public string CreateHistogram(double ignoreValue)
     {
         if (_fileImg != null)
         {
-            _fileImg.Scale(selectedScaling, height, width, B, C);
+            return _fileImg.CreateColorHistogram(ignoreValue);
         }
+
+        return string.Empty;
     }
 
     #endregion
@@ -123,6 +124,8 @@ public class PnmServices: IPnmServices
 
         return null;
     }
+    
+    
 
     #endregion
     

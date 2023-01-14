@@ -1,0 +1,20 @@
+﻿<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:viewModels="clr-namespace:Lab1.ViewModels"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="Lab1.Views.HistogramDisplay">
+    <Design.DataContext>
+        <viewModels:HistogramDisplayViewModel/>
+    </Design.DataContext>
+    
+    <StackPanel>
+        <TextBlock Foreground="Orange" FontSize="20">Канал 1</TextBlock>
+        <Image Height="200" Width="200" Source="{Binding Channel1Histogram}"></Image>
+        <TextBlock Foreground="Orange" FontSize="20">Канал 2</TextBlock>
+        <Image Height="200" Width="200" Source="{Binding Channel2Histogram}"></Image>
+        <TextBlock Foreground="Orange" FontSize="20">Канал 3</TextBlock>
+        <Image Height="200" Width="200" Source="{Binding Channel3Histogram}"></Image>
+    </StackPanel>
+</UserControl>

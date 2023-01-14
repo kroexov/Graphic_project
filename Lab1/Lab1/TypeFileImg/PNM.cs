@@ -59,6 +59,8 @@ public abstract class Pnm
         }
     }
 
+    public abstract string CreateColorHistogram(double valueIgnore);
+
     #endregion
 
     #region Private/protected methods

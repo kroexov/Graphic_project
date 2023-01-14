@@ -4,9 +4,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Media.Imaging;
 using Lab1.Models;
 using Lab1.Views;
 using ReactiveUI;
@@ -18,13 +16,6 @@ namespace Lab1.ViewModels
         #region Private fields
 
         private string _selectedColorSpace = "RGB";
-
-        private double _width;
-        private double _height;
-        private double _xOffset;
-        private double _yOffset;
-        private string B = "0";
-        private string C = "0.5";
         private ObservableCollection<string> _spaces = new ObservableCollection<string>()
         {
             "RGB",
@@ -35,21 +26,14 @@ namespace Lab1.ViewModels
             "YСoCg",
             "CMY"
         };
-        
-        private string _selectedScaling = "Closest point";
-        private ObservableCollection<string>  _scalings = new ObservableCollection<string>()
-        {
-            "Closest point",
-            "Bilinear",
-            "Lanczos3",
-            "BC-splines"
-        };
 
         private PnmServices _model;
 
         private bool _errorOccured = false;
         
         private string _errorText = "Неизвестная ошибка";
+
+        private string _ignoranceRate = "0";
 
         private bool _firstChannel = true;
         private bool _secondChannel = true;
@@ -64,6 +48,7 @@ namespace Lab1.ViewModels
             _model = model;
             model.ModelErrorHappened += (s => OnErrorHappened(s));
             ImageDisplayViewModel = new ImageDisplayViewModel();
+            HistogramDisplayViewModel = new HistogramDisplayViewModel();
         }
 
         #endregion
@@ -84,38 +69,6 @@ namespace Lab1.ViewModels
                 }
             }
         }
-        
-        public ObservableCollection<string> Scalings
-        {
-            get => _scalings;
-        }
-
-        public string BValue
-        {
-            get => B;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref B, value);
-            }
-        }
-        
-        public string CValue
-        {
-            get => C;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref C, value);
-            }
-        }
-        
-        public string SelectedScaling
-        {
-            get => _selectedScaling;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref _selectedScaling, value);
-            }
-        }
 
         public bool FirstChannel
         {
@@ -123,6 +76,10 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _firstChannel, value);
+                if (!value)
+                {
+                    HistogramDisplayViewModel.ClearChannel1();
+                }
                 _model.ChangeColorChannel(new bool[3]
                 {
                     _firstChannel, _secondChannel, _thirdChannel
@@ -142,6 +99,10 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _secondChannel, value);
+                if (!value)
+                {
+                    HistogramDisplayViewModel.ClearChannel2();
+                }
                 _model.ChangeColorChannel(new bool[3]
                 {
                     _firstChannel, _secondChannel, _thirdChannel
@@ -154,12 +115,25 @@ namespace Lab1.ViewModels
             } 
         }
         
+        public string IgnoranceRate
+        {
+            get => _ignoranceRate;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _ignoranceRate, value);
+            }
+        }
+        
         public bool ThirdChannel
         {
             get => _thirdChannel;
             set
             {
                 this.RaiseAndSetIfChanged(ref _thirdChannel, value);
+                if (!value)
+                {
+                    HistogramDisplayViewModel.ClearChannel3();
+                }
                 _model.ChangeColorChannel(new bool[3]
                 {
                     _firstChannel, _secondChannel, _thirdChannel
@@ -181,39 +155,6 @@ namespace Lab1.ViewModels
             }
         }
         
-        public double Xoffset
-        {
-            get => _xOffset;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref _xOffset, value);
-            }
-        }
-        public double Yoffset
-        {
-            get => _yOffset;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref _yOffset, value);
-            }
-        }
-        public double ImageWidth
-        {
-            get => _width;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref _width, value);
-            }
-        }
-        public double ImageHeight
-        {
-            get => _height;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref _height, value);
-            }
-        }
-        
         public string ErrorText
         {
             get => _errorText;
@@ -224,6 +165,8 @@ namespace Lab1.ViewModels
         }
         
         public ImageDisplayViewModel ImageDisplayViewModel { get; }
+        
+        public HistogramDisplayViewModel HistogramDisplayViewModel { get; }
 
         public ObservableCollection<string> ColorSpaces
         {
@@ -273,16 +216,7 @@ namespace Lab1.ViewModels
             try
             {
                 string altpath = _model.ReadFile(path, new bool[] {_firstChannel, _secondChannel, _thirdChannel}, (ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
-                WidthChanged?.Invoke(new Bitmap(altpath).Size.Width);
-                HeightChanged?.Invoke(new Bitmap(altpath).Size.Height);
-                if (!altpath.Equals(String.Empty) && (_height > 500 && _width > 500))
-                {
-                    ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(altpath), new PixelRect(Convert.ToInt32(_width/2 - 250 + _xOffset + 0.5), Convert.ToInt32(_height/2 - 250 + _yOffset+ 0.5), 500, 500)));
-                }
-                else if (!altpath.Equals(String.Empty) && _height < 500 && _width < 500)
-                {
-                    ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(altpath), new PixelRect(0, 0, Convert.ToInt32(_width), Convert.ToInt32(_height))));
-                }
+                ImageDisplayViewModel.SetPath(altpath);
             }
             catch (Exception e)
             {
@@ -290,44 +224,28 @@ namespace Lab1.ViewModels
             }
         }
 
-        public void ResizeImage()
+        public void CreateHistogram()
         {
-            if (_selectedScaling.Equals("BC-splines"))
+            // test part, change this
+            double result;
+
+            //Try parsing in the current culture
+            if (!double.TryParse(_ignoranceRate, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
+                //Then try in US english
+                !double.TryParse(_ignoranceRate, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
+                //Then in neutral language
+                !double.TryParse(_ignoranceRate, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
             {
-                double Bvalue;
-                double Cvalue;
-                if (!double.TryParse(B, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out Bvalue) &&
-                    !double.TryParse(B, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out Bvalue) &&
-                    !double.TryParse(B, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out Bvalue))
-                {
-                    Bvalue = 0;
-                }
-                if (!double.TryParse(C, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out Cvalue) &&
-                    !double.TryParse(C, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out Cvalue) &&
-                    !double.TryParse(C, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out Cvalue))
-                {
-                    Cvalue = 0;
-                }
-                _model.ResizeImage(Convert.ToInt32(_height), Convert.ToInt32(_width), _xOffset, _yOffset, _selectedScaling, Bvalue, Cvalue);
+                result = 0;
             }
-            _model.ResizeImage(Convert.ToInt32(_height), Convert.ToInt32(_width), _xOffset, _yOffset, _selectedScaling);
-            var path = _model.RefreshImage();
-            if (!path.Equals(String.Empty) && (_height >= 500 && _width >= 500))
+
+            var fullFileName=_model.CreateHistogram(result);
+            if (_firstChannel)
             {
-                ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(Convert.ToInt32(_width/2 - 250 + _xOffset), Convert.ToInt32(_height/2 - 250 + _yOffset), 500, 500)));
+                HistogramDisplayViewModel.SetPathForChannel1(fullFileName);
             }
-            else if (!path.Equals(String.Empty) && _height < 500 && _width < 500)
-            {
-                ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(0, 0, Convert.ToInt32(_width), Convert.ToInt32(_height))));
-            }
-            else if (!path.Equals(String.Empty) && _height >= 500 && _width < 500)
-            {
-                ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(0, Convert.ToInt32(_height/2 - 250 + _yOffset), Convert.ToInt32(_width), 500))); 
-            }
-            else if (!path.Equals(String.Empty) && _height < 500 && _width >= 500)
-            {
-                ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(Convert.ToInt32(_width/2 - 250 + _xOffset), 0, 500, Convert.ToInt32(_height)))); 
-            }
+
+            ImageDisplayViewModel.SetPath(_model.RefreshImage());
         }
 
         #endregion
@@ -349,9 +267,6 @@ namespace Lab1.ViewModels
         public event Action<string> OnErrorHappened;
         
         public event PropertyChangedEventHandler PropertyChanged;
-        
-        public event Action<double>? HeightChanged;
-        public event Action<double>? WidthChanged;
 
         #endregion
         
