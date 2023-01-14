@@ -30,7 +30,7 @@
         <Grid.Styles>
             
             <Style Selector="Button">
-                <Setter Property="Width" Value="300"></Setter>
+                <Setter Property="Width" Value="350"></Setter>
                 <Setter Property="Height" Value="40"></Setter>
                 <Setter Property="FontSize" Value="20"></Setter>
                 <Setter Property="Foreground" Value="#FFFFFFFF" />
@@ -128,14 +128,23 @@
         <Popup Grid.Row="1" Grid.Column="1" IsOpen="{Binding IsErrorOccured}">
             <TextBlock Text="{Binding ErrorText}"/>
         </Popup>
-        <StackPanel Grid.Row="2" Grid.Column="2">
-            <Button Content="Сохранить изображение" Command="{Binding SaveFile}" ></Button>
+        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Grid.Row="2" Grid.Column="2">
+            <Button Content="Выбрать алгоритм дизеринга" Click="ChooseAlgorithm" ></Button>
+            <Button Name="SaveButton" Click="SaveButton_OnClick" IsEnabled="{Binding AlgChosen}" Content="Сохранить изображение" Command="{Binding SaveFile}" ></Button>
         </StackPanel>
         
         <StackPanel Grid.Row="2" Grid.Column="0">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Width="100" Background="black" FontSize="20" TextAlignment="Center">Высота</TextBlock>
+                <NumericUpDown Minimum="50" Maximum="600" Width="250" Value="{Binding Height}"></NumericUpDown>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Width="100" Background="black" FontSize="20" TextAlignment="Center">Ширина</TextBlock>
+                <NumericUpDown Minimum="50" Maximum="600" Width="250" Value="{Binding Width}"></NumericUpDown>
+            </StackPanel>
+            <Button Content="Сгенерировать градиент" Command="{Binding GenerateGradient}"></Button>
             <Button Content="Открыть изображение" Command="{Binding AddNewFile}"></Button>
         </StackPanel>
     </Grid>
-
 </Window>
 

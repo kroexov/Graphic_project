@@ -10,5 +10,5 @@
         <viewModels:ImageDisplayViewModel/>
     </Design.DataContext>
     
-    <Image Stretch="None" Source="{Binding ImageToLoadPublic}"></Image>
+    <Image Stretch="Uniform" Source="{Binding ImageToLoadPublic}"></Image>
 </UserControl>

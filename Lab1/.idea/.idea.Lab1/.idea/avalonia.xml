@@ -4,6 +4,8 @@
     <option name="projectPerEditor">
       <map>
         <entry key="Lab1/App.axaml" value="Lab1/Lab1.csproj" />
+        <entry key="Lab1/ViewModels/AlgorithmWindow.axaml" value="Lab1/Lab1.csproj" />
+        <entry key="Lab1/Views/AlgorithmWindow.axaml" value="Lab1/Lab1.csproj" />
         <entry key="Lab1/Views/ErrorWindow.axaml" value="Lab1/Lab1.csproj" />
         <entry key="Lab1/Views/ImageDisplay.axaml" value="Lab1/Lab1.csproj" />
         <entry key="Lab1/Views/ImageDisplayWindow.axaml" value="Lab1/Lab1.csproj" />
