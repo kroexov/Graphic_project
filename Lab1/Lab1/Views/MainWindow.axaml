@@ -66,27 +66,6 @@
             </StackPanel>
         </StackPanel>
         
-        <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Grid.RowSpan="3">
-            <TextBlock Width="400" Foreground="Orange" FontSize="20">Новый размер изображения</TextBlock>
-            <DockPanel>
-                <NumericUpDown Name="WidthField" Minimum="10" Width="200" Value="{Binding ImageWidth}">
-                </NumericUpDown>
-                <NumericUpDown Name="HeightField" Minimum="10" Width="200" Value="{Binding ImageHeight}"></NumericUpDown>
-            </DockPanel>
-            <TextBlock Width="400" Foreground="Orange" FontSize="20">Смещения по осям</TextBlock>
-            <DockPanel>
-                <NumericUpDown Minimum="-500" Maximum="500" Width="200" Value="{Binding Xoffset}"></NumericUpDown>
-                <NumericUpDown Minimum="-500" Maximum="500" Width="200" Value="{Binding Yoffset}"></NumericUpDown>
-            </DockPanel>
-            <TextBlock Foreground="Orange" Margin="0 20 0 20" HorizontalAlignment="Center" FontSize="20">Способы масштабирования</TextBlock>
-            <ListBox Items="{Binding Scalings}" SelectedItem="{Binding SelectedScaling}"></ListBox>
-            <StackPanel Orientation="Horizontal">
-            <TextBox Width="100" Text="{Binding BValue}" Watermark="B"/>
-            <TextBox Width="100" Text="{Binding CValue}" Watermark="C"/>
-            </StackPanel>
-            <Button Width="400" Content="Применить масштабирование" Command="{Binding ResizeImage}"></Button> 
-        </StackPanel>
-        
         <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
             <TextBlock Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Center" FontSize="20">Цветовые пространства</TextBlock>
             <ListBox Items="{Binding ColorSpaces}" SelectedItem="{Binding SelectedColorSpace}"></ListBox>
@@ -101,7 +80,7 @@
                 MaxWidth="600">
             <StackPanel >
                 
-            <Border HorizontalAlignment="Center" VerticalAlignment="Center"
+            <Border HorizontalAlignment="Center"
                     Background="FloralWhite"
                     BorderThickness="2" 
                     BorderBrush="Black"
@@ -110,30 +89,39 @@
                     MaxHeight="500"
                     MaxWidth="500"
                     Margin="0 20 0 0">
-        <views:ImageDisplay  DataContext="{Binding ImageDisplayViewModel}">
+        <views:ImageDisplay DataContext="{Binding ImageDisplayViewModel}">
         </views:ImageDisplay>
                 </Border>
         </StackPanel>
         </Border>
         
-        <StackPanel Grid.RowSpan="3" Grid.Row="0" Grid.Column="0">
-            <TextBlock Foreground="Orange" Margin="0 10 0 0" FontSize="20">Доля игнорируемых пикселей</TextBlock>
-            <TextBox HorizontalAlignment="Left" Margin="0 10 0 0" Width="100" Text="{Binding IgnoranceRate}"></TextBox>
-            <Button Width="350" Margin="0 10 0 10" Content="Сгенерировать гистограммы" Command="{Binding CreateHistogram}"></Button>
-            <views:HistogramDisplay Name="Display" DataContext="{Binding HistogramDisplayViewModel}"></views:HistogramDisplay>
+        <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Grid.RowSpan="3">
+            <TextBlock Foreground="Orange" Margin="0 20 0 20" HorizontalAlignment="Center" FontSize="20">Алгоритмы фильтрации</TextBlock>
+            <ListBox Items="{Binding Filters}" SelectedItem="{Binding SelectedFilter}"></ListBox>
+            <TextBlock Width="400" Foreground="Orange" FontSize="20">Порог фильтрации</TextBlock>
+            <NumericUpDown IsEnabled="{Binding IsThreshold}" Maximum="255" Minimum="0" Width="200" Value="{Binding FiltrationThreshold}"></NumericUpDown>
+            <TextBlock Width="400" Foreground="Orange" FontSize="20">Радиус ядра</TextBlock>
+            <TextBox IsEnabled="{Binding IsRadius}" Text="{Binding CoreRadius}"></TextBox>
+            <TextBlock Width="400" Foreground="Orange" FontSize="20">Сигма</TextBlock>
+            <TextBox IsEnabled="{Binding IsSigma}" Text="{Binding Sigma}"></TextBox>
+            <TextBlock Width="400" Foreground="Orange" FontSize="20">Sharpness</TextBlock>
+            <TextBox IsEnabled="{Binding IsSharpness}" Text="{Binding Sharpness}"></TextBox>
+            
+            <Button Width="400" Content="Предпросмотр фильтрации" Click="ShowFilter"></Button>
+            <Button Width="400" Content="Применить фильтрацию" Command="{Binding ChangeImageByFilter}"></Button> 
         </StackPanel>
+        
+        
         <Popup Grid.Row="1" Grid.Column="1" IsOpen="{Binding IsErrorOccured}">
             <TextBlock Text="{Binding ErrorText}"/>
         </Popup>
         <StackPanel Grid.Row="2" Grid.Column="2">
-            <Button Content="Открыть изображение" Command="{Binding AddNewFile}"></Button>
             <Button Content="Сохранить изображение" Command="{Binding SaveFile}" ></Button>
         </StackPanel>
         
-        <!--
         <StackPanel Grid.Row="2" Grid.Column="0">
-            
-        </StackPanel>-->
+            <Button Content="Открыть изображение" Command="{Binding AddNewFile}"></Button>
+        </StackPanel>
     </Grid>
 
 </Window>

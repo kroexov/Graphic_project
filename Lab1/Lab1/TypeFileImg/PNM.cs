@@ -61,6 +61,8 @@ public abstract class Pnm
 
     public abstract string CreateColorHistogram(double valueIgnore);
 
+    public abstract Bitmap AlgorithmFilter(TypeFilter typeFilter, double value);
+
     #endregion
 
     #region Private/protected methods

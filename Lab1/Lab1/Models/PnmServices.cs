@@ -70,14 +70,20 @@ public class PnmServices: IPnmServices
         }
     }
 
-    public string CreateHistogram(double ignoreValue)
+    public string FilterImage(TypeFilter typeFilter, double value)
     {
         if (_fileImg != null)
         {
-            return _fileImg.CreateColorHistogram(ignoreValue);
-        }
+            
+            var pathSaveFile = AppDomain.CurrentDomain.BaseDirectory;
+            pathSaveFile = pathSaveFile.Substring(0, pathSaveFile.Length - 17);
+            var fullFileName = pathSaveFile + "\\SystemImage\\Filter.bmp";
+            
+            _fileImg.AlgorithmFilter(typeFilter, value).Save(fullFileName);
 
-        return string.Empty;
+            return fullFileName;
+        }
+        return String.Empty;
     }
 
     #endregion
@@ -124,8 +130,6 @@ public class PnmServices: IPnmServices
 
         return null;
     }
-    
-    
 
     #endregion
     

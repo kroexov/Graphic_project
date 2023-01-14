@@ -26,6 +26,18 @@ namespace Lab1.ViewModels
             "YСoCg",
             "CMY"
         };
+        
+        private string _selectedFilter = "ThresholdFiltering";
+        private ObservableCollection<string>  _filters = new ObservableCollection<string>()
+        {
+            "ThresholdFiltering",
+            "ThresholdFilteringByOcu",
+            "MedianFiltering",
+            "GaussFiltering",
+            "BoxBlurFiltering",
+            "SobelFiltering",
+            "ContrastAdaptiveSharpening"
+        };
 
         private PnmServices _model;
 
@@ -33,11 +45,15 @@ namespace Lab1.ViewModels
         
         private string _errorText = "Неизвестная ошибка";
 
-        private string _ignoranceRate = "0";
-
         private bool _firstChannel = true;
         private bool _secondChannel = true;
         private bool _thirdChannel = true;
+
+        private int _filtrationThreshold;
+
+        private string _coreRadius;
+        private string _sigma;
+        private string _sharpness;
 
         #endregion
 
@@ -48,7 +64,6 @@ namespace Lab1.ViewModels
             _model = model;
             model.ModelErrorHappened += (s => OnErrorHappened(s));
             ImageDisplayViewModel = new ImageDisplayViewModel();
-            HistogramDisplayViewModel = new HistogramDisplayViewModel();
         }
 
         #endregion
@@ -69,6 +84,24 @@ namespace Lab1.ViewModels
                 }
             }
         }
+        
+        public ObservableCollection<string> Filters
+        {
+            get => _filters;
+        }
+        
+        public string SelectedFilter
+        {
+            get => _selectedFilter;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _selectedFilter, value);
+                RaisePropertyChanged(nameof(IsThreshold));
+                RaisePropertyChanged(nameof(IsRadius));
+                RaisePropertyChanged(nameof(IsSigma));
+                RaisePropertyChanged(nameof(IsSharpness));
+            }
+        }
 
         public bool FirstChannel
         {
@@ -76,10 +109,6 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _firstChannel, value);
-                if (!value)
-                {
-                    HistogramDisplayViewModel.ClearChannel1();
-                }
                 _model.ChangeColorChannel(new bool[3]
                 {
                     _firstChannel, _secondChannel, _thirdChannel
@@ -92,6 +121,31 @@ namespace Lab1.ViewModels
                 
             } 
         }
+
+        public bool IsThreshold => _selectedFilter == "ThresholdFiltering";
+        public bool IsRadius => (_selectedFilter == "MedianFiltering" || _selectedFilter == "BoxBlurFiltering");
+        public bool IsSigma => _selectedFilter == "GaussFiltering";
+        public bool IsSharpness => _selectedFilter == "ContrastAdaptiveSharpening";
+        
+        public string Sharpness{
+            get => _sharpness;
+            set => this.RaiseAndSetIfChanged(ref _sharpness, value);
+        }
+        public int FiltrationThreshold
+        {
+            get => _filtrationThreshold;
+            set => this.RaiseAndSetIfChanged(ref _filtrationThreshold, value);
+        }
+        public string CoreRadius
+        {
+            get => _coreRadius;
+            set => this.RaiseAndSetIfChanged(ref _coreRadius, value);
+        }
+        public string Sigma
+        {
+            get => _sigma;
+            set => this.RaiseAndSetIfChanged(ref _sigma, value);
+        }
         
         public bool SecondChannel
         {
@@ -99,10 +153,6 @@ namespace Lab1.ViewModels
             set
             {
                 this.RaiseAndSetIfChanged(ref _secondChannel, value);
-                if (!value)
-                {
-                    HistogramDisplayViewModel.ClearChannel2();
-                }
                 _model.ChangeColorChannel(new bool[3]
                 {
                     _firstChannel, _secondChannel, _thirdChannel
@@ -115,25 +165,12 @@ namespace Lab1.ViewModels
             } 
         }
         
-        public string IgnoranceRate
-        {
-            get => _ignoranceRate;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref _ignoranceRate, value);
-            }
-        }
-        
         public bool ThirdChannel
         {
             get => _thirdChannel;
             set
             {
                 this.RaiseAndSetIfChanged(ref _thirdChannel, value);
-                if (!value)
-                {
-                    HistogramDisplayViewModel.ClearChannel3();
-                }
                 _model.ChangeColorChannel(new bool[3]
                 {
                     _firstChannel, _secondChannel, _thirdChannel
@@ -165,8 +202,6 @@ namespace Lab1.ViewModels
         }
         
         public ImageDisplayViewModel ImageDisplayViewModel { get; }
-        
-        public HistogramDisplayViewModel HistogramDisplayViewModel { get; }
 
         public ObservableCollection<string> ColorSpaces
         {
@@ -224,29 +259,56 @@ namespace Lab1.ViewModels
             }
         }
 
-        public void CreateHistogram()
+        public void ChangeImageByFilter()
         {
-            // test part, change this
-            double result;
-
-            //Try parsing in the current culture
-            if (!double.TryParse(_ignoranceRate, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
-                //Then try in US english
-                !double.TryParse(_ignoranceRate, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
-                //Then in neutral language
-                !double.TryParse(_ignoranceRate, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
-            {
-                result = 0;
-            }
-
-            var fullFileName=_model.CreateHistogram(result);
-            if (_firstChannel)
-            {
-                HistogramDisplayViewModel.SetPathForChannel1(fullFileName);
-            }
-
-            ImageDisplayViewModel.SetPath(_model.RefreshImage());
+            ImageDisplayViewModel.SetPath(ApplySelectedFiler());
         }
+        public string ApplySelectedFiler()
+        {
+            TypeFilter Filter = (TypeFilter) Enum.Parse(typeof(TypeFilter), _selectedFilter, true);
+            double value = 0;
+            
+            switch (Filter)
+            {
+                case TypeFilter.ThresholdFiltering:
+                    value = _filtrationThreshold;
+                    break;
+                case TypeFilter.MedianFiltering:
+                    if (!double.TryParse(_coreRadius, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value) &&
+                        !double.TryParse(_coreRadius, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value) &&
+                        !double.TryParse(_coreRadius, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    {
+                        value = 0;
+                    }
+                    break;
+                case TypeFilter.BoxBlurFiltering:
+                    if (!double.TryParse(_coreRadius, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value) &&
+                        !double.TryParse(_coreRadius, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value) &&
+                        !double.TryParse(_coreRadius, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    {
+                        value = 0;
+                    }
+                    break;
+                case TypeFilter.GaussFiltering:
+                    if (!double.TryParse(_sigma, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value) &&
+                        !double.TryParse(_sigma, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value) &&
+                        !double.TryParse(_sigma, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    {
+                        value = 0;
+                    }
+                    break;
+                case TypeFilter.ContrastAdaptiveSharpening:
+                    if (!double.TryParse(_sharpness, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out value) &&
+                        !double.TryParse(_sharpness, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out value) &&
+                        !double.TryParse(_sharpness, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out value))
+                    {
+                        value = 0;
+                    }
+                    break;
+            }
+            return _model.FilterImage(Filter, value);
+        }
+        
 
         #endregion
 

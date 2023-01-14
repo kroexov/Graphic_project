@@ -172,6 +172,11 @@ public class P5 : Pnm
         }
     }
 
+    public override Bitmap AlgorithmFilter(TypeFilter typeFilter, double value)
+    {
+        throw new NotImplementedException();
+    }
+
     #endregion
     
     private void ClosestPointScale(int newHeight, int newWidth)
