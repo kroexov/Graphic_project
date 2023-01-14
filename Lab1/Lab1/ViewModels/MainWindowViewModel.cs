@@ -23,8 +23,8 @@ namespace Lab1.ViewModels
         private double _height;
         private double _xOffset;
         private double _yOffset;
-        private string B;
-        private string C;
+        private string B = "0";
+        private string C = "0.5";
         private ObservableCollection<string> _spaces = new ObservableCollection<string>()
         {
             "RGB",
@@ -277,7 +277,7 @@ namespace Lab1.ViewModels
                 HeightChanged?.Invoke(new Bitmap(altpath).Size.Height);
                 if (!altpath.Equals(String.Empty) && (_height > 500 && _width > 500))
                 {
-                    ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(altpath), new PixelRect(Convert.ToInt32(_width/2 - 250 + _xOffset), Convert.ToInt32(_height/2 - 250 + _yOffset), 500, 500)));
+                    ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(altpath), new PixelRect(Convert.ToInt32(_width/2 - 250 + _xOffset + 0.5), Convert.ToInt32(_height/2 - 250 + _yOffset+ 0.5), 500, 500)));
                 }
                 else if (!altpath.Equals(String.Empty) && _height < 500 && _width < 500)
                 {

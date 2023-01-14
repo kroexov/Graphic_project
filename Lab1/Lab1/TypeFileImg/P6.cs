@@ -285,6 +285,18 @@ public class P6 : Pnm
                 newData[3 * y * newWidth + 3 * x] = newValue1 < 0 ? rndValues1[rnd.Next(0,3)] : newValue1;
                 newData[3 * y * newWidth + 3 * x + 1] = newValue2 < 0 ? rndValues2[rnd.Next(0,3)] : newValue2;
                 newData[3 * y * newWidth + 3 * x + 2] = newValue3 < 0 ? rndValues3[rnd.Next(0,3)] : newValue3;
+                if (newData[3 * y * newWidth + 3 * x] > 1)
+                {
+                    newData[3 * y * newWidth + 3 * x] = 1;
+                }
+                if (newData[3 * y * newWidth + 3 * x + 1] > 1)
+                {
+                    newData[3 * y * newWidth + 3 * x + 1] = 1;
+                }
+                if (newData[3 * y * newWidth + 3 * x + 2] > 1)
+                {
+                    newData[3 * y * newWidth + 3 * x + 2] = 1;
+                }
             }
         }
         Data = newData;
@@ -386,6 +398,7 @@ public class P6 : Pnm
                 newData[3 * y * newWidth + 3 * x] = valuePixel[0] < 0 ? 0 : (valuePixel[0] > 1 ? 1 : valuePixel[0]);
                 newData[3 * y * newWidth + 3 * x + 1] = valuePixel[1] < 0 ? 0 : (valuePixel[1] > 1 ? 1 : valuePixel[1]);
                 newData[3 * y * newWidth + 3 * x + 2] = valuePixel[2] < 0 ? 0 : (valuePixel[2] > 1 ? 1 : valuePixel[2]);
+                
             }
         }
 
