@@ -66,6 +66,28 @@
             </StackPanel>
         </StackPanel>
         
+        <StackPanel Grid.RowSpan="2" VerticalAlignment="Center">
+            <Button Content="Создать линию" Command="{Binding DrawLine}"></Button>
+            <StackPanel Orientation="Horizontal">
+            <TextBlock Name="Point1" Width="150" FontSize="20"></TextBlock>
+            <TextBlock Name="Point2" Width="150" FontSize="20"></TextBlock>
+            </StackPanel>
+            <TextBlock TextAlignment="Center" Width="300" Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Left" FontSize="20">Ширина линии</TextBlock>
+            <NumericUpDown Minimum="1" HorizontalAlignment="Left" Maximum="30" Width="300" Value="{Binding LineWidth}"></NumericUpDown>
+            <TextBlock TextAlignment="Center" Width="300" Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Left" FontSize="20">Прозрачность</TextBlock>
+            <TextBox Width="300" HorizontalAlignment="Left" Text="{Binding Opacity}"></TextBox>
+            <TextBlock TextAlignment="Center" Width="300" Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Left" FontSize="20">Выбор значений по каналам</TextBlock>
+            <StackPanel Orientation="Horizontal">
+                <TextBox Width="100" Text="{Binding FirstChannelValue}"></TextBox>
+                <TextBox Width="100" Text="{Binding SecondChannelValue}"></TextBox>
+                <TextBox Width="100" Text="{Binding ThirdChannelValue}"></TextBox>
+            </StackPanel>
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Посмотреть цвет" Click="Button_OnClick"/>
+                <Image Name="MyImage" HorizontalAlignment="Center" Width="20" Height="20" Source="{Binding Sample}"></Image>
+            </StackPanel>
+        </StackPanel>
+        
         <StackPanel VerticalAlignment="Top" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
             <DockPanel>
                 <TextBox Width="100" Text="{Binding GammaValue}"></TextBox>
@@ -94,10 +116,9 @@
                     BorderBrush="Black"
                     CornerRadius="3"
                     Padding="4"
-                    MaxHeight="500"
-                    MaxWidth="500"
+                    VerticalAlignment="Top"
                     Margin="0 20 0 0">
-        <views:ImageDisplay DataContext="{Binding ImageDisplayViewModel}">
+        <views:ImageDisplay VerticalAlignment="Top" PointerPressed="OnPointerPressed" DataContext="{Binding ImageDisplayViewModel}">
         </views:ImageDisplay>
                 </Border>
         </StackPanel>
