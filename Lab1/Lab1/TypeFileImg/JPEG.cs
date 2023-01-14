@@ -1,15 +1,24 @@
-﻿using System.Drawing;
+﻿using System;
+using System.Drawing;
 
 namespace Lab1.TypeFileImg;
 
-public class JPEG
+public class Jpeg
 {
-    public JPEG(byte[] bytes)
+    #region Constructor
+
+    public Jpeg(byte[] bytes)
     {
     }
 
+    #endregion
+
+    #region Public methods
+
     public Bitmap CreateBitmap()
     {
-        throw new System.NotImplementedException();
+        throw new NotImplementedException();
     }
+
+    #endregion
 }

@@ -4,32 +4,47 @@ using Lab1.Models;
 
 namespace Lab1.TypeFileImg;
 
-public abstract class PNM
+public abstract class Pnm
 {
-    protected FileHeaderInfo _header;
-    private int _index;
-    protected double[] _data;
-    
-    protected PNM(byte[] bytes)
-    {
-        _header = new FileHeaderInfo(ExtractHeaderInfo(bytes));
-        
-        _data = new double[_header.Width * _header.Height * _header.PixelSize];
-        for (var i = 0; i < _header.Width * _header.Height * _header.PixelSize; i++)
-        {
-            _data[i] = Convert.ToDouble(bytes[i + _index]) / 255.0;
-        }
-        
-        if (_header.Width * _header.Height > bytes.Length - _index)
-        {
-            throw new Exception("Damaged file");
-        }
-    }
+    #region Private/protected fields
+
+    protected FileHeaderInfo Header;
+    protected int _index;
+    protected double[] Data;
+
+    #endregion
+
+    #region Public abstract methods
 
     public abstract Bitmap CreateBitmap();
 
     public abstract void ConvertColor(ColorSpace colorSpace);
-    
+
+    public abstract void SetColorChannel(bool[] newColorChannel);
+
+    public abstract byte[] SaveFile(byte[] origFile);
+
+    #endregion
+
+    #region Private/protected methods
+
+    protected Pnm(byte[] bytes)
+    {
+        Header = new FileHeaderInfo(ExtractHeaderInfo(bytes));
+        
+        if (Header.Width * Header.Height * Header.PixelSize  > bytes.Length - _index)
+        {
+            throw new Exception("Damaged file");
+        }
+        
+        Data = new double[Header.Width * Header.Height * Header.PixelSize];
+
+        for (var i = 0; i < Header.Width * Header.Height * Header.PixelSize; i++)
+        {
+            Data[i] = Convert.ToDouble(bytes[i + _index]) / 255.0;
+        }
+    }
+
     private string ExtractHeaderInfo(byte[] bytes)
     {
         var header = "";
@@ -57,6 +72,8 @@ public abstract class PNM
 
     protected int GetCoordinates(int x, int y)
     {
-        return y * _header.Width + x;
+        return y * Header.Width + x;
     }
+
+    #endregion
 }

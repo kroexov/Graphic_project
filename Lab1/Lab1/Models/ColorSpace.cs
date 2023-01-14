@@ -2,11 +2,11 @@
 
 public enum ColorSpace
 {
-    RGB,
-    HSL,
-    HSV,
-    YCbCR601,
-    YCbCR709,
+    Rgb,
+    Hsl,
+    Hsv,
+    YCbCr601,
+    YCbCr709,
     YСoCg,
-    CMY
+    Cmy
 }

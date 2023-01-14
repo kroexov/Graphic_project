@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using Avalonia.Controls;
@@ -12,37 +13,112 @@ namespace Lab1.ViewModels
 {
     public class MainWindowViewModel : ViewModelBase, INotifyPropertyChanged
     {
-        private string _data;
+        #region Private fields
 
-        private string _selectedImage = string.Empty;
+        private string _selectedColorSpace = "RGB";
+        private ObservableCollection<string> _spaces = new ObservableCollection<string>()
+        {
+            "RGB",
+            "HSL",
+            "HSV",
+            "YCbCr601",
+            "YCbCr709",
+            "YСoCg",
+            "CMY"
+        };
 
-        private ObservableCollection<string> _items = new ObservableCollection<string>();
-
-        private PortableAnyMapModel _model;
+        private PnmServices _model;
 
         private bool _errorOccured = false;
         
         private string _errorText = "Неизвестная ошибка";
 
-        private bool _rgbMode = true;
+        private bool _firstChannel = true;
+        private bool _secondChannel = true;
+        private bool _thirdChannel = true;
 
-        public string SelectedImage
+        #endregion
+
+        #region Constructor
+
+        public MainWindowViewModel(PnmServices model)
         {
-            get => _selectedImage;
+            _model = model;
+            model.ModelErrorHappened += (s => OnErrorHappened(s));
+            ImageDisplayViewModel = new ImageDisplayViewModel();
+        }
+
+        #endregion
+
+        #region Public properties
+
+        public string SelectedColorSpace
+        {
+            get => _selectedColorSpace;
             set
             {
-                this.RaiseAndSetIfChanged(ref _selectedImage, value);
-                RaisePropertyChanged(nameof(IsImageSelected));
+                this.RaiseAndSetIfChanged(ref _selectedColorSpace, value);
+                _model.ChangeColorSpace((ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
+                var res = _model.RefreshImage();
+                if (res != string.Empty)
+                {
+                    ImageDisplayViewModel.SetPath(res);
+                }
             }
         }
 
-        public bool RgbMode
+        public bool FirstChannel
         {
-            get => _rgbMode;
+            get => _firstChannel;
             set
             {
-                this.RaiseAndSetIfChanged(ref _rgbMode, value);
-                _model.ColorType = _rgbMode;
+                this.RaiseAndSetIfChanged(ref _firstChannel, value);
+                _model.ChangeColorChannel(new bool[3]
+                {
+                    _firstChannel, _secondChannel, _thirdChannel
+                });
+                var res = _model.RefreshImage();
+                if (res != string.Empty)
+                {
+                    ImageDisplayViewModel.SetPath(res);
+                }
+                
+            } 
+        }
+        
+        public bool SecondChannel
+        {
+            get => _secondChannel;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _secondChannel, value);
+                _model.ChangeColorChannel(new bool[3]
+                {
+                    _firstChannel, _secondChannel, _thirdChannel
+                });
+                var res = _model.RefreshImage();
+                if (res != string.Empty)
+                {
+                    ImageDisplayViewModel.SetPath(res);
+                }
+            } 
+        }
+        
+        public bool ThirdChannel
+        {
+            get => _thirdChannel;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _thirdChannel, value);
+                _model.ChangeColorChannel(new bool[3]
+                {
+                    _firstChannel, _secondChannel, _thirdChannel
+                });
+                var res = _model.RefreshImage();
+                if (res != string.Empty)
+                {
+                    ImageDisplayViewModel.SetPath(res);
+                }
             } 
         }
 
@@ -63,31 +139,22 @@ namespace Lab1.ViewModels
                 this.RaiseAndSetIfChanged(ref _errorText, value);
             }
         }
+        
+        public ImageDisplayViewModel ImageDisplayViewModel { get; }
 
-        public bool IsImageSelected => SelectedImage != String.Empty;
-
-        public MainWindowViewModel(PortableAnyMapModel model)
+        public ObservableCollection<string> ColorSpaces
         {
-            _model = model;
-            model.ModelErrorHappened += (s => OnErrorHappened(s));
-        }
-
-        public ObservableCollection<string> Items
-        {
-            get => _items;
+            get => _spaces;
             set
             {
-                this.RaiseAndSetIfChanged(ref _items, value);
-                RaisePropertyChanged(nameof(IsImageSelected));
+                this.RaiseAndSetIfChanged(ref _spaces, value);
             }
         }
 
-        public string Data
-        {
-            get => _data;
-            set => this.RaiseAndSetIfChanged(ref _data, value);
-        }
-        
+        #endregion
+
+        #region Public methods
+
         public async void AddNewFile()
         {
             var ofd = new OpenFileDialog();
@@ -99,13 +166,7 @@ namespace Lab1.ViewModels
             result = await ofd.ShowAsync(new Window());
             if (result != null)
             {
-                if (!Items.Contains(result.First()))
-                {
-                    _items.Add(result.First());
-                    Data = File.ReadAllText(result.First());
-                    return;
-                }
-                OnErrorHappened("Вы уже выбирали этот файл!");
+                OpenFile(result.First());
             }
         }
 
@@ -117,52 +178,30 @@ namespace Lab1.ViewModels
             ofd.Filters.Add(new FileDialogFilter() {Name = "Файлы P5", Extensions = {"pgm"}});
             
             var result = await ofd.ShowAsync(new Window());
+            
             if (result != null)
             {
-                File.WriteAllText(result, Data);
+                File.WriteAllBytes(result,_model.SaveFile());
             }
         }
 
-        public void DeleteFile()
+        public void OpenFile(string path)
         {
-            if (_items.Contains(_selectedImage))
-            {
-                _items.Remove(_selectedImage);
-                _selectedImage = String.Empty;
-                RaisePropertyChanged(nameof(IsImageSelected));
-            }
-        }
-
-        public void OpenFile()
-        {
-            bool isok = true;
             try
             {
-                _model.ReadFile(_selectedImage);
+                string altpath = _model.ReadFile(path, new bool[] {_firstChannel, _secondChannel, _thirdChannel}, (ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
+                ImageDisplayViewModel.SetPath(altpath);
             }
             catch (Exception e)
             {
-                isok = false;
-                DeleteFile();
                 OnErrorHappened(e.Message);
             }
-
-            if (isok)
-            {
-                string _pathFile = _model.AfterOpenFileLogic(_selectedImage);
-                ImageDisplayWindow imageDisplayWindow = new ImageDisplayWindow()
-                {
-                    DataContext = new ImageDisplayViewModel(_pathFile)
-                };
-                imageDisplayWindow.Show();
-            }
-
-            
         }
 
-        public event Action<string> OnErrorHappened;
-        
-        public event PropertyChangedEventHandler PropertyChanged;
+        #endregion
+
+        #region Private methods
+
         private void RaisePropertyChanged(string propertyName)
         {
             if (PropertyChanged != null)
@@ -170,6 +209,17 @@ namespace Lab1.ViewModels
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
+
+        #endregion
+
+        #region Events
+
+        public event Action<string> OnErrorHappened;
+        
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        #endregion
+        
     }
 }
 

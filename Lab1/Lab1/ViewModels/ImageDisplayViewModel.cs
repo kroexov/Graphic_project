@@ -5,14 +5,28 @@ namespace Lab1.ViewModels;
 
 public class ImageDisplayViewModel : ViewModelBase
 {
-    public ImageDisplayViewModel(string path)
+    #region Private fields
+
+    private Bitmap? _imageToLoad;
+
+    #endregion
+
+    #region Public methods
+
+    public void SetPath(string path)
     {
-        ImageToLoad = new Bitmap(path);
+        ImageToLoadPublic = new Bitmap(path);
     }
-    private Bitmap? ImageToLoad;
+
+    #endregion
+
+    #region Public properties
+
     public Bitmap? ImageToLoadPublic
     {
-        get => ImageToLoad;
-        private set => this.RaiseAndSetIfChanged(ref ImageToLoad, value);
+        get => _imageToLoad;
+        private set => this.RaiseAndSetIfChanged(ref _imageToLoad, value);
     }
+
+    #endregion
 }

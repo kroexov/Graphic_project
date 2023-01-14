@@ -1,9 +1,9 @@
 ﻿namespace Lab1.Models;
 
-public interface IPNMServices
+public interface IPnmServices
 {
     // Читает файл по пути и создает объект класса ImgFile
-    void ReadFile(string filePath);
+    string ReadFile(string filePath, bool[] channels, ColorSpace colorSpace = ColorSpace.Rgb);
 
     void ChangeColorSpace(ColorSpace newColorSpace);
 

@@ -1,14 +1,12 @@
-﻿using System.ComponentModel;
-using Avalonia;
+﻿using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
-using Avalonia.Media.Imaging;
 
 namespace Lab1.Views;
 
-public partial class ImageDisplayWindow : Window
+public partial class ImageDisplay : UserControl
 {
-    public ImageDisplayWindow()
+    public ImageDisplay()
     {
         InitializeComponent();
     }
