@@ -30,9 +30,10 @@ public class FileHeaderInfo
     
     #region Public properties
 
+    // сломал Баиру get/set правила для properties и мне не жаль
     public string FileFormat { get; }
-    public int Width { get; }
-    public int Height { get; }
+    public int Width { get; set; }
+    public int Height { get; set; }
     public int MaxColorLevel { get; }
     public int PixelSize { get; }
 

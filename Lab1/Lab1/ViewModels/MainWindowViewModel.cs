@@ -4,7 +4,9 @@ using System.ComponentModel;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Media.Imaging;
 using Lab1.Models;
 using Lab1.Views;
 using ReactiveUI;
@@ -15,21 +17,14 @@ namespace Lab1.ViewModels
     {
         #region Private fields
 
-        private string _data;
-
-        private int _width = 100;
-
-        private int _height = 100;
-
-        private string _currentPath;
-
-        private string _gamma = "0";
-
         private string _selectedColorSpace = "RGB";
 
-        private bool _algChosen;
-
-        private ObservableCollection<string> _items = new ObservableCollection<string>();
+        private double _width;
+        private double _height;
+        private double _xOffset;
+        private double _yOffset;
+        private string B = "0";
+        private string C = "0.5";
         private ObservableCollection<string> _spaces = new ObservableCollection<string>()
         {
             "RGB",
@@ -39,6 +34,15 @@ namespace Lab1.ViewModels
             "YCbCr709",
             "YСoCg",
             "CMY"
+        };
+        
+        private string _selectedScaling = "Closest point";
+        private ObservableCollection<string>  _scalings = new ObservableCollection<string>()
+        {
+            "Closest point",
+            "Bilinear",
+            "Lanczos3",
+            "BC-splines"
         };
 
         private PnmServices _model;
@@ -50,7 +54,6 @@ namespace Lab1.ViewModels
         private bool _firstChannel = true;
         private bool _secondChannel = true;
         private bool _thirdChannel = true;
-        private AlgorithmWindowViewModel _algorithmWindowViewModel;
 
         #endregion
 
@@ -59,36 +62,13 @@ namespace Lab1.ViewModels
         public MainWindowViewModel(PnmServices model)
         {
             _model = model;
-            _algorithmWindowViewModel = new AlgorithmWindowViewModel(model);
             model.ModelErrorHappened += (s => OnErrorHappened(s));
-            model.OnAlgChosen += ModelOnOnAlgChosen;
             ImageDisplayViewModel = new ImageDisplayViewModel();
-            model.DitheredApplied += ImageDisplayViewModel.SetPath;
-        }
-
-        private void ModelOnOnAlgChosen()
-        {
-            AlgChosen = true;
         }
 
         #endregion
 
         #region Public properties
-
-        public AlgorithmWindowViewModel AlgorithmWindowViewModel
-        {
-            get => _algorithmWindowViewModel;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref _algorithmWindowViewModel, value);
-            }
-        }
-
-        public bool AlgChosen
-        {
-            get => _algChosen;
-            set => this.RaiseAndSetIfChanged(ref _algChosen, value);
-        }
 
         public string SelectedColorSpace
         {
@@ -102,6 +82,38 @@ namespace Lab1.ViewModels
                 {
                     ImageDisplayViewModel.SetPath(res);
                 }
+            }
+        }
+        
+        public ObservableCollection<string> Scalings
+        {
+            get => _scalings;
+        }
+
+        public string BValue
+        {
+            get => B;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref B, value);
+            }
+        }
+        
+        public string CValue
+        {
+            get => C;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref C, value);
+            }
+        }
+        
+        public string SelectedScaling
+        {
+            get => _selectedScaling;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _selectedScaling, value);
             }
         }
 
@@ -122,33 +134,6 @@ namespace Lab1.ViewModels
                 }
                 
             } 
-        }
-
-        public string GammaValue
-        {
-            get => _gamma;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref _gamma, value);
-            }
-        }
-        
-        public int Width
-        {
-            get => _width;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref _width, value);
-            }
-        }
-        
-        public int Height
-        {
-            get => _height;
-            set
-            {
-                this.RaiseAndSetIfChanged(ref _height, value);
-            }
         }
         
         public bool SecondChannel
@@ -196,6 +181,39 @@ namespace Lab1.ViewModels
             }
         }
         
+        public double Xoffset
+        {
+            get => _xOffset;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _xOffset, value);
+            }
+        }
+        public double Yoffset
+        {
+            get => _yOffset;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _yOffset, value);
+            }
+        }
+        public double ImageWidth
+        {
+            get => _width;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _width, value);
+            }
+        }
+        public double ImageHeight
+        {
+            get => _height;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _height, value);
+            }
+        }
+        
         public string ErrorText
         {
             get => _errorText;
@@ -216,12 +234,6 @@ namespace Lab1.ViewModels
             }
         }
 
-        public string Data
-        {
-            get => _data;
-            set => this.RaiseAndSetIfChanged(ref _data, value);
-        }
-
         #endregion
 
         #region Public methods
@@ -237,53 +249,7 @@ namespace Lab1.ViewModels
             result = await ofd.ShowAsync(new Window());
             if (result != null)
             {
-                _items.Add(result.First());
-                Data = File.ReadAllText(result.First());
-                _currentPath = result.First();
                 OpenFile(result.First());
-            }
-        }
-
-        public void ChangeGamma()
-        {
-            double result;
-
-            //Try parsing in the current culture
-            if (!double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
-                //Then try in US english
-                !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
-                //Then in neutral language
-                !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
-            {
-                result = 0;
-            }
-            
-            _model.AssignGamma(result);
-            var res = _model.RefreshImage();
-            if (res != string.Empty)
-            {
-                ImageDisplayViewModel.SetPath(res);
-            }
-        }
-
-        public void ApplyGamma()
-        {
-            double result;
-
-            //Try parsing in the current culture
-            if (!double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
-                //Then try in US english
-                !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
-                //Then in neutral language
-                !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
-            {
-                result = 0;
-            }
-            _model.ConvertGamma(result);
-            var res = _model.RefreshImage();
-            if (res != string.Empty)
-            {
-                ImageDisplayViewModel.SetPath(res);
             }
         }
 
@@ -293,7 +259,7 @@ namespace Lab1.ViewModels
             ofd.Filters.Add(new FileDialogFilter() {Name = "Другой файл", Extensions = {"*"}});
             ofd.Filters.Add(new FileDialogFilter() {Name = "Файлы P6", Extensions = {"ppm"}});
             ofd.Filters.Add(new FileDialogFilter() {Name = "Файлы P5", Extensions = {"pgm"}});
-
+            
             var result = await ofd.ShowAsync(new Window());
             
             if (result != null)
@@ -307,7 +273,16 @@ namespace Lab1.ViewModels
             try
             {
                 string altpath = _model.ReadFile(path, new bool[] {_firstChannel, _secondChannel, _thirdChannel}, (ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
-                ImageDisplayViewModel.SetPath(altpath);
+                WidthChanged?.Invoke(new Bitmap(altpath).Size.Width);
+                HeightChanged?.Invoke(new Bitmap(altpath).Size.Height);
+                if (!altpath.Equals(String.Empty) && (_height > 500 && _width > 500))
+                {
+                    ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(altpath), new PixelRect(Convert.ToInt32(_width/2 - 250 + _xOffset + 0.5), Convert.ToInt32(_height/2 - 250 + _yOffset+ 0.5), 500, 500)));
+                }
+                else if (!altpath.Equals(String.Empty) && _height < 500 && _width < 500)
+                {
+                    ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(altpath), new PixelRect(0, 0, Convert.ToInt32(_width), Convert.ToInt32(_height))));
+                }
             }
             catch (Exception e)
             {
@@ -315,16 +290,44 @@ namespace Lab1.ViewModels
             }
         }
 
-        public void GenerateGradient()
+        public void ResizeImage()
         {
-            string path = _model.CreateGradient(_width, _height);
-            string altpath = _model.ReadFile(path, new bool[] {_firstChannel, _secondChannel, _thirdChannel}, (ColorSpace) Enum.Parse(typeof(ColorSpace), _selectedColorSpace, true));
-            ImageDisplayViewModel.SetPath(altpath);
-        }
-        
-        public void ChooseAlgorithm()
-        {
-            
+            if (_selectedScaling.Equals("BC-splines"))
+            {
+                double Bvalue;
+                double Cvalue;
+                if (!double.TryParse(B, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out Bvalue) &&
+                    !double.TryParse(B, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out Bvalue) &&
+                    !double.TryParse(B, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out Bvalue))
+                {
+                    Bvalue = 0;
+                }
+                if (!double.TryParse(C, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out Cvalue) &&
+                    !double.TryParse(C, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out Cvalue) &&
+                    !double.TryParse(C, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out Cvalue))
+                {
+                    Cvalue = 0;
+                }
+                _model.ResizeImage(Convert.ToInt32(_height), Convert.ToInt32(_width), _xOffset, _yOffset, _selectedScaling, Bvalue, Cvalue);
+            }
+            _model.ResizeImage(Convert.ToInt32(_height), Convert.ToInt32(_width), _xOffset, _yOffset, _selectedScaling);
+            var path = _model.RefreshImage();
+            if (!path.Equals(String.Empty) && (_height >= 500 && _width >= 500))
+            {
+                ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(Convert.ToInt32(_width/2 - 250 + _xOffset), Convert.ToInt32(_height/2 - 250 + _yOffset), 500, 500)));
+            }
+            else if (!path.Equals(String.Empty) && _height < 500 && _width < 500)
+            {
+                ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(0, 0, Convert.ToInt32(_width), Convert.ToInt32(_height))));
+            }
+            else if (!path.Equals(String.Empty) && _height >= 500 && _width < 500)
+            {
+                ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(0, Convert.ToInt32(_height/2 - 250 + _yOffset), Convert.ToInt32(_width), 500))); 
+            }
+            else if (!path.Equals(String.Empty) && _height < 500 && _width >= 500)
+            {
+                ImageDisplayViewModel.SetImage(new CroppedBitmap(new Bitmap(path), new PixelRect(Convert.ToInt32(_width/2 - 250 + _xOffset), 0, 500, Convert.ToInt32(_height)))); 
+            }
         }
 
         #endregion
@@ -346,6 +349,9 @@ namespace Lab1.ViewModels
         public event Action<string> OnErrorHappened;
         
         public event PropertyChangedEventHandler PropertyChanged;
+        
+        public event Action<double>? HeightChanged;
+        public event Action<double>? WidthChanged;
 
         #endregion
         

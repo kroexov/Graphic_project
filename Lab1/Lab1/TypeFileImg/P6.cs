@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.Intrinsics.Arm;
 using Lab1.Models;
 
 namespace Lab1.TypeFileImg;
@@ -12,11 +14,17 @@ public class P6 : Pnm
     private bool[] _currentColorСhannel;
     private ColorSpace _currentColorSpace;
     private Bitmap _img;
-    private readonly double[] _tempPixel = new double[3];
+    private double[] tempPixel = new double[3];
 
     #endregion
 
     #region Constructor
+
+    public P6(byte[] bytes) : base(bytes)
+    {
+        _currentColorСhannel = new bool[] { true, true, true };
+        _currentColorSpace = ColorSpace.Rgb;
+    }
 
     public P6(byte[] bytes, ColorSpace colorSpace) : base(bytes)
     {
@@ -40,15 +48,11 @@ public class P6 : Pnm
                 var value2 = Data[GetCoordinates(3*x + 1, 3*y)]  * Convert.ToInt32(_currentColorСhannel[1]);
                 var value3 = Data[GetCoordinates(3*x + 2, 3*y)]  * Convert.ToInt32(_currentColorСhannel[2]);
                 
-                ConvertColorPixel(_tempPixel, value1, value2, value3, ColorSpace.Rgb);
+                ConvertColorPixel(tempPixel, value1, value2, value3, ColorSpace.Rgb);
                 
-                // var valueRed = 255 * tempPixel[0];
-                // var valueGreen = 255 * tempPixel[1];
-                // var valueBlue = 255 * tempPixel[2];
-                
-                var valueRed = 255 * AssignGamma(_tempPixel[0]);
-                var valueGreen = 255 * AssignGamma(_tempPixel[1]);
-                var valueBlue = 255 * AssignGamma(_tempPixel[2]);
+                var valueRed = 255 * tempPixel[0];
+                var valueGreen = 255 * tempPixel[1];
+                var valueBlue = 255 * tempPixel[2];
                 
                 Color newColor = Color.FromArgb((byte)Math.Round(valueRed),
                     (byte)Math.Round(valueGreen), 
@@ -83,11 +87,11 @@ public class P6 : Pnm
                 var value1 = Data[GetCoordinates(3*x, 3*y)];
                 var value2 = Data[GetCoordinates(3*x + 1, 3*y)];
                 var value3 = Data[GetCoordinates(3*x + 2, 3*y)];
-                ConvertColorPixel(_tempPixel, value1, value2, value3, colorSpace);
+                ConvertColorPixel(tempPixel, value1, value2, value3, colorSpace);
                 
-                Data[GetCoordinates(3*x, 3*y)] = _tempPixel[0];
-                Data[GetCoordinates(3*x + 1, 3*y)] = _tempPixel[1];
-                Data[GetCoordinates(3*x + 2, 3*y)] = _tempPixel[2];
+                Data[GetCoordinates(3*x, 3*y)] = tempPixel[0];
+                Data[GetCoordinates(3*x + 1, 3*y)] = tempPixel[1];
+                Data[GetCoordinates(3*x + 2, 3*y)] = tempPixel[2];
             }
         }
         SetColorSpace(colorSpace);
@@ -122,7 +126,7 @@ public class P6 : Pnm
             }
 
             for (var i = 0; i < Header.Height * Header.Width; i++)
-                saveFile[i + _index] = (byte)Math.Round((Data[i * 3 + c]) * 255);
+                saveFile[i + _index] = (byte)Math.Round(Data[i*3 + c] * 255);
 
             return saveFile;
         }
@@ -133,16 +137,372 @@ public class P6 : Pnm
             saveFile[i] = origFile[i];
         
         for (var i = 0; i < Header.Height * Header.Width * Header.PixelSize; i++)
-            saveFile[i + _index] = (byte)Math.Round((Data[i]) * 255 * Convert.ToInt32(_currentColorСhannel[i % 3]));
-        
+            saveFile[i + _index] = (byte)Math.Round(Data[i] * 255 * Convert.ToInt32(_currentColorСhannel[i % 3]));
+
         return saveFile;
+    }
+
+    public override void Scale(string scalingAlgorithm, int newHeight, int newWidth, double B = 0, double C = 0.5)
+    {
+        switch (scalingAlgorithm)
+        {
+            case "Closest point":
+                ClosestPointScale(newHeight, newWidth);
+                break;
+            case "Bilinear":
+                BilinearInterpolation(newHeight, newWidth);
+                break;
+            case "Lanczos3":
+                LanczosInterpolation(newHeight, newWidth);
+                break;
+            case "BC-splines":
+                BcSplinesScale(newHeight, newWidth, B, C);
+                break;
+        }
     }
 
     #endregion
 
     #region Private methods
 
+    private void BcSplinesScale(int newHeight, int newWidth, double B, double C)
+    {
+        if (newHeight == Header.Height && newWidth == Header.Width)
+        {
+            return;
+        }
+        var newData = new double[Header.PixelSize * newHeight * newWidth];
+            
+        for (var y = 0; y < newHeight; y++)
+        {
+            var gy = ((double)y) / newHeight * (Header.Height);
+            var gy0 = (int)Math.Round(gy);
+            if (gy0 == Header.Height)
+            {
+                gy0 -= 1;
+            }
+
+            var gy1 = (gy0 + 1 >= Header.Height) ? gy0 - 1 : gy0 + 1;
+
+            for (var x = 0; x < newWidth; x++)
+            {
+                var gx = ((double)x) / newWidth * (Header.Width);
+                var gx0 = (int)Math.Round(gx);
+                if (gx0 == Header.Width)
+                {
+                    gx0 -= 1;
+                }
+                var gx1 = (gx0 + 1 >= Header.Width) ? gx0 - 1 : gx0 + 1;
+
+                var d = Math.Sqrt(Math.Pow(gx - gx1, 2) + Math.Pow(gy - gy0, 2));
+                
+                // gx, gy - P
+                // gxi, gyi - P0
+                // gxi + 1, gyi - P1 -> d = math.sqrt(diffx^2 + diffy^2)
+                // gxi, gyi + 1 - P2
+                // gxi + 1, gyi + 1 - P3
+                
+                
+                var oldP1value1 = Data[GetCoordinates(3*gx0, 3*gy0)];
+                var oldP1value2 = Data[GetCoordinates(3*gx0 + 1, 3*gy0)];
+                var oldP1value3 = Data[GetCoordinates(3*gx0 + 2, 3*gy0)];
+                
+                var oldP2value1 = Data[GetCoordinates(3*gx0, 3*gy1)];
+                var oldP2value2 = Data[GetCoordinates(3*gx0 + 1, 3*gy1)];
+                var oldP2value3 = Data[GetCoordinates(3*gx0 + 2, 3*gy1)];
+                
+                var oldP3value1 = Data[GetCoordinates(3*gx1, 3*gy0)];
+                var oldP3value2 = Data[GetCoordinates(3*gx1 + 1, 3*gy0)];
+                var oldP3value3 = Data[GetCoordinates(3*gx1 + 2, 3*gy0)];
+                
+                var oldP4value1 = Data[GetCoordinates(3*gx1, 3*gy1)];
+                var oldP4value2 = Data[GetCoordinates(3*gx1 + 1, 3*gy1)];
+                var oldP4value3 = Data[GetCoordinates(3*gx1 + 2, 3*gy1)];
+
+                var newValue1 =
+                    ((-B / 6 - C) * oldP1value1 + (-3 * B / 2 - C + 2) * oldP2value1
+                                                + (3 * B / 2 + C - 2) * oldP3value1 + (B / 6 + C) * oldP4value1) *
+                    Math.Pow(d, 3)
+
+                    + ((B / 2 + 2 * C) * oldP1value1 + (2 * B + C - 3) * oldP2value1 +
+                        (-5 * B / 2 - 2 * C + 3) * oldP3value1 - C * oldP4value1) *
+                    Math.Pow(d, 2)
+
+                    + ((-B / 2 - C) * oldP1value1 + (B / 2 + C) * oldP3value1) *
+                    d
+
+                    + B / 6 * oldP1value1 + (-B / 3 + 1) * oldP2value1 + B / 6 * oldP3value1;
+                
+                var newValue2 =
+                    ((-B / 6 - C) * oldP1value2 + (-3 * B / 2 - C + 2) * oldP2value2
+                                                + (3 * B / 2 + C - 2) * oldP3value2 + (B / 6 + C) * oldP4value2) *
+                    Math.Pow(d, 3)
+
+                    + ((B / 2 + 2 * C) * oldP1value2 + (2 * B + C - 3) * oldP2value2 +
+                        (-5 * B / 2 - 2 * C + 3) * oldP3value2 - C * oldP4value2) *
+                    Math.Pow(d, 2)
+
+                    + ((-B / 2 - C) * oldP1value2 + (B / 2 + C) * oldP3value2) *
+                    d
+
+                    + B / 6 * oldP1value2 + (-B / 3 + 1) * oldP2value2 + B / 6 * oldP3value2;
+                
+                var newValue3 =
+                    ((-B / 6 - C) * oldP1value3 + (-3 * B / 2 - C + 2) * oldP2value3
+                                                + (3 * B / 2 + C - 2) * oldP3value3 + (B / 6 + C) * oldP4value3) *
+                    Math.Pow(d, 3)
+
+                    + ((B / 2 + 2 * C) * oldP1value3 + (2 * B + C - 3) * oldP2value3 +
+                        (-5 * B / 2 - 2 * C + 3) * oldP3value3 - C * oldP4value3) *
+                    Math.Pow(d, 2)
+
+                    + ((-B / 2 - C) * oldP1value3 + (B / 2 + C) * oldP3value3) *
+                    d
+
+                    + B / 6 * oldP1value3 + (-B / 3 + 1) * oldP2value3 + B / 6 * oldP3value3;
+                
+                var rndValues1 = new List<double>{
+                    oldP1value1,
+                    oldP2value1,
+                    oldP3value1,
+                    oldP4value1
+                };
+                var rndValues2 = new List<double>{
+                    oldP1value2,
+                    oldP2value2,
+                    oldP3value2,
+                    oldP4value2
+                };
+
+                var rndValues3 = new List<double>{
+                    oldP1value3,
+                    oldP2value3,
+                    oldP3value3,
+                    oldP4value3
+                };
+                
+                Random rnd = new Random();
+                newData[3 * y * newWidth + 3 * x] = newValue1 < 0 ? rndValues1[rnd.Next(0,3)] : newValue1;
+                newData[3 * y * newWidth + 3 * x + 1] = newValue2 < 0 ? rndValues2[rnd.Next(0,3)] : newValue2;
+                newData[3 * y * newWidth + 3 * x + 2] = newValue3 < 0 ? rndValues3[rnd.Next(0,3)] : newValue3;
+                if (newData[3 * y * newWidth + 3 * x] > 1)
+                {
+                    newData[3 * y * newWidth + 3 * x] = 1;
+                }
+                if (newData[3 * y * newWidth + 3 * x + 1] > 1)
+                {
+                    newData[3 * y * newWidth + 3 * x + 1] = 1;
+                }
+                if (newData[3 * y * newWidth + 3 * x + 2] > 1)
+                {
+                    newData[3 * y * newWidth + 3 * x + 2] = 1;
+                }
+            }
+        }
+        Data = newData;
+        Header.Width = newWidth;
+        Header.Height = newHeight;
+    }
+
+    private void ClosestPointScale(int newHeight, int newWidth)
+    {
+        if (newHeight == Header.Height && newWidth == Header.Width)
+        {
+            return;
+        }
+        
+        var newData = new double[Header.PixelSize * newHeight * newWidth];
+
+        for (var y = 0; y < newHeight; y++)
+        {
+            var gy = ((double)y) / newHeight * (Header.Height);
+            var gyi = (int)Math.Round(gy);
+
+            for (var x = 0; x < newWidth; x++)
+            {
+                var gx = ((double)x) / newWidth * (Header.Width);
+                var gxi = (int)Math.Round(gx);
+
+                var value1 = Data[GetCoordinates(3*Clamp(gxi, Header.Width - 1), 3*Clamp(gyi, Header.Height - 1))];
+                var value2 = Data[GetCoordinates(3*Clamp(gxi, Header.Width - 1) + 1, 3*Clamp(gyi, Header.Height - 1))];
+                var value3 = Data[GetCoordinates(3*Clamp(gxi, Header.Width - 1) + 2, 3*Clamp(gyi, Header.Height - 1))];
+
+                newData[3 * y * newWidth + 3 * x] = value1;
+                newData[3 * y * newWidth + 3 * x + 1] = value2;
+                newData[3 * y * newWidth + 3 * x + 2] = value3;
+            }
+        }
+
+        Data = newData;
+        Header.Width = newWidth;
+        Header.Height = newHeight;
+    }
+
+    private static double Lerp(double s, double e, double t)
+    {
+        return s + (e - s) * t;
+    }
+
+    private static double Blerp(double c00, double c10, double c01, double c11, double tx, double ty) {
+        return Lerp(Lerp(c00, c10, tx), Lerp(c01, c11, tx), ty);
+    }
     
+    private void BilinearInterpolation(int newHeight, int newWidth)
+    {
+        if (newHeight == Header.Height && newWidth == Header.Width)
+        {
+            return;
+        }
+        
+        var newData = new double[Header.PixelSize * newHeight * newWidth];
+        
+        double gy;
+        int gyi;
+        double gx;
+        int gxi;
+        
+        var valuePixel = new double[3];
+        var valueY = new double[2];
+        var valueX = new double[2];
+
+        for (var y = 0; y < newHeight; y++)
+        {
+            gy = (double)y / newHeight * (Header.Height);
+            gyi = (int)Math.Round(gy);
+
+            var offsetY = gy - gyi < 0 ? -1 : 0;
+
+            for (var x = 0; x < newWidth; x++)
+            {
+                gx = (double)x / newWidth * (Header.Width);
+                gxi = (int)Math.Round(gx);
+                
+                var offsetX = gx - gxi < 0 ? -1 : 0;
+
+                for (var colorChannel = 0; colorChannel < 3; colorChannel++)
+                {
+                    for (var yWindow = offsetY; yWindow < 2 + offsetY; yWindow++)
+                    {
+                        for (var xWindow = offsetX; xWindow < 2 + offsetX; xWindow++)
+                        {
+                            var value = Data[GetCoordinates(3 * Clamp((gxi + xWindow), Header.Width - 1) + colorChannel, 3 * Clamp(gyi + yWindow, Header.Height - 1))];
+                            valueX[xWindow - offsetX] = value;
+                        }
+                    
+                        valueY[yWindow - offsetY] = Lerp(valueX[0], valueX[1], gx - gxi - offsetX);
+                    }
+                    
+                    valuePixel[colorChannel] = Lerp(valueY[0], valueY[1], gy - gyi - offsetY);
+                }
+                
+                newData[3 * y * newWidth + 3 * x] = valuePixel[0] < 0 ? 0 : (valuePixel[0] > 1 ? 1 : valuePixel[0]);
+                newData[3 * y * newWidth + 3 * x + 1] = valuePixel[1] < 0 ? 0 : (valuePixel[1] > 1 ? 1 : valuePixel[1]);
+                newData[3 * y * newWidth + 3 * x + 2] = valuePixel[2] < 0 ? 0 : (valuePixel[2] > 1 ? 1 : valuePixel[2]);
+                
+            }
+        }
+
+        Data = newData;
+        Header.Width = newWidth;
+        Header.Height = newHeight;
+    }
+
+
+    public int Clamp(int x, int b)
+    {
+        if (x < 0)
+        {
+            return 0;
+        }
+        
+        return x > b ? b : x;
+    }
+
+    public double L(double x)
+    {
+        if (x == 0)
+        {
+            return 1;
+        }
+
+        if (x >= -3 && x <= 3)
+        {
+            return (3 * Math.Sin(Math.PI * x) * Math.Sin(Math.PI * x / 3)) / (Math.Pow(Math.PI, 2) * Math.Pow(x, 2));
+        }
+
+        return 0;
+    }
+
+    public double F(double[] c, double t)
+    {
+        var a = 3;
+        var ceilT = Convert.ToInt32(Math.Floor(t));
+        double ans = 0.0;
+        for (int i = 0; i < 6; i++)
+        {
+            ans += c[i] * L(t - (ceilT - a + 1 + i));
+        }
+
+        return ans;
+    }
+    
+    private void LanczosInterpolation(int newHeight, int newWidth)
+    {
+        if (newHeight == Header.Height && newWidth == Header.Width)
+        {
+            return;
+        }
+        
+        var newData = new double[Header.PixelSize * newHeight * newWidth];
+        double gy;
+        int gyi;
+        double gx;
+        int gxi;
+        
+        var valuePixel = new double[3];
+        var valueY = new double[6];
+        var valueX = new double[6];
+
+        for (var y = 0; y < newHeight; y++)
+        {
+            gy = ((double)y) / newHeight * (Header.Height - 1);
+            gyi = (int)Math.Round(gy);
+            
+            var offsetY = gy - gyi < 0 ? -1 : 0;
+
+            for (var x = 0; x < newWidth; x++)
+            {
+                gx = ((double)x) / newWidth * (Header.Width - 1);
+                gxi = (int)Math.Round(gx);
+                
+                var offsetX = gx - gxi < 0 ? -1 : 0;
+                
+                for (var colorChannel = 0; colorChannel < 3; colorChannel++){
+
+                    for (var yWindow = -2 + offsetY; yWindow < 4 + offsetY; yWindow++)
+                    {
+                        for (var xWindow = -2 + offsetX; xWindow < 4 + offsetX; xWindow++)
+                        {
+                            var value = Data[GetCoordinates(3 * Clamp((gxi + xWindow), Header.Width - 1) + colorChannel, 3 * Clamp(gyi + yWindow, Header.Height - 1))];
+                            valueX[xWindow + 2 - offsetX] = value;
+                        }
+                    
+                        valueY[yWindow + 2 - offsetY] = F(valueX, 2 + gx - gxi - offsetX);
+                    }
+                    
+                    valuePixel[colorChannel] = F(valueY, 2 + gy - gyi - offsetY);
+                }
+
+                newData[3 * y * newWidth + 3 * x] = valuePixel[0] < 0 ? 0 : (valuePixel[0] > 1 ? 1 : valuePixel[0]);
+                newData[3 * y * newWidth + 3 * x + 1] = valuePixel[1] < 0 ? 0 : (valuePixel[1] > 1 ? 1 : valuePixel[1]);
+                newData[3 * y * newWidth + 3 * x + 2] = valuePixel[2] < 0 ? 0 : (valuePixel[2] > 1 ? 1 : valuePixel[2]);
+            }
+        }
+
+        Data = newData;
+        Header.Width = newWidth;
+        Header.Height = newHeight;
+    }
 
     private void ConvertColorPixel(double[] pixel, double value1, double value2, double value3, ColorSpace colorSpace)
     {

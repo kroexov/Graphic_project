@@ -30,7 +30,7 @@
         <Grid.Styles>
             
             <Style Selector="Button">
-                <Setter Property="Width" Value="350"></Setter>
+                <Setter Property="Width" Value="300"></Setter>
                 <Setter Property="Height" Value="40"></Setter>
                 <Setter Property="FontSize" Value="20"></Setter>
                 <Setter Property="Foreground" Value="#FFFFFFFF" />
@@ -66,34 +66,25 @@
             </StackPanel>
         </StackPanel>
         
-        <StackPanel Grid.RowSpan="2" VerticalAlignment="Center">
-            <Button Content="Создать линию" Command="{Binding DrawLine}"></Button>
-            <StackPanel Orientation="Horizontal">
-            <TextBlock Name="Point1" Width="150" FontSize="20"></TextBlock>
-            <TextBlock Name="Point2" Width="150" FontSize="20"></TextBlock>
-            </StackPanel>
-            <TextBlock TextAlignment="Center" Width="300" Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Left" FontSize="20">Ширина линии</TextBlock>
-            <NumericUpDown Minimum="1" HorizontalAlignment="Left" Maximum="30" Width="300" Value="{Binding LineWidth}"></NumericUpDown>
-            <TextBlock TextAlignment="Center" Width="300" Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Left" FontSize="20">Прозрачность</TextBlock>
-            <TextBox Width="300" HorizontalAlignment="Left" Text="{Binding Opacity}"></TextBox>
-            <TextBlock TextAlignment="Center" Width="300" Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Left" FontSize="20">Выбор значений по каналам</TextBlock>
-            <StackPanel Orientation="Horizontal">
-                <TextBox Width="100" Text="{Binding FirstChannelValue}"></TextBox>
-                <TextBox Width="100" Text="{Binding SecondChannelValue}"></TextBox>
-                <TextBox Width="100" Text="{Binding ThirdChannelValue}"></TextBox>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Button Content="Посмотреть цвет" Click="Button_OnClick"/>
-                <Image Name="MyImage" HorizontalAlignment="Center" Width="20" Height="20" Source="{Binding Sample}"></Image>
-            </StackPanel>
-        </StackPanel>
-        
-        <StackPanel VerticalAlignment="Top" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
+        <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="0" Grid.RowSpan="3">
+            <TextBlock Width="400" Foreground="Orange" FontSize="20">Новый размер изображения</TextBlock>
             <DockPanel>
-                <TextBox Width="100" Text="{Binding GammaValue}"></TextBox>
-                <Button Width="300" Command="{Binding ChangeGamma}" Content="Применить фильтр"></Button>
+                <NumericUpDown Name="WidthField" Minimum="10" Width="200" Value="{Binding ImageWidth}">
+                </NumericUpDown>
+                <NumericUpDown Name="HeightField" Minimum="10" Width="200" Value="{Binding ImageHeight}"></NumericUpDown>
             </DockPanel>
-            <Button Width="400" Command="{Binding ApplyGamma}" Content="Изменить изображение по гамме"></Button>
+            <TextBlock Width="400" Foreground="Orange" FontSize="20">Смещения по осям</TextBlock>
+            <DockPanel>
+                <NumericUpDown Minimum="-500" Maximum="500" Width="200" Value="{Binding Xoffset}"></NumericUpDown>
+                <NumericUpDown Minimum="-500" Maximum="500" Width="200" Value="{Binding Yoffset}"></NumericUpDown>
+            </DockPanel>
+            <TextBlock Foreground="Orange" Margin="0 20 0 20" HorizontalAlignment="Center" FontSize="20">Способы масштабирования</TextBlock>
+            <ListBox Items="{Binding Scalings}" SelectedItem="{Binding SelectedScaling}"></ListBox>
+            <StackPanel Orientation="Horizontal">
+            <TextBox Width="100" Text="{Binding BValue}" Watermark="B"/>
+            <TextBox Width="100" Text="{Binding CValue}" Watermark="C"/>
+            </StackPanel>
+            <Button Width="400" Content="Применить масштабирование" Command="{Binding ResizeImage}"></Button> 
         </StackPanel>
         
         <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
@@ -110,15 +101,16 @@
                 MaxWidth="600">
             <StackPanel >
                 
-            <Border HorizontalAlignment="Center"
+            <Border HorizontalAlignment="Center" VerticalAlignment="Center"
                     Background="FloralWhite"
                     BorderThickness="2" 
                     BorderBrush="Black"
                     CornerRadius="3"
                     Padding="4"
-                    VerticalAlignment="Top"
+                    MaxHeight="500"
+                    MaxWidth="500"
                     Margin="0 20 0 0">
-        <views:ImageDisplay VerticalAlignment="Top" PointerPressed="OnPointerPressed" DataContext="{Binding ImageDisplayViewModel}">
+        <views:ImageDisplay  DataContext="{Binding ImageDisplayViewModel}">
         </views:ImageDisplay>
                 </Border>
         </StackPanel>
@@ -128,23 +120,14 @@
         <Popup Grid.Row="1" Grid.Column="1" IsOpen="{Binding IsErrorOccured}">
             <TextBlock Text="{Binding ErrorText}"/>
         </Popup>
-        <StackPanel VerticalAlignment="Bottom" HorizontalAlignment="Right" Grid.Row="2" Grid.Column="2">
-            <Button Content="Выбрать алгоритм дизеринга" Click="ChooseAlgorithm" ></Button>
-            <Button Name="SaveButton" Click="SaveButton_OnClick" IsEnabled="{Binding AlgChosen}" Content="Сохранить изображение" Command="{Binding SaveFile}" ></Button>
+        <StackPanel Grid.Row="2" Grid.Column="2">
+            <Button Content="Сохранить изображение" Command="{Binding SaveFile}" ></Button>
         </StackPanel>
         
         <StackPanel Grid.Row="2" Grid.Column="0">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Width="100" Background="black" FontSize="20" TextAlignment="Center">Высота</TextBlock>
-                <NumericUpDown Minimum="50" Maximum="600" Width="250" Value="{Binding Height}"></NumericUpDown>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Width="100" Background="black" FontSize="20" TextAlignment="Center">Ширина</TextBlock>
-                <NumericUpDown Minimum="50" Maximum="600" Width="250" Value="{Binding Width}"></NumericUpDown>
-            </StackPanel>
-            <Button Content="Сгенерировать градиент" Command="{Binding GenerateGradient}"></Button>
             <Button Content="Открыть изображение" Command="{Binding AddNewFile}"></Button>
         </StackPanel>
     </Grid>
+
 </Window>
 

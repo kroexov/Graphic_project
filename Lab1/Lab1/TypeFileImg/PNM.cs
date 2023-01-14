@@ -27,6 +27,8 @@ public abstract class Pnm
     public abstract void SetColorChannel(bool[] newColorChannel);
 
     public abstract byte[] SaveFile(byte[] origFile);
+    
+    public abstract void Scale(string scalingAlgorithm, int newHeight, int newWidth, double B = 0, double C = 0.5);
 
     public void SetGammaСoefficient(double newGamma)
     {

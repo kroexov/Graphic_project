@@ -58,5 +58,49 @@ public class P5 : Pnm
         return saveFile;
     }
 
+    public override void Scale(string scalingAlgorithm, int height, int width, double B = 0, double C = 0.5)
+    {
+        switch (scalingAlgorithm)
+        {
+            case "Closest point":
+                ClosestPointScale(height, width);
+                break;
+            case "Bilinear":
+                break;
+            case "Lanczos3":
+                break;
+            case "BC-splines":
+                break;
+        }
+    }
+
     #endregion
+    
+    private void ClosestPointScale(int newHeight, int newWidth)
+    {
+        var newData = new double[Header.PixelSize * newHeight * newWidth];
+
+        for (var y = 0; y < newHeight; y++)
+        {
+            var oldY = (int)Math.Ceiling(y * (double)Header.Height / newHeight);
+            if (oldY == Header.Height)
+                oldY--;
+
+            for (var x = 0; x < newWidth; x++)
+            {
+                var oldX = (int)Math.Ceiling(x * (double)Header.Width / newWidth);
+
+                if (oldX == Header.Width)
+                    oldX--;
+                
+                var value1 = Data[GetCoordinates(oldX, oldY)];
+
+                newData[y * newWidth + x] = value1;
+            }
+        }
+
+        Data = newData;
+        Header.Width = newWidth;
+        Header.Height = newHeight;
+    }
 }
