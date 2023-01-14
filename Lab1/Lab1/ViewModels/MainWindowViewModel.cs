@@ -15,7 +15,15 @@ namespace Lab1.ViewModels
     {
         #region Private fields
 
+        private string _data;
+
+        private string _currentPath;
+
+        private string _gamma = "0";
+
         private string _selectedColorSpace = "RGB";
+
+        private ObservableCollection<string> _items = new ObservableCollection<string>();
         private ObservableCollection<string> _spaces = new ObservableCollection<string>()
         {
             "RGB",
@@ -85,6 +93,15 @@ namespace Lab1.ViewModels
                 
             } 
         }
+
+        public string GammaValue
+        {
+            get => _gamma;
+            set
+            {
+                this.RaiseAndSetIfChanged(ref _gamma, value);
+            }
+        }
         
         public bool SecondChannel
         {
@@ -151,6 +168,12 @@ namespace Lab1.ViewModels
             }
         }
 
+        public string Data
+        {
+            get => _data;
+            set => this.RaiseAndSetIfChanged(ref _data, value);
+        }
+
         #endregion
 
         #region Public methods
@@ -166,7 +189,53 @@ namespace Lab1.ViewModels
             result = await ofd.ShowAsync(new Window());
             if (result != null)
             {
+                _items.Add(result.First());
+                Data = File.ReadAllText(result.First());
+                _currentPath = result.First();
                 OpenFile(result.First());
+            }
+        }
+
+        public void ChangeGamma()
+        {
+            double result;
+
+            //Try parsing in the current culture
+            if (!double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
+                //Then try in US english
+                !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
+                //Then in neutral language
+                !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+            {
+                result = 0;
+            }
+            
+            _model.AssignGamma(result);
+            var res = _model.RefreshImage();
+            if (res != string.Empty)
+            {
+                ImageDisplayViewModel.SetPath(res);
+            }
+        }
+
+        public void ApplyGamma()
+        {
+            double result;
+
+            //Try parsing in the current culture
+            if (!double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.CurrentCulture, out result) &&
+                //Then try in US english
+                !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.GetCultureInfo("en-US"), out result) &&
+                //Then in neutral language
+                !double.TryParse(_gamma, System.Globalization.NumberStyles.Any, CultureInfo.InvariantCulture, out result))
+            {
+                result = 0;
+            }
+            _model.ConvertGamma(result);
+            var res = _model.RefreshImage();
+            if (res != string.Empty)
+            {
+                ImageDisplayViewModel.SetPath(res);
             }
         }
 

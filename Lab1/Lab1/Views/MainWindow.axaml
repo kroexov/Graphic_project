@@ -66,6 +66,14 @@
             </StackPanel>
         </StackPanel>
         
+        <StackPanel VerticalAlignment="Top" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
+            <DockPanel>
+                <TextBox Width="100" Text="{Binding GammaValue}"></TextBox>
+                <Button Width="300" Command="{Binding ChangeGamma}" Content="Применить фильтр"></Button>
+            </DockPanel>
+            <Button Width="400" Command="{Binding ApplyGamma}" Content="Изменить изображение по гамме"></Button>
+        </StackPanel>
+        
         <StackPanel VerticalAlignment="Center" Grid.Row="0" Grid.Column="2" Grid.RowSpan="3">
             <TextBlock Foreground="Orange" Margin="0 0 0 10" HorizontalAlignment="Center" FontSize="20">Цветовые пространства</TextBlock>
             <ListBox Items="{Binding ColorSpaces}" SelectedItem="{Binding SelectedColorSpace}"></ListBox>

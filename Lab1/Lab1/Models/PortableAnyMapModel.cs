@@ -24,6 +24,7 @@ public class PortableAnyMapModel
     {
         var header = "";
         var lineBreakCounter = 0;
+        
         const int codeOfLineBreakChar = 10;
         _index = 0;
 
